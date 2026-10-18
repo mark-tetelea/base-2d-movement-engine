@@ -43,6 +43,7 @@ module.exports = {
   anchorBottom: 15,          // bottom-most solid row must land exactly here (the feet)
   margin: 1,                 // empty px inside the canvas
   offset: [0, 0],            // translate the finished art instead of re-deriving coordinates
+  floor: true,               // ONLY for floor tiles: they are the ground, so lint skips vanish/read-1x
   draw(b, K) { /* K is kit.js: rect, span, ellipse, roundRect, poly, grid, line, stroke,
                    ball, band, bay, rimLight, outline, rng; K.P.ramps.wood, K.P.OUTLINE */ }
 };

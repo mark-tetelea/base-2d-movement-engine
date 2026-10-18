@@ -89,8 +89,9 @@ function analyse(t) {
   // 5. Anything painted in the ground colour ON THE SILHOUETTE is the floor the
   //    sprite stands on and will simply not exist on screen (trap 66: a legal
   //    palette slot that happens to be the ground).
+  //    A floor tile (spec.floor) IS the ground, so rules 5 and 10 do not apply to it.
   const vanish = solid.filter(([x, y, c]) => c === GROUND && isEdge(x, y));
-  if (vanish.length > 2) fails.push(['vanish',
+  if (vanish.length > 2 && !spec.floor) fails.push(['vanish',
     `${vanish.length} silhouette px are ${GROUND} = the floor colour; ` +
     `they will not read. First at (${vanish[0][0]},${vanish[0][1]})`]);
 
@@ -136,7 +137,7 @@ function analyse(t) {
   const edge = solid.filter(([x, y]) => isEdge(x, y));
   const lit = edge.filter(([, , c]) => Math.abs(lum(c) - GROUND_L) > 16);
   const read = edge.length ? lit.length / edge.length : 0;
-  if (read < 0.15) warns.push(['read1x',
+  if (read < 0.15 && !spec.floor) warns.push(['read1x',
     `only ${(read * 100).toFixed(0)}% of the silhouette stands out from the floor - check it reads at 1x`]);
 
   const L = solid.map(s => lum(s[2]));

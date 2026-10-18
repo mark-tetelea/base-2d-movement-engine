@@ -202,3 +202,136 @@ hot 1).
 - Traps 71 (fixed timestep is a rational in Unity 6; a "successful" eval can still log an
   error) and 72 (an unfocused editor ignores a manifest edit for as long as it stays
   unfocused - ten minutes here).
+
+---
+
+## 2026-10-18 - Movement: the rule, the player, the test arena
+
+### Decided
+
+**Feel settings live in an asset, one per feel (`MoveFeel`: `Instant.asset`,
+`Glide.asset`).** The user's choice. Claude recommended a plain settings block on the
+component (one caller today; "no config systems until three callers").
+- **Why (the user's pick):** values tuned during play mode are kept afterwards, and
+  several movers can share one feel.
+- **Shape:** the asset only holds a plain `MoveSettings` struct, and the rule takes the
+  struct, never the asset. Tests, editor previews and boosts make or copy a struct
+  without touching an asset.
+- **Consequence:** this one asset type is the user's explicit exception to "no
+  ScriptableObject config systems". It is not a config system; nothing else gets an
+  asset because movement has one.
+
+**The feel knobs are speed (tiles/s), time to full speed (s) and time to stop (s); 0 is
+instant.** Times are what a designer tunes by feel; the rule derives the rates
+(speed / time). Velocity moves in a straight line toward its target (`MoveTowards`), so a
+full reversal takes twice the time to full speed, and a 90-degree turn dips in speed
+part-way. Starting values, not tuned: Instant 6 / 0 / 0, Glide 6 / 0.4 / 0.8.
+
+**The player reads its current velocity back from the Rigidbody2D every step.**
+- **Why:** after a physics step the body has already lost whatever a wall took, so
+  pushing into a wall builds nothing up and turning away from it is immediate. A
+  velocity kept in a field would keep pushing into the wall and make the player stick.
+
+**How boosts, slowdowns and knockback will push (designed, not built - no caller yet):**
+- **Boosts and slowdowns:** pass `Movement.Step` a copy of the settings with a scaled
+  speed. The times stay the same, so acceleration scales too; speed 0 stops at once
+  (guarded in the rule). If a game wants fixed acceleration under a boost, add a
+  target-only multiplier then.
+- **Knockback and recoil:** their own velocity, decayed by the knockback rule (Decision 2's
+  "damage and knockback: one function"), added to the body after `Step`. Not pushed into
+  `Step`'s velocity: an Instant feel would cancel it in one step. When it lands, the
+  player reads its move velocity back as body velocity minus the push.
+
+**The input latch keeps a NEW direction until a step uses it; a held key is not
+latched.**
+- **Why:** a tap seen by one frame still moves (Decision 1), but a release is never
+  delayed. The obvious latch ("last non-zero direction since the last step") adds one
+  extra step after every release at high frame rates - a frame-rate difference, the
+  thing Decision 1 exists to prevent.
+
+**Keys are read straight from `Keyboard.current` (WASD and arrows), not the template's
+`InputSystem_Actions` asset.** That asset also binds gamepads and joysticks, and the kit
+has no gamepad. Keys are read by physical position, so AZERTY works.
+
+**Pixel Perfect Camera: Pixel Snapping, Windowbox.** The usual pixel-art pair: Windowbox
+shows exactly 640x360 at any window size (bars where the scale is not whole - WXGA);
+Pixel Snapping leaves post-processing and UI usable, which Upscale Render Texture does
+not. Not yet looked at on WXGA (trap 32's test).
+
+**Kit code lives in the `TopDownKit` namespace;** test-arena-only code in
+`TopDownKit.TestArena`, so games built on the kit do not collide with it.
+
+**Player collider:** a circle of radius 0.375 (6 px, the drawn body's width) at the feet,
+with a frictionless material so sliding along a wall does not drag.
+
+### Built
+
+- `Assets/Scripts/Movement/MoveSettings.cs` - the feel, as a struct (tiles and seconds).
+- `Assets/Scripts/Movement/Movement.cs` - the one rule:
+  `Step(velocity, moveDirection, settings, dt)`. Cuts direction length to 1 (diagonals),
+  reads no time, input or scene.
+- `Assets/Scripts/Movement/MoveFeel.cs` - the asset wrapping the struct.
+- `Assets/Scripts/Movement/PlayerMover.cs` - keys to a direction in `Update`, the latch,
+  `Step` in `FixedUpdate` on the Rigidbody2D, reading the feel every step.
+- `Assets/Scripts/TestArena/FeelKeys.cs` - test arena only: keys 1-9 swap the feel, and a
+  top-left label names it (IMGUI, a dev overlay - not the kit's UI).
+- `Assets/Data/Movement/` - `Instant.asset`, `Glide.asset`, `NoFriction.physicsMaterial2D`.
+- `Assets/Scenes/TestArena.unity` - from the URP 2D template (camera, global light).
+  Pixel Perfect Camera 640x360 / 16 PPU, background `steel-0` (the void). A `Grid` with a
+  floor tilemap and a wall tilemap (TilemapCollider2D merged into a static
+  CompositeCollider2D, polygons): a wall ring at the screen edge, a 2x2 pillar, a 6-tile
+  bar, a single block, four diagonal steps and a one-tile corridor. Row y = 0 and column
+  x = 0 are kept clear for measuring. Player starts at (0, -2) on Instant.
+- Art (pxkit): `floor`, `wall`, `player` (one direction, facing the camera) in
+  `Tools/pxkit/sprites/`, exported to `Assets/Art/Generated/`; tiles in
+  `Assets/Art/Generated/Tiles/` (wall collider type Grid).
+- `Tools/pxkit/lint.js`: a sprite spec may say `floor: true` - a floor tile IS the ground,
+  so the vanish and read-at-1x rules skip it.
+- `Tools/measure/` - the first measuring harness (CLAUDE.md said: the first time a number
+  is needed). `movement.cs` runs through `eval_file` in play mode: a virtual keyboard fed
+  with queued key events (the real `PlayerMover` key path), and a recorder appended to the
+  FixedUpdate player loop that logs the body after every fixed step. It changes input
+  routing, vsync and the frame cap for the run and restores them (read back afterwards).
+  `analyse-movement.js` prints the results.
+
+### Measured / verified
+
+- **Compiles:** 0 errors, 0 warnings in the Unity console, after building and after
+  every play session.
+- **Imports read back:** PPU 16, Point, uncompressed, no mips; tiles 1x1 world units, the
+  player 1x1.5 with its pivot at (8, 0) px - bottom-centre.
+- **Pixel Perfect Camera read back through `SerializedObject`** (trap 30): `m_CropFrame`
+  Windowbox, `m_GridSnapping` PixelSnapping, 16 PPU, 640x360.
+- **Decision 1's promise - distance per second is the same at 30 and 144 fps.** 16 runs,
+  in two passes of the harness (a scratch copy, then the saved `Tools/measure/movement.cs`):
+  Instant and Glide, each at 30 and 144 fps, four times each, holding D for 2 s through the
+  real key path. Frame rates measured 30.0 and 142.4-144.1.
+  - First second after the first moving step: Instant 6.0000 tiles in all 8 runs, Glide
+    4.8500 in all 8 (the rule predicts both exactly).
+  - Steady speed 6.0000 tiles/s on the game clock in all 16 runs; 5.82-6.04 on the wall
+    clock (editor frame-timing jitter; the game clock is what the step uses).
+  - The first 120 moving steps (2 s) match step for step: maximum difference **0** between
+    any two runs of the same feel, across frame rates, in both passes.
+  - Glide stops in 2.35 tiles at both frame rates, all 8 runs.
+  - Two of the four Instant runs at 144 fps moved 121 steps; every other Instant run moved
+    120. The scripted release landed just after a step boundary. A held key's length is only resolved to one
+    step (16.7 ms) - input timing, not the movement depending on frame rate.
+- **8 directions (two runs, Instant, 60 fps):** all eight at speed 6.0000, at exactly
+  0 / 45 / 90 / 135 / 180 degrees and their negatives; diagonals (4.243, 4.243).
+- **The latch (two runs, ~144 fps, Instant):** 10 taps per run, each visible to exactly
+  one frame; 20 of 20 moved exactly one step (first run's final x 1.0000001 = 10 x 0.1).
+- **Walls (two runs per feel, 60 fps):** holding A into the left wall stops the player at
+  x = -18.62 (wall face -19 + radius 0.375, less Unity's 0.005 contact gap), with velocity
+  reading 0 while pushing. Holding W+A diagonally into the wall slides along it at
+  **4.243 tiles/s** - only the along-wall part of the diagonal - with both feels.
+- **Not judged - waiting on the user:** how Instant and Glide feel, and whether a wall
+  slide should keep the full 6 tiles/s. Those are a playtest.
+
+### Found
+
+- Traps 73-76: assets loaded before `OpenScene(Single)` in the same script come back
+  fake-null (tiles painted nothing); a script-painted tilemap collider stays empty until
+  toggled and the scene saves it empty; decimal commas from this editor's locale;
+  `capture_game_view --save_path` writes under `Assets/`.
+- `eval` / `eval_file` compile the code as a method body: no `using` lines (write names
+  in full), and `Object` is ambiguous (write `UnityEngine.Object`).

@@ -58,12 +58,28 @@ What the player meets, in order:
   the kit.** Why: the kit proves systems; real art belongs to each game. (LOG, 2026-10-18)
 - **The kit has no score and no world-origin rule.** Why: each game decides its own; aim
   comes straight from the mouse, so nothing infers "forward". (LOG, 2026-10-18)
+- **Movement feel lives in a `MoveFeel` asset, one per feel (Instant, Glide); the asset
+  only wraps a plain `MoveSettings` struct, and the rule takes the struct.** The user's
+  choice: play-mode tuning is kept and movers share feels. An exception for movement
+  feel, not a config system. (LOG, 2026-10-18)
 
 ## What exists
 
-No game code yet: the Unity URP 2D template (`Assets/Scenes/SampleScene.unity`, URP
-settings in `Assets/Settings/`).
+Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
+`SampleScene.unity` is the template's empty scene). Kit code is in namespace `TopDownKit`.
 
+- `Assets/Scripts/Movement/` - `Movement.Step(velocity, moveDirection, settings, dt)` is the
+  one movement rule; `MoveSettings` (speed in tiles/s, time to full speed, time to stop;
+  0 = instant), `MoveFeel` (the asset), `PlayerMover` (keys -> direction in `Update`,
+  latched until a step uses it; `Step` in `FixedUpdate` on an interpolated Rigidbody2D,
+  reading the body's velocity back so walls take speed away).
+- `Assets/Data/Movement/` - `Instant.asset`, `Glide.asset`, `NoFriction` (player collider).
+- `Assets/Scenes/TestArena.unity` - Pixel Perfect Camera 640x360 / 16 PPU, Pixel Snapping,
+  Windowbox; floor and wall tilemaps (walls: one merged collider, trap 74); the player.
+  Keys 1-9 swap the feel (`Assets/Scripts/TestArena/FeelKeys.cs`, test arena only).
+- `Tools/measure/` - measuring harness: `movement.cs` (run with `eval_file` in play mode;
+  drives the real key path through a virtual keyboard, logs every fixed step) and
+  `analyse-movement.js`. Re-run it after any change to movement.
 - `Assets/Art/Palette/endesga-32.gpl` - the one palette; pxkit and Aseprite both load it.
   Never written by a script that also reads it (trap 70).
 - `Assets/Art/PixelSprite16.preset` - import default for PNGs under `Assets/Art/**`.
@@ -80,12 +96,12 @@ settings in `Assets/Settings/`).
 - **Saving** - not in the kit's list. Comes off when a game needs it; read traps 46-50
   first.
 - **Managers, event bus, ScriptableObject config systems, custom pooling frameworks** -
-  until three real callers exist (see How we work).
+  until three real callers exist (see How we work). `MoveFeel` is the user's one exception.
 
 ## Traps
 
 > One line each: symptom -> rule. The full story is in `Docs/TRAPS.md` under the same
-> number. Add the day a trap is found; next free number is **73**.
+> number. Add the day a trap is found; next free number is **77**.
 
 **The editor lies about your own edits**
 1. Code right, game wrong -> a changed `[SerializeField]` default does not change a scene that already saved it; edit the scene in edit mode and save.
@@ -182,6 +198,10 @@ settings in `Assets/Settings/`).
 **Found in this project**
 71. Fixed timestep write "succeeds", changes nothing -> it is a rational in Unity 6; set `Fixed Timestep.m_Count` (2352000 = 60 Hz). Check `console_status` errors after any settings write.
 72. Manifest edited, nothing happens for minutes -> an unfocused editor ignores disk changes; ask the user to click its window.
+73. Script-painted tilemap is empty -> `OpenScene(Single)` unloads assets loaded before it; open the scene first, then load assets.
+74. Wall tilemap has no collision -> toggle the TilemapCollider2D after painting, read shapes next call, then save.
+75. Numbers split across CSV columns -> this editor writes decimal commas; use `CultureInfo.InvariantCulture`.
+76. `capture_game_view --save_path` made an asset -> it writes under `Assets/`; copy out and `DeleteAsset` the folder.
 
 ## Environment
 
@@ -222,9 +242,11 @@ settings in `Assets/Settings/`).
 - **pxkit** (`Tools/pxkit`, code-drawn sprites; `.claude/skills/draw-sprite`) reads the
   palette `Assets/Art/Palette/endesga-32.gpl`. Checked end to end 2026-10-18. Art rules:
   `ART.md`; drawing list: `TO-DRAW.md`.
-- **Not set up yet, on purpose:** the Pixel Perfect Camera (with the first scene), an unlit
-  URP material for LineRenderers (with the first LineRenderer - the default renders magenta
-  under URP), a measuring harness (the first time a number is needed, `Docs/MEASURING.md`).
+- **`eval` / `eval_file` compile code as a method body:** no `using` lines (write names in
+  full), and `Object` is ambiguous (write `UnityEngine.Object`). Number output uses decimal
+  commas unless told otherwise (trap 75).
+- **Not set up yet, on purpose:** an unlit URP material for LineRenderers (with the first
+  LineRenderer - the default renders magenta under URP).
 
 ## Which file wins
 

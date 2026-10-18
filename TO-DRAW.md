@@ -6,9 +6,9 @@
 
 | Sprite | Canvas | Feet / pivot | Ramps | Who | Done |
 |---|---|---|---|---|---|
-| Floor tile (test arena) | 16x16 | tile | steel | Claude | no |
-| Wall tile | 16x16 | tile | steel | Claude | no |
-| Player, 8 directions, idle + walk | 16x24 | bottom-centre | blue, skin, steel | Claude | no |
+| Floor tile (test arena) | 16x16 | tile | steel | Claude | yes - `floor.js` (2026-10-18) |
+| Wall tile | 16x16 | tile | steel | Claude | yes - `wall.js` (2026-10-18) |
+| Player, 8 directions, idle + walk | 16x24 | bottom-centre | blue, skin, steel | Claude | 1 of 8: facing the camera, idle (`player.js`) |
 | Enemy | 16x16 | bottom-centre | plum, steel | Claude | no |
 | NPC | 16x24 | bottom-centre | green, skin, steel | Claude | no |
 | Chest, closed + open | 16x16 | bottom-centre | wood, steel | Claude | no |

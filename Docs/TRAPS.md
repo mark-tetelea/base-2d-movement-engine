@@ -524,4 +524,40 @@ connected, only the user clicking the editor window makes it notice disk changes
 that click straight away rather than waiting. Once connected, `AssetDatabase.Refresh()`
 through `eval` does it (then read results in the NEXT call, trap 42's shape).
 
-(next number is 73)
+**73. A script paints a tilemap, reports success, and the tilemap is empty.** Found
+2026-10-18 building the test arena. One editor script made the Tile and MoveFeel assets,
+then `EditorSceneManager.OpenScene(path, Single)`, then painted with `SetTile` and assigned
+the feels to fields, then saved. The scene file had the feel references right, the
+tilemaps had 0 tiles, and in memory the feel fields read null. **Cause:** opening a scene
+in Single mode unloads assets nothing in the new scene uses, so every asset reference the
+script held from before the call became Unity's fake null. Assigning one to a serialised
+field still saved correctly (by its ID), which hid the problem; `SetTile` with it painted
+nothing and said nothing. **Rule:** open the scene first, then load or make the assets the
+script uses - or reload them with `AssetDatabase.LoadAssetAtPath` after the open. Count the
+painted cells afterwards.
+
+**74. A wall tilemap painted from a script has no collision, even in play mode.** Found
+2026-10-18. Walls tilemap with `TilemapCollider2D` (composite operation Merge), a static
+Rigidbody2D and a `CompositeCollider2D`: the tiles were there (145 cells, collider type
+Grid), but the composite had 0 paths, `Physics2D.OverlapPoint` on a wall hit nothing, and
+`ProcessTilemapChanges()` + `GenerateGeometry()` changed nothing. The composite had been
+built while the tilemap was still empty and was SAVED that way, and play mode loaded the
+saved empty paths. **Rule:** after painting from a script, toggle the TilemapCollider2D
+(`enabled = false; enabled = true`), read `pathCount` / `shapeCount` in the NEXT call
+(trap 42's shape; trap 43 is the same "toggle it" fix for lights), then save the scene.
+Check one wall point with `OverlapPoint` in play mode.
+
+**75. Every number in a CSV written from `eval` splits into two columns.** Found
+2026-10-18. This editor's locale writes decimals with a comma (`34,4833336`), so a CSV
+built with `ToString()` had whole numbers in one column and decimals in two, and the
+analysis read garbage. **Rule:** format numbers with
+`System.Globalization.CultureInfo.InvariantCulture` in anything a tool will read back.
+`Tools/measure/movement.cs` does.
+
+**76. `capture_game_view --save_path Temp/x.png` creates an asset.** Found 2026-10-18.
+The path is taken relative to `Assets/`, so the capture landed at `Assets/Temp/x.png` with
+a `.meta`, and a path outside the project is refused outright. **Rule:** copy the file out
+and delete the folder with `AssetDatabase.DeleteAsset` (never leave it for git), or read
+the inline image instead of saving.
+
+(next number is 77)
