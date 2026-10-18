@@ -1,12 +1,16 @@
 # Where the kit is now
 
-> Rewritten, never appended. True as of **2026-10-18**.
+> Rewritten, never appended. True as of **2026-10-18**, end of the kickoff.
 
 ## How it plays
 
-It does not play yet. The project is the empty Unity URP 2D template: one empty scene
-(`Assets/Scenes/SampleScene.unity`), no scripts, no art. The day-one decisions are made
-and written in `CLAUDE.md`; their arguments are in `Docs/LOG.md` (2026-10-18).
+It does not play yet. There is no game code and no art: the project is the Unity URP 2D
+template (`Assets/Scenes/SampleScene.unity`, empty) plus the environment. The day-one
+decisions are in `CLAUDE.md`, their arguments in `Docs/LOG.md` (2026-10-18).
+
+Ready to use: the `unity` command line (port 7801), a 60 Hz fixed step in project settings,
+the Full HD Game view, the Endesga 32 palette, pxkit for code-drawn sprites, and an import
+preset that makes any PNG under `Assets/Art` a 16 PPU pixel sprite.
 
 ## What the kit will have (the user's list, in the order to build it)
 
@@ -27,13 +31,15 @@ None yet.
 
 ## What is not done
 
-- Everything in the list above.
-- Environment setup still in progress on 2026-10-18 - see `Docs/NEXT.md`.
+- Everything in the list above, and every placeholder in `TO-DRAW.md`.
+- A test-arena scene with the Pixel Perfect Camera at 640x360 (comes with movement).
+- **Open question for when movement is built:** where the feel settings live - a plain
+  serialisable settings class on the component, or one settings asset with presets such as
+  "instant" and "glide". The design test says feel is a setting; it does not yet say what
+  shape the setting takes.
 - **Open question for when shooting is built:** "reused bullets" (the user's spec) against
-  the working agreement's "no pooling no measurement asked for". Likely answer: Unity's
-  built-in `UnityEngine.Pool.ObjectPool<T>` (no custom framework), justified by a stress
-  measurement - mobile is a target, and allocation spikes there are real. Ask then.
-- **Open question for when movement is built:** where the feel settings live (a plain
-  serialisable settings class on the component, or one settings asset with presets like
-  "instant" and "glide"). The design test says feel is a setting; it does not yet say
-  what shape the setting takes.
+  the working agreement's "no pooling that no measurement asked for". Likely answer:
+  Unity's built-in `UnityEngine.Pool.ObjectPool<T>` (no custom framework), justified by a
+  stress measurement - mobile is a target, and allocation spikes there are real. Ask then.
+- **Open question for the facing work:** 8-direction art as eight drawings, or five with
+  mirroring.

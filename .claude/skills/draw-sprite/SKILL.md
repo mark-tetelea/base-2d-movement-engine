@@ -64,8 +64,9 @@ before the first one has been looked at in the game.
     node Tools/pxkit/export.js <id> --dir Assets/Art/Generated
     node Tools/pxkit/export.js <id> --swap plum:green,blue
 
-A new PNG in `Assets/` needs its import settings set once and **read back**: PPU 16, Point,
-Compression None, no mipmaps, pivot per `ART.md` rule 7 (traps 57-59, 45).
+A new PNG under `Assets/Art/` gets PPU 16, Point, Uncompressed, no mips from the import
+preset on its first import - **read it back** anyway, and set the pivot per `ART.md` rule 7
+(bottom-centre for things with feet) by hand (traps 57-59, 45).
 
 ## When the user wants to draw it
 

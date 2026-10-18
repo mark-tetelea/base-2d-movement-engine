@@ -135,3 +135,70 @@ optional add-on piece. Never 'if this game, do X' inside the core."*
 - `Docs/TRAPS.md`: the kit's 24 traps plus 46 carried from Jewelery Shop's `CLAUDE.md`
   (its 25-76, renumbered 25-70 with "(JS nn)" tags). Left out as game-specific: JS 63, 67,
   71, 74, 76; JS 66 folded into 50.
+
+## 2026-10-18 - Environment: unity command line, drawing, import preset
+
+### Decided
+
+**Palette for the kit's placeholders: Endesga 32** (lospec.com, free), stored as
+`Assets/Art/Palette/endesga-32.gpl` with slot 0 reserved see-through and the 32 colours
+ordered into named ramps (steel 7, wood 5, skin 2, rust 2, fire 5, green 4, blue 3, plum 3,
+hot 1).
+- **Why:** pxkit checks every sprite against one palette file, and Jewelery Shop's
+  Mezzanine palette is that game's own. Endesga 32 is common for top-down pixel games and
+  its ramps cover a player, chest, coin, bullets and floor. Chosen over Resurrect 64 (more
+  shades than placeholders need) and PICO-8 (16 colours, very limiting).
+- **Consequence:** each real game swaps in its own palette; pxkit reads whatever `.gpl`
+  `palette.js` points at. The ramp names are load-bearing (pxkit recovers ramps from them).
+
+**The test-arena floor is `steel-2`; `steel-0` is the void and the outline colour.**
+- **Why:** pxkit's "vanish" rule needs one ground colour to test silhouettes against. In a
+  top-down game sprites stand on the floor, not on a dark screen as in Jewelery Shop. Picked
+  by Claude as a starting point, not discussed - change it in `palette.js` and `ART.md`
+  together if the arena floor changes.
+
+**PNG import settings as a Preset Manager default, not per-file edits.**
+- **Why:** every placeholder Claude exports would otherwise need a per-file settings call
+  (and the CLI's 5 s limit makes bulk reimports fail, trap 26). A preset filtered to
+  `Assets/Art/**` sets them on first import with nothing to remember.
+- **Consequence:** it does not change files already imported, does not set pivots, and does
+  not cover `.aseprite` files (different importer).
+
+### Built
+
+- `com.unity.pipeline` 0.7.0-exp.1 in `Packages/manifest.json`; the `unity` command line
+  connects on port 7801 (Jewelery Shop, also open, holds 7800). Autotick 200 ms.
+- `ProjectSettings/TimeManager.asset`: fixed timestep 1/60 (Decision 1 applied).
+- Game view set to the built-in Full HD (1920x1080) size.
+- `Tools/pxkit` copied from Jewelery Shop and cut down: kept png, kit (minus bench, night
+  sky, rock face, stone, glitter), lint (minus "warm means lit" and "items out-shine
+  furniture"; read-1x now counts darker edges as readable), review, export, aseprite,
+  template; new `palette.js` on the Endesga file. Left behind: sprites, people kit,
+  drawings, recolour tables, C# palette writer.
+- `.claude/skills/draw-sprite/` rewritten for this kit. `ART.md`, `TO-DRAW.md` (12
+  placeholder rows, canvases marked as proposals).
+- `Assets/Art/PixelSprite16.preset` + `ProjectSettings/PresetManager.asset` default.
+
+### Measured / verified
+
+- **Which editor answers:** `eval` returning `Application.dataPath` gave this project's path,
+  both with `--project-path` and auto-detected from the project folder. One check each.
+- **Build target** reads `StandaloneWindows64`. **`activeInputHandler: 1`** (Input System
+  only) read from ProjectSettings.
+- **Fixed timestep:** `Time.fixedDeltaTime` read back 0.0166666675 (= `1f/60f`), and the
+  file holds `m_Count: 2352000` over 141120000. The first attempt silently failed (trap 71).
+- **pxkit end to end, one run each:** `lint` on a code sprite and on its exported PNG
+  (clean); `review` (8x for ~21 tokens); `export --swap fire:blue`; `template.js` made an
+  `.aseprite` that read back as 16x16, Indexed, 33 palette colours with slot 1 = `#181425`
+  and slot 32 = `#ff0044`, guide layer hidden. Throwaway files deleted.
+- **Import preset:** a PNG imported after the preset existed read back PPU 16, Point,
+  Uncompressed, no mips, rect 16x16, world size 1.0. A PNG imported before it kept Unity's
+  defaults (PPU 100, Bilinear, Compressed) - presets apply on first import only. One file
+  each. Throwaway files deleted.
+- Console after setup: 0 errors once the trap-71 error was cleared.
+
+### Found
+
+- Traps 71 (fixed timestep is a rational in Unity 6; a "successful" eval can still log an
+  error) and 72 (an unfocused editor ignores a manifest edit for as long as it stays
+  unfocused - ten minutes here).

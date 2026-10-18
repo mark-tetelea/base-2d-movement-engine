@@ -53,12 +53,17 @@ Slot 0 (`#ff00ff`, "see-through") is reserved and never painted (trap 62).
 
 ## Unity import settings
 
-Set once per file and **checked by reading them back**, never assumed (traps 57, 58, 59):
 Pixels Per Unit **16**, Filter **Point**, Compression **None**, **no mipmaps**, pivot as
-rule 7. For `.aseprite` files, set them through the importer's public properties
-(`spritePixelsPerUnit`, `filterMode`, `mipmapEnabled`, `SetImporterPlatformSettings`).
+rule 7. **Checked by reading them back**, never assumed (traps 57, 58, 59).
 
-*Not yet set up in Unity (2026-10-18): waiting on the `unity` command line connection.*
+- **PNGs:** automatic. `Assets/Art/PixelSprite16.preset` is the Preset Manager default for
+  textures under `Assets/Art/**` (Single sprite, Clamp, alpha is transparency, plus the
+  above). Verified 2026-10-18 on a fresh PNG: PPU 16, Point, Uncompressed, 16x16 px = 1.0
+  world unit. It applies on a file's **first** import only; it does not touch files already
+  imported, and it does not set the pivot - set bottom-centre per file for things with feet.
+- **`.aseprite` files:** the preset is a TextureImporter preset and does not cover them. Set
+  them through the importer's public properties (`spritePixelsPerUnit`, `filterMode`,
+  `mipmapEnabled`, `SetImporterPlatformSettings`) and read back (trap 57).
 
 ## Templates
 

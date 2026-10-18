@@ -502,4 +502,26 @@ table is not a pipeline - break after the first match.
 
 # Found in this project
 
-(none yet - next number is 71)
+**71. Setting the fixed timestep from code reports success and changes nothing.** Found
+2026-10-18, applying Decision 1. `SerializedObject` on `ProjectSettings/TimeManager.asset`,
+`FindProperty("Fixed Timestep").floatValue = 1f/60f`, apply, save: `unity command eval`
+returned `success: true`, `Time.fixedDeltaTime` still read 0.02 and the file still said
+0.02. The only sign was one error in the **Unity console** ("type is not a supported float
+value") - nothing in the eval's own result. **Cause:** in Unity 6 `Fixed Timestep` is a
+rational, not a float: `m_Count` over `m_Rate.m_Numerator / m_Rate.m_Denominator`
+(141120000 / 1). **Rule:** set `Fixed Timestep.m_Count` (141120000 / 60 = **2352000** for
+60 Hz) and read back both `Time.fixedDeltaTime` and the file. More generally: **an eval
+that "succeeds" can still have logged an error - check `console_status` error counts after
+any settings write**, and walk a property's children before writing a value whose type you
+have not seen (trap 30 is the same shape).
+
+**72. The manifest was edited and nothing happened for ten minutes.** Found 2026-10-18:
+`com.unity.pipeline` was added to `Packages/manifest.json` while the editor sat in the
+background behind another project's window. No package resolve, no import, no `.meta` for
+new files under `Assets/` - the editor does not look at the disk while unfocused. One click
+on its window and it resolved within seconds. **Rule:** before the command line is
+connected, only the user clicking the editor window makes it notice disk changes - ask for
+that click straight away rather than waiting. Once connected, `AssetDatabase.Refresh()`
+through `eval` does it (then read results in the NEXT call, trap 42's shape).
+
+(next number is 73)

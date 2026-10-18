@@ -61,8 +61,15 @@ What the player meets, in order:
 
 ## What exists
 
-Nothing yet: the empty Unity URP 2D template (`Assets/Scenes/SampleScene.unity`, URP
+No game code yet: the Unity URP 2D template (`Assets/Scenes/SampleScene.unity`, URP
 settings in `Assets/Settings/`).
+
+- `Assets/Art/Palette/endesga-32.gpl` - the one palette; pxkit and Aseprite both load it.
+  Never written by a script that also reads it (trap 70).
+- `Assets/Art/PixelSprite16.preset` - import default for PNGs under `Assets/Art/**`.
+  Not a place for per-sprite settings (pivots are set per file).
+- `Tools/pxkit/` - code-drawn sprites (`README.md` there). Must not grow game-specific
+  helpers: a drawing used once belongs in its sprite file.
 
 ## Do NOT build yet
 
@@ -78,7 +85,7 @@ settings in `Assets/Settings/`).
 ## Traps
 
 > One line each: symptom -> rule. The full story is in `Docs/TRAPS.md` under the same
-> number. Add the day a trap is found; next free number is **71**.
+> number. Add the day a trap is found; next free number is **73**.
 
 **The editor lies about your own edits**
 1. Code right, game wrong -> a changed `[SerializeField]` default does not change a scene that already saved it; edit the scene in edit mode and save.
@@ -172,20 +179,36 @@ settings in `Assets/Settings/`).
 69. Nearest-colour remap flattens art -> pin big areas by role first.
 70. Migration does a third of the job -> never read from the path you write; a substitution table is not a pipeline.
 
+**Found in this project**
+71. Fixed timestep write "succeeds", changes nothing -> it is a rational in Unity 6; set `Fixed Timestep.m_Count` (2352000 = 60 Hz). Check `console_status` errors after any settings write.
+72. Manifest edited, nothing happens for minutes -> an unfocused editor ignores disk changes; ask the user to click its window.
+
 ## Environment
 
-- **Unity 6000.3.23f1**, 2D, **URP 17.3.0** (2D Renderer). Build target **Windows PC**,
-  landscape 16:9 (1920x1080), keyboard + mouse, no gamepad. Android and iOS later.
+- **Unity 6000.3.23f1**, 2D, **URP 17.3.0** (2D Renderer). Build target **Windows PC**
+  (`StandaloneWindows64`, read back 2026-10-18), landscape 16:9, keyboard + mouse, no
+  gamepad. Android and iOS later.
+- **Fixed timestep is 1/60** in `ProjectSettings/TimeManager.asset` (`m_Count` 2352000 of
+  141120000; `Time.fixedDeltaTime` read back 0.0166666675). Trap 71.
+- **Game view** is on Unity's built-in "Full HD (1920x1080)" size. "WXGA (1366x768)" is
+  also built in - the size where 640x360 does NOT scale by a whole number (trap 32's test).
 - **Repo root is this folder** (`Base_2D_movement_engine`), branch `main`. Open this folder
   in Claude Code, not its parent, so this file loads.
 - **Input System only** (`activeInputHandler: 1`, read from ProjectSettings 2026-10-18). The
   old `Input.GetMouseButtonDown` throws at runtime.
 - `com.unity.2d.aseprite` 3.0.2 and `com.unity.2d.psdimporter` 12.0.2 come with the
   template, so `.aseprite` and layered `.psd` import directly.
-- **Editor driven by the `unity` command line** through `com.unity.pipeline` (0.7.0-exp.1),
-  port 7800 for the first open project - **not** MCP for Unity on `127.0.0.1:8080` (Orbit's
-  setup; returns ConnectionRefused forever here). Check with `unity status` -> `ready`.
-  Autotick on, or `eval` times out (trap 25). *Connection not yet verified - see NEXT.*
+- **Editor driven by the `unity` command line** through `com.unity.pipeline` (0.7.0-exp.1) -
+  **not** MCP for Unity on `127.0.0.1:8080` (Orbit's setup; ConnectionRefused forever here).
+  Check with `unity status` -> `ready`. Ports go by opening order: with Jewelery Shop open
+  too, it holds **7800 and this project is 7801**. Run `unity command ...` from this folder
+  (the project is auto-detected - verified by `eval` returning this `dataPath`) or pass
+  `--project-path`. **Check which project answered before any write** when both are open.
+  Autotick is on (200 ms), or `eval` times out (trap 25). Connected 2026-10-18.
+- **Pixel-art import preset:** `Assets/Art/PixelSprite16.preset` is the Preset Manager
+  default for every texture under `Assets/Art/**` - PPU 16, Point, Uncompressed, no mips,
+  Single sprite, Clamp. Verified on a fresh PNG: 16x16 px = 1.0 world unit. It applies only
+  on a file's FIRST import; files already in `Assets/Art` are not changed by it.
 - **A C# compile error boots Unity into Safe Mode and the command line cannot connect at
   all.** Fix the compile error; never hand-edit scene files instead.
 - `set_player_settings` silently ignores fields it does not know - check `applied` in its
@@ -196,6 +219,12 @@ settings in `Assets/Settings/`).
   results to a file. Never script an edit to a file open in Aseprite.
 - `D:\package.json` is broken JSON: any Node tool under `D:\` needs its own `package.json`
   (trap 55).
+- **pxkit** (`Tools/pxkit`, code-drawn sprites; `.claude/skills/draw-sprite`) reads the
+  palette `Assets/Art/Palette/endesga-32.gpl`. Checked end to end 2026-10-18. Art rules:
+  `ART.md`; drawing list: `TO-DRAW.md`.
+- **Not set up yet, on purpose:** the Pixel Perfect Camera (with the first scene), an unlit
+  URP material for LineRenderers (with the first LineRenderer - the default renders magenta
+  under URP), a measuring harness (the first time a number is needed, `Docs/MEASURING.md`).
 
 ## Which file wins
 
