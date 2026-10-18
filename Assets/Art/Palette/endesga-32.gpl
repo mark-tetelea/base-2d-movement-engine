@@ -1,0 +1,44 @@
+GIMP Palette
+Name: Base 2D kit - Endesga 32
+Columns: 8
+# Endesga 32 by Endesga (lospec.com/palette-list/endesga-32), chosen 2026-10-18 for the kit's
+#   placeholder art. Each game built on the kit swaps in its own palette.
+# Slot 0 is SEE-THROUGH. Never paint with it (Aseprite Indexed index 0 erases - trap 62).
+# Slots are grouped into ramps by name (ramp-N, dark to light). pxkit reads the ramps from these
+#   names, so a renamed slot is a moved ramp. Load THIS file in Aseprite, not Aseprite's built-in
+#   Endesga 32 preset: same colours, different slot order (trap 61).
+# The floor of the test arena is steel-2; steel-0 is the void outside it and the outline colour.
+# Ramps: steel(7), wood(5), skin(2), rust(2), fire(5), green(4), blue(3), plum(3), hot(1)
+255   0 255	see-through
+ 24  20  37	steel-0
+ 38  43  68	steel-1
+ 58  68 102	steel-2
+ 90 105 136	steel-3
+139 155 180	steel-4
+192 203 220	steel-5
+255 255 255	steel-6
+ 62  39  49	wood-0
+115  62  57	wood-1
+184 111  80	wood-2
+228 166 114	wood-3
+234 212 170	wood-4
+194 133 105	skin-0
+232 183 150	skin-1
+190  74  47	rust-0
+215 118  67	rust-1
+162  38  51	fire-0
+228  59  68	fire-1
+247 118  34	fire-2
+254 174  52	fire-3
+254 231  97	fire-4
+ 25  60  62	green-0
+ 38  92  66	green-1
+ 62 137  72	green-2
+ 99 199  77	green-3
+ 18  78 137	blue-0
+  0 153 219	blue-1
+ 44 232 245	blue-2
+104  56 108	plum-0
+181  80 136	plum-1
+246 117 122	plum-2
+255   0  68	hot-0
