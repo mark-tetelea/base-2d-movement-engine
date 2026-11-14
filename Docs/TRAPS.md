@@ -575,3 +575,18 @@ and look at `git status ProjectSettings` before committing.
 Symptom: the camera check failed with the player stopped half-way. Cause: timeouts were
 written in frames ("600 frames = 10 s"), but the unfocused editor ran ~300 fps, so they
 lasted 2 s. Rule: time play-mode check steps with `Time.time`, never frame counts.
+
+## 79. A 1 s timer lasts 61 steps
+
+Symptom: invulnerable time of 1.0 s let the next hit land 61 fixed steps later, not 60.
+Cause: subtracting 1/60 as a float sixty times leaves a tiny positive remainder, so the
+"still running" test is true for one more step. Rule: end step timers below a small
+epsilon (`Damage` uses 1e-4) or count whole steps. Found 2026-11-14 by `combat.cs`.
+
+## 80. Allocation measures 0 bytes
+
+Symptom: `System.GC.GetAllocatedBytesForCurrentThread()` around 300 Instantiate calls
+reported 0 B. Cause: this editor's Mono does not implement it (returns 0). Rule: measure
+`GC.GetTotalMemory(false) + Profiler.GetTotalAllocatedMemoryLong()` growth around the
+calls, and don't trust frame-level "GC Allocated In Frame" in the editor (~110 KB/frame of
+editor and OnGUI noise). Found 2026-11-14 (`bullet-alloc.cs`).

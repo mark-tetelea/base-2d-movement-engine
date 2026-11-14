@@ -18,6 +18,9 @@ namespace TopDownKit
             var body = other.attachedRigidbody;
             if (body == null || body.GetComponent<PlayerMover>() == null) return;
             if (rig == null && Camera.main != null) rig = Camera.main.GetComponent<CameraRig>();
+            // Only the one the camera follows: enemies have PlayerMovers too, and a warped
+            // enemy left its room unclearable (LOG 2026-11-14).
+            if (rig != null && rig.target != null && body.transform != rig.target) return;
             if (rig == null) { Move(body); return; }
             if (rig.InTransition) return;
             rig.FadeThen(() => Move(body));

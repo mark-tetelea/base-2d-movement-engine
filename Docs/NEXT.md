@@ -1,32 +1,36 @@
 # Next
 
-> Overwritten at every `/handoff`. Written 2026-11-14, end of phase 3 (camera and rooms).
+> Overwritten at every `/handoff`. Written 2026-11-14, end of phase 4 (combat, Arena shooter demo).
 
 ## Do first
 
-1. **The user playtests phases 1-3** in `Assets/Scenes/TestArena.unity` (Play):
-   - Phases 1-2 as before (keys 1-4, Space, K, F/G/H).
-   - Phase 3: L cycles Open / Rooms slide / Rooms fade. Walk right into room B (doors
-     lock; C clears), up into big room C, onto the brown pad for area D. K shakes.
-     Questions: dead zone / smoothing / look-ahead feel; slide 0.5 s and fade 0.25 s;
-     should keys pause during a slide; is shake (0.4 tiles) too much at high fps (it
-     jitters every frame); is shake showing past room edges OK.
-2. Then phase 4 of `Docs/ROADMAP.md` (interaction).
+1. **The user plays the Arena shooter** (`Assets/Scenes/ArenaShooter.unity`, Play, ~5 min):
+   do the weapons feel different and good; is 6 health / 1 s invulnerable fair; are
+   enemies too fast/slow (3 tiles/s), too tanky (2-3 hits); is the shotgun recoil (8) fun or
+   annoying; shake on hit (0.3) too much? Also still open from phases 1-3 (see LOG).
+2. Then phase 5 of `Docs/ROADMAP.md`: interaction, pickups, inventory, chests, NPC text ->
+   RPG room demo. Ammo pickups can call `Gun.Refill` (or a per-weapon version) then.
 
 ## Half-done
 
 - `Assets/_Recovery/` (+ `.meta`): Unity's crash backup, not committed. Delete it in the Project window.
-- Not measured: dash and knockback into walls (`PlayerMover.TakeWallLoss`).
-- Fade quad is a runtime `SpriteRenderer` at sorting order 32767; once real UI exists it may belong there.
+- Enemies have no pathfinding: a chaser behind a pillar stays stuck. Fine for the demo
+  (spawns placed clear); a game that needs it adds it as an add-on.
+- HUD is an OnGUI developer label; real screens are phase 6.
+- Enemy art: one blob in three colours (pxkit `enemy.js`), no facing; enemy shots use the
+  same bullet sprite tinted orange.
+- Not measured: the real mouse path (checks drive `Gun` as data); the look in a capture.
 
 ## Waiting on the user
 
-- The playtest above. Still open: wall-slide speed (4.24 tiles/s).
+- The playtest above (and the earlier phases' playtest questions).
 
 ## Don't
 
-- Don't move the camera into `FixedUpdate`; it follows the interpolated player in `LateUpdate`.
-- Don't clamp shake to rooms without asking (decided against, LOG 2026-11-14).
-- Don't time play-mode checks in frames (trap 78).
-- Don't read the mouse outside `PlayerAim`; don't push knockback into `Movement.Step`.
-- Checks: `Tools/measure/movement.cs`, `facing.cs`, `camera.cs` in play mode. After one, put `runInBackground` back (trap 77).
+- Don't replace `ObjectPool` with a custom pool, or drop it: measured (LOG 2026-11-14).
+- Don't let `Warp` move anything but the camera's target (enemies have PlayerMovers).
+- Don't read the mouse outside `PlayerAim` / `PlayerShooter`; `Gun` takes data.
+- Don't time play-mode checks in frames (trap 78); end float timers with an epsilon (trap 79).
+- Checks: `movement.cs`, `facing.cs`, `camera.cs` on TestArena; `combat.cs`,
+  `playthrough.cs`, `bullet-alloc.cs` on ArenaShooter, all in play mode. After one, check
+  `runInBackground` is back to 0 (trap 77).

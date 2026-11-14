@@ -431,3 +431,31 @@ Brief: `Docs/prompt-phase3-camera.md`.
 - Shake: 30 frames, every frame moved, max 0.354 tiles, 0 off-pixel.
 - First camera-check run failed on frame-count timeouts (editor ran ~300 fps): checks must time by `Time.time`, not frames.
 - Not verified: feel of all of it (playtest); fade look; real keyboard (virtual one used).
+
+## 2026-11-14 - Phase 4: health, damage, shooting, enemies, Arena shooter demo
+
+Brief: `Docs/prompt-phase4-combat.md`.
+
+**Decided:**
+- **One damage rule, `Damage.Apply` / `Damage.Tick` (static), used through `Health.Hit(amount, push)` by bullets, enemy touches and tests.** Why: one copy of each core rule. Health is whole points; teams stop friendly fire (player 0, enemies 1).
+- **A dash with `invulnerable` on now really protects** (`Health` asks `Dash.IsInvulnerable`).
+- **Weapons are assets (`Weapon`, settings only), like `MoveFeel`.** Why: the roadmap names a weapon asset and several shooters share one. Not a config system: no behaviour in it.
+- **Enemies walk with the same `PlayerMover`** (new `readKeyboard` off + `SetMoveDirection`, input as data), take damage through the same `Health`, shoot with the same `Gun`. Behaviour (Chase / KeepDistanceAndShoot / Wander) is a setting on `EnemyBrain`.
+- **Bullets are reused with Unity's own `ObjectPool<Bullet>`** - the measurement asked for it (below). `Bullet.reuse = false` only exists to repeat the measurement.
+- **`Warp` now only moves what the camera follows.** Why: enemies have PlayerMovers too; a chaser walked onto C's warp pad, landed in D, and room C could never clear.
+- **Invulnerable time counts as over below 1e-4 s.** Why: 60 float steps of 1/60 do not sum to 1, so 1 s lasted 61 steps (trap 79).
+
+**Built:**
+- `Assets/Scripts/Combat/`: `Damage`, `Health` (invulnerable time, flash, blink, knockback on the target, optional shake, destroy on death), `Weapon`, `Gun` (fire rate exact across steps, spread fan / seeded random, bullets per shot, magazine + reload or infinite, recoil via knockback, `Refill`), `Bullet` (fixed step, circle sweep each step so nothing is skipped, stops on walls and other-team Health), `PlayerShooter` (mouse/R/1-9/wheel -> Gun), `EnemyBrain`, `RoomWaves` (add-on: waves start when the doors shut, `RoomLock.Clear()` after the last), `RestartOnDeath`, `ShooterHud` (OnGUI readout + win/death text).
+- `PlayerMover`: `readKeyboard`, `SetMoveDirection`.
+- Assets: `Assets/Data/Weapons/` Pistol, Shotgun, Rapid, EnemyShot; `Assets/Data/Movement/EnemyWalk`; `Assets/Prefabs/Enemies/` Chaser, Shooter, Wanderer. pxkit `enemy.js` (+ fire/green swaps) and `bullet.js`.
+- `Assets/Scenes/ArenaShooter.unity` (copy of TestArena, built by `Tools/measure/setup-phase4-assets.cs` + `setup-phase4-scene.cs`): Glide, face the aim, Rooms slide; A has 2 wanderers; B 2 waves, C 3 waves (own doors), D 2 waves; first in the build list.
+- Checks: `Tools/measure/combat.cs`, `bullet-alloc.cs`, `playthrough.cs`.
+
+**Measured / verified (one run each unless said):**
+- Compiles, 0 errors.
+- Combat check, 30 vs 144 fps, 561 fixed steps each: **0 differing rows** (player hp, hits landed, dummy hp and x, bullets alive, ammo). Hits every step land at steps 300/360/420 (1 s invulnerable). 5 hits during a dash: none landed. A pistol shot at a wall 3.5 tiles away is gone 12 steps later (range would be 47).
+- Bullet cost, 300 spawns: Instantiate ~4,150 B and ~21-27 us each; pool ~150 B and ~4 us (managed heap + Unity native growth; `GC.GetAllocatedBytesForCurrentThread` returned 0 in the editor). Frame-level "GC Allocated In Frame" was useless: ~110 KB/frame of editor/OnGUI noise either way.
+- Playthrough bot (999 health, rapid gun): B, C, D each run all waves and open; win state reached; death at 6 health reloads the scene with full health. First runs found the warp bug and a chaser stuck behind C's pillar (no pathfinding; spawn moved).
+- Movement harness unchanged (11 OK), facing 18/18, camera ALL PASS (after the warp change).
+- Not verified: feel, numbers and look of any of it (playtest); the real mouse path (the checks drive the Gun as data).

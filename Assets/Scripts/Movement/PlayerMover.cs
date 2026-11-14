@@ -19,6 +19,8 @@ namespace TopDownKit
         public MoveFeel feel;
         [Tooltip("While on, keys are ignored (walking eases to a stop by the feel). Set by camera fades and slides.")]
         public bool inputPaused;
+        [Tooltip("On: WASD / arrows steer it (the player). Off: something else calls SetMoveDirection (an enemy brain, a touch stick).")]
+        public bool readKeyboard = true;
 
         Rigidbody2D body;
         Vector2 held;              // keys held at the last frame
@@ -59,8 +61,18 @@ namespace TopDownKit
             body.linearVelocity = sentVelocity;
         }
 
+        // Input as data: the direction to walk from the next step on (length 1 or less).
+        // Kept until changed. Used when readKeyboard is off.
+        public void SetMoveDirection(Vector2 direction)
+        {
+            if (direction != held && direction != Vector2.zero) pressedSinceStep = direction;
+            held = direction;
+            if (direction != Vector2.zero) LastMoveDirection = direction.normalized;
+        }
+
         void Update()
         {
+            if (!readKeyboard) return;
             Vector2 keys = ReadKeys();
             // Latch a new direction until a step uses it, so a tap that starts and ends
             // between two steps still moves (Decision 1, input timing).

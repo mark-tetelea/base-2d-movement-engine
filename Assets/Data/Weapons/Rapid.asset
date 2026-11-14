@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d4255634bac5d44e8d498eb30e8fbd8, type: 3}
+  m_Name: Rapid
+  m_EditorClassIdentifier: Assembly-CSharp::TopDownKit.Weapon
+  fireRate: 12
+  automatic: 1
+  bulletsPerShot: 1
+  spread: 8
+  bulletSpeed: 20
+  range: 12
+  damage: 1
+  knockback: 2
+  recoil: 0.6
+  magazine: 30
+  reloadTime: 1.5
+  bulletRadius: 0.15
+  shakeOnShot: 0
+  bulletSprite: {fileID: 21300000, guid: 1a22e7f146e220c4caa0b2651205f861, type: 3}
+  bulletColor: {r: 0.17254902, g: 0.9098039, b: 0.9607843, a: 1}

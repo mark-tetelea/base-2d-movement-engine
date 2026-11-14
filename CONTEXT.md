@@ -1,6 +1,6 @@
 # Where the kit is now
 
-> Rewritten, never appended. True as of **2026-11-14**, end of phase 3 (camera and rooms).
+> Rewritten, never appended. True as of **2026-11-14**, end of phase 4 (combat and the Arena shooter demo).
 
 ## How it plays
 
@@ -21,8 +21,7 @@ right side flipped) and a yellow diamond shows the aim, towards the mouse. **F**
 4 / 8 facings, **G** face walk / aim, **H** aim from mouse / walk; the second label line
 names them. Standing still keeps the facing.
 
-**Space** dashes 3 tiles in 0.2 s (0.4 s cooldown; invulnerable flag stored for damage
-later). **K** knocks the player away from the mouse. Along the top of the arena: a yellow
+**Space** dashes 3 tiles in 0.2 s (0.4 s cooldown; hits do not land during it). **K** knocks the player away from the mouse. Along the top of the arena: a yellow
 speed pad (x1.6), brown mud (x0.5) and a cyan ice patch (Ice feel while on it).
 
 **Camera and rooms (phase 3):** the arena is now room A of a small level: room B to the
@@ -40,6 +39,23 @@ Measured: the same keys give the same movement step for step at 30 and 144 fps (
 step, the Endesga 32 palette, pxkit, the PNG import preset, and the movement measuring
 harness in `Tools/measure/`.
 
+## The Arena shooter demo (phase 4)
+
+Open `Assets/Scenes/ArenaShooter.unity` and press Play. Glide feel, the player faces the
+mouse, rooms slide. WASD move, mouse aims, left click shoots, R reloads, 1-3 or the wheel
+pick Pistol (12 shots, semi), Shotgun (6 pellets, 4 shells, strong recoil) or Rapid (auto,
+30), Space dashes (invulnerable). Player 6 health, 1 s invulnerable after a hit (blinks),
+the screen shakes. Room A has two green wanderers to warm up on; walking into B, C or the
+warp area D shuts the doors and sends waves: red chasers (touch damage), purple shooters
+(keep 6 tiles away and fire), green wanderers. The last wave dead opens the doors. All
+rooms cleared shows "Arena cleared - you win"; dying reloads the scene after 1.5 s. A
+top-left label shows health, weapon, ammo and the wave. Every number is a starting guess.
+
+Measured: combat behaves step for step the same at 30 and 144 fps; reused bullets
+(Unity's `ObjectPool`) cost ~4 us and ~150 B against ~25 us and ~4 KB with Instantiate; a
+bot clears every room and the death restart works. Enemies walk straight at you - they
+can get stuck behind a pillar (no pathfinding).
+
 ## What the kit will have (the user's list, in the order to build it)
 
 1. **Movement** - 8 directions and instant-to-glide feel: **built**. Ice/Heavy presets, dash,
@@ -50,7 +66,8 @@ harness in `Tools/measure/`.
 3. **Interaction** - one key, best nearby target: chests, NPCs, items.
 4. **Pickups and inventory** - auto (coins, ammo) and manual (weapons, key items),
    inventory with a hotbar, chests as inventories.
-5. **Shooting** - weapon settings, reused bullets, health, damage, recoil.
+5. **Shooting** - weapon settings, reused bullets, health, damage, recoil: **built**, with
+   tiny enemies and rooms that lock until cleared (phase 4, 2026-11-14).
 
 The order is a suggestion, not a decision.
 
@@ -64,7 +81,4 @@ None. The test arena has a one-line developer label (which feel is in use, and t
 - Everything after movement in the list above, and every placeholder in `TO-DRAW.md`
   except the floor, wall, the player and the aim marker. The facing playtest (does 8 feel
   right, walk-cycle speed 8 fps).
-- **Open question for when shooting is built:** "reused bullets" (the user's spec) against
-  the working agreement's "no pooling that no measurement asked for". Likely answer:
-  Unity's built-in `UnityEngine.Pool.ObjectPool<T>` (no custom framework), justified by a
-  stress measurement - mobile is a target, and allocation spikes there are real. Ask then.
+- The combat playtest: weapon numbers, enemy speed and health, wave sizes, damage feel.
