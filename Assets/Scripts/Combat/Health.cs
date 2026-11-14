@@ -57,6 +57,14 @@ namespace TopDownKit
         // Back to full health (a restart without reloading the scene).
         public void Restore() { Init(); Current = maxHealth; invulnerableLeft = 0f; }
 
+        // Gives health back, up to maxHealth (a health pickup). Not while dead.
+        public void Heal(int amount)
+        {
+            Init();
+            if (amount <= 0 || Current <= 0) return;
+            Current = Mathf.Min(maxHealth, Current + amount);
+        }
+
         // Damage with a knockback push (tiles/s, already pointing the way to push; zero for
         // none). Returns whether the hit landed.
         public bool Hit(int amount, Vector2 push)

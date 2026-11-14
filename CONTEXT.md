@@ -1,6 +1,6 @@
 # Where the kit is now
 
-> Rewritten, never appended. True as of **2026-11-14**, end of phase 4 (combat and the Arena shooter demo).
+> Rewritten, never appended. True as of **2026-11-14**, end of phase 5 (interaction, inventory, Little RPG room demo).
 
 ## How it plays
 
@@ -56,6 +56,17 @@ Measured: combat behaves step for step the same at 30 and 144 fps; reused bullet
 bot clears every room and the death restart works. Enemies walk straight at you - they
 can get stuck behind a pillar (no pathfinding).
 
+## The Little RPG room demo (phase 5)
+
+Open `Assets/Scenes/LittleRpg.unity` and press Play. Instant feel, 4 facings, rooms fade.
+WASD move, E uses the best target in front (an "E" shows over it), 1-5 pick a hotbar slot,
+Q drops one. The green Guide in A explains; coins are picked up by walking near (magnet
+2.5 tiles); the pink door east is locked; the key is in a chest in big room C; the door
+opens with it (key used up); room B has the Keeper and the crown chest - taking the crown
+wins. In C a lever opens the gate over the warp to D (Hermit, a coin chest, a heart).
+Chests open a transfer screen (click a slot, T take all, E close). A storage chest sits
+in A. Measured: a bot plays it start to finish (24 checks pass). All numbers are guesses.
+
 ## What the kit will have (the user's list, in the order to build it)
 
 1. **Movement** - 8 directions and instant-to-glide feel: **built**. Ice/Heavy presets, dash,
@@ -63,9 +74,9 @@ can get stuck behind a pillar (no pathfinding).
 2. **Facing and animation** - 4 or 8 directions, aim separate from walking: **built**
    (phase 2, 2026-11-14). 5 drawings + mirroring by default, true 8 as a setting.
    **Camera and world layout** (roadmap 3): **built** (phase 3, 2026-11-14).
-3. **Interaction** - one key, best nearby target: chests, NPCs, items.
+3. **Interaction** - one key, best nearby target: **built** (phase 5).
 4. **Pickups and inventory** - auto (coins, ammo) and manual (weapons, key items),
-   inventory with a hotbar, chests as inventories.
+   inventory with a hotbar, chests as inventories: **built** (phase 5).
 5. **Shooting** - weapon settings, reused bullets, health, damage, recoil: **built**, with
    tiny enemies and rooms that lock until cleared (phase 4, 2026-11-14).
 
@@ -81,4 +92,5 @@ None. The test arena has a one-line developer label (which feel is in use, and t
 - Everything after movement in the list above, and every placeholder in `TO-DRAW.md`
   except the floor, wall, the player and the aim marker. The facing playtest (does 8 feel
   right, walk-cycle speed 8 fps).
+- The RPG demo playtest: reach 1.5, facing vs closest, magnet, text box.
 - The combat playtest: weapon numbers, enemy speed and health, wave sizes, damage feel.

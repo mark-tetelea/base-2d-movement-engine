@@ -459,3 +459,24 @@ Brief: `Docs/prompt-phase4-combat.md`.
 - Playthrough bot (999 health, rapid gun): B, C, D each run all waves and open; win state reached; death at 6 health reloads the scene with full health. First runs found the warp bug and a chaser stuck behind C's pillar (no pathfinding; spawn moved).
 - Movement harness unchanged (11 OK), facing 18/18, camera ALL PASS (after the warp change).
 - Not verified: feel, numbers and look of any of it (playtest); the real mouse path (the checks drive the Gun as data).
+
+## 2026-11-14 - Phase 5: interaction, pickups, inventory, chests, NPC text, Little RPG room demo
+
+**Decided:**
+- **Best target = a plain-points rule** (`Interaction.Pick`): Closest, or Facing (smallest angle in the front half; within 1 degree the closer wins; nothing in front -> closest). **Why:** checks, the player and later AI call one thing. Starting choice, not the user's.
+- **One `Inventory` class (plain C#) for the bag and chests**, wrapped by the `Bag` component; the hotbar is the first `hotbarSlots` slots. Chest transfer = `Inventory.Move`. **Why:** one copy of each rule.
+- **Text box, chest screen and RPG HUD are OnGUI placeholders** like `ShooterHud`. **Why:** real screens are phase 6; avoids UI Toolkit traps now.
+- **Coins are an item in the bag** (stack 99), not a separate counter. Ammo pickup = `Gun.Refill` (phase 4 has magazines, not a reserve).
+
+**Built:**
+- `Assets/Scripts/Interaction/`: `Interaction` (rule + `InteractSettings`: reach, best, press/hold, holdTime), `Interactable` (base for add-on targets), `Interactor` (E as data, panels pause walking), `InteractPrompt` (E key cap + hold bar), `TextBox`, `DialogueLines`, targets `Talker`, `LockedDoor`, `Lever`.
+- `Assets/Scripts/Inventory/`: `Item`, `Inventory` (+ `ItemStack`, `InventorySettings`: size, hotbar, stack limit), `Bag`, `Pickup` (auto/manual; items, heal, ammo refill; drop), `Collector` (magnet reach/speed, collect reach), `Chest`, `ChestScreen` (click / T take all / E close), `Hotbar` (1-N select, Q drop), `InventoryGui`, `RpgHud`. `Health.Heal` added.
+- pxkit sprites coin, key, crown, heart, chest, chest-open, lever, prompt-e; items in `Assets/Data/Items/`, lines in `Assets/Data/Dialogue/`.
+- `Assets/Scenes/LittleRpg.unity` (build index 1) via `Tools/measure/setup-phase5-assets.cs` + `setup-phase5-scene.cs`.
+- Checks: `Tools/measure/inventory.cs` (edit mode), `rpg-playthrough.cs` (play mode, LittleRpg).
+
+**Measured / verified:**
+- `inventory.cs`: 21/21 pass (stacking, full bag leftover, stack limit, remove, chest move both ways, take all, no coins lost, drop; closest/facing/fallback/tie/reach). One run.
+- `rpg-playthrough.cs`: 24/24 pass, one run (after fixing a test bug: Health maxHealth set after it started). Guide talk pauses walking, coins, locked door message, key chest take all, door opens and uses key, crown won, drop + take back, Hold lever at 31 steps, heart heals, ammo refills, full-health heart stays.
+- Movement (all OK), facing 18/18, camera ALL PASS, combat identical 30/144, playthrough ALL PASS. Console 0 errors.
+- Not verified: the mouse path in the chest screen (trap 39), OnGUI look (not in `capture_game_view`), feel of any number (playtest).

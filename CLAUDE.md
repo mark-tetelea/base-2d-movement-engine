@@ -103,11 +103,18 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
   / Wander on a `PlayerMover` with `readKeyboard` off), add-ons `RoomWaves` (clears a
   `RoomLock`), `RestartOnDeath`; `ShooterHud` (demo label). Weapons in `Assets/Data/Weapons/`,
   enemies in `Assets/Prefabs/Enemies/`. Enemies walk straight: no pathfinding.
+- `Assets/Scripts/Interaction/` - `Interaction.Pick` (the one best-target rule, plain points),
+  `Interactable` base + targets `Talker`, `LockedDoor`, `Lever` (and `Chest`, `Pickup`),
+  `Interactor` (E as data; open panels pause walking), `InteractPrompt`, `TextBox` +
+  `DialogueLines`. `Assets/Scripts/Inventory/` - `Inventory` (the one rule, plain C#, used by
+  bag and chests), `Bag`, `Item`, `Pickup` (auto/manual, heal, ammo), `Collector` (magnet),
+  `Hotbar`, `ChestScreen`, `RpgHud`. Screens are OnGUI placeholders until phase 6.
+- `Assets/Scenes/LittleRpg.unity` - the Little RPG room demo (build index 1).
 - `Assets/Scenes/ArenaShooter.unity` - the Arena shooter demo (first in the build list;
   death reloads by build index). `Warp` moves only the camera's target.
 - `Tools/measure/` - measuring harness: `movement.cs` (run with `eval_file` in play mode;
   drives the real key path through a virtual keyboard, logs every fixed step) and
-  `analyse-movement.js`; it also checks dash distance and knockback decay at 30 vs 144 fps. Re-run it after any change to movement. `combat.cs` (30 vs 144 fps), `bullet-alloc.cs`, `playthrough.cs` on ArenaShooter.
+  `analyse-movement.js`; it also checks dash distance and knockback decay at 30 vs 144 fps. Re-run it after any change to movement. `combat.cs` (30 vs 144 fps), `bullet-alloc.cs`, `playthrough.cs` on ArenaShooter; `inventory.cs` (edit mode), `rpg-playthrough.cs` on LittleRpg.
 - `Assets/Art/Palette/endesga-32.gpl` - the one palette; pxkit and Aseprite both load it.
   Never written by a script that also reads it (trap 70).
 - `Assets/Art/PixelSprite16.preset` - import default for PNGs under `Assets/Art/**`.
