@@ -17,6 +17,8 @@ namespace TopDownKit
     {
         [Tooltip("How moving feels. Read every step, so swapping or tuning it shows at once.")]
         public MoveFeel feel;
+        [Tooltip("While on, keys are ignored (walking eases to a stop by the feel). Set by camera fades and slides.")]
+        public bool inputPaused;
 
         Rigidbody2D body;
         Vector2 held;              // keys held at the last frame
@@ -72,6 +74,7 @@ namespace TopDownKit
         {
             if (body == null) body = GetComponent<Rigidbody2D>();
             Vector2 direction = held != Vector2.zero ? held : pressedSinceStep;
+            if (inputPaused) direction = Vector2.zero;
             pressedSinceStep = Vector2.zero;
             InputDirection = direction;
             if (direction != Vector2.zero) LastMoveDirection = direction.normalized;

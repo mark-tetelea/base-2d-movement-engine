@@ -91,6 +91,11 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
   (rule on the fixed step), `DirectionalSprites` (sprite swap idle / 2-step walk, flips the
   left side; no Animator). Test arena: `FacingKeys` (F 4/8, G walk/aim, H aim source, aim
   marker). Player sprites are 48x24 sheets of 3 frames sliced by `Tools/pxkit/slice-sheet.cs`.
+- `Assets/Scripts/Camera/` - `CameraFollow` (the one camera rule), `CameraRig` (on the camera;
+  layout Open / RoomsSlide / RoomsFade is a setting; whole pixels; slide, fade, `Shake`),
+  `Room` (marked rectangle), add-ons `RoomLock` (doors until `Clear()`) and `Warp`. Arena:
+  rooms A, B (locks), C (big), area D; L cycles layout, C clears (`CameraKeys.cs`).
+  `Tools/measure/camera.cs` checks pixels and room bounds in all layouts.
 - `Tools/measure/` - measuring harness: `movement.cs` (run with `eval_file` in play mode;
   drives the real key path through a virtual keyboard, logs every fixed step) and
   `analyse-movement.js`; it also checks dash distance and knockback decay at 30 vs 144 fps. Re-run it after any change to movement.
@@ -115,7 +120,7 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
 ## Traps
 
 > One line each: symptom -> rule. The full story is in `Docs/TRAPS.md` under the same
-> number. Add the day a trap is found; next free number is **78**.
+> number. Add the day a trap is found; next free number is **79**.
 
 **The editor lies about your own edits**
 1. Code right, game wrong -> a changed `[SerializeField]` default does not change a scene that already saved it; edit the scene in edit mode and save.
@@ -217,6 +222,7 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
 75. Numbers split across CSV columns -> this editor writes decimal commas; use `CultureInfo.InvariantCulture`.
 76. `capture_game_view --save_path` made an asset -> it writes under `Assets/`; copy out and `DeleteAsset` the folder.
 77. `runInBackground: 1` appears in ProjectSettings after a test -> setting it at runtime writes the Player setting; put it back, check `git status`.
+78. Play-mode check times out early -> the editor runs ~300 fps; time steps by `Time.time`, never frame counts.
 
 ## Environment
 

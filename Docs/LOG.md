@@ -405,3 +405,29 @@ with a frictionless material so sliding along a wall does not drag.
   8 directions 6.000, 10/10 taps, dash 3.0000, knockback 2.5667 / 2.5910).
 - Down sprite judged in a game render (snapshot); others judged from pxkit review only.
 - Not verified: the feel (needs a playtest); the real mouse path (the check used a virtual mouse).
+
+## 2026-11-14 - Phase 3: camera and world layout
+
+Brief: `Docs/prompt-phase3-camera.md`.
+
+**Decided:**
+- **One `CameraRig` on the camera; layout (Open / RoomsSlide / RoomsFade) is a setting; the maths is static `CameraFollow` (DeadZone, Smooth, Clamp, SnapToPixel).** Why: one copy of the rule. Consequence: the camera runs in `LateUpdate` on frame time (presentation, after the interpolated player), not on the fixed step.
+- **The camera position is rounded to 1/16 tile by the rig itself**, not left to the Pixel Perfect Camera. Why: a checkable "whole pixels" rule.
+- **Screen shake is added after the room clamp, so it may show a few pixels past a room edge.** Why: rooms exactly the screen size would otherwise kill shake. Playtest call.
+- **Slides and fades pause keys through `PlayerMover.inputPaused`** (Dash respects it). Walking eases to a stop by the feel.
+- **Warps (area doors) always fade, in every layout.**
+
+**Built:**
+- `Assets/Scripts/Camera/CameraFollow.cs` - the rule + `CameraLayout`, `FollowSettings` (smooth 0.12 s, dead zone 1 x 0.75 tiles, look-ahead 1.5 tiles toward `PlayerAim`).
+- `CameraRig.cs` - follow, room clamp, slide (0.5 s), fade (0.25 s out + in, black quad made on first use), `Shake(tiles)` (scale 1, decay 2 tiles/s), `SetLayout` (snaps, cancels a transition).
+- `Room.cs` - marked rectangle, static register, `Room.At(point)`. `RoomLock.cs` - add-on: doors shut when the player is 2 tiles inside, `Clear()` opens. `Warp.cs` - add-on area door.
+- `TestArena`: rooms A (old arena), B (right, locks), C (80x30 above, bigger than the screen), area D (warp pad in C). Built by `Tools/measure/setup-phase3.cs`. `CameraKeys`: L cycles layout, C clears the room. K now also shakes (0.4 tiles).
+- `Tools/measure/camera.cs` - camera check.
+
+**Measured / verified (one run each):**
+- Compiles, 0 console errors.
+- Camera check, all three layouts: 11/11 PASS; 6,865 frames, 0 off whole pixels, 0 frames with the view outside the current room (or room != player's room) outside transitions. Lock holds the player (x 21.38 after 1.5 s walking at the door), Clear opens.
+- Movement harness unchanged (0 tiles difference 30 vs 144 fps, dash 3.0000, knockback 2.5667 / 2.5910). Facing check 18/18.
+- Shake: 30 frames, every frame moved, max 0.354 tiles, 0 off-pixel.
+- First camera-check run failed on frame-count timeouts (editor ran ~300 fps): checks must time by `Time.time`, not frames.
+- Not verified: feel of all of it (playtest); fade look; real keyboard (virtual one used).

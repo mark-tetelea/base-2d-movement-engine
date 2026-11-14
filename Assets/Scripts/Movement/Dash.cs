@@ -56,7 +56,7 @@ namespace TopDownKit
         {
             if (mover == null) mover = GetComponent<PlayerMover>();
             float dt = Time.fixedDeltaTime;
-            bool start = requested;
+            bool start = requested && !mover.inputPaused;
             requested = false;
 
             if (stepsLeft > 0)

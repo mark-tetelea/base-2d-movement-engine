@@ -1,6 +1,6 @@
 # Where the kit is now
 
-> Rewritten, never appended. True as of **2026-11-14**, end of phase 2 (facing and aim).
+> Rewritten, never appended. True as of **2026-11-14**, end of phase 3 (camera and rooms).
 
 ## How it plays
 
@@ -25,6 +25,13 @@ names them. Standing still keeps the facing.
 later). **K** knocks the player away from the mouse. Along the top of the arena: a yellow
 speed pad (x1.6), brown mud (x0.5) and a cyan ice patch (Ice feel while on it).
 
+**Camera and rooms (phase 3):** the arena is now room A of a small level: room B to the
+right (its doors lock once you are inside; **C** clears it), room C above (80x30, bigger
+than the screen), and area D reached by a brown warp pad in C. **L** switches the camera:
+Open (follows with a small dead zone, leans 1.5 tiles toward the aim), Rooms slide (stays
+in the room, slides 0.5 s to the next), Rooms fade (fade out/in 0.25 s each). Keys pause
+during slides and fades. **K** also shakes the screen. The camera is always on whole pixels.
+
 All of it is starting guesses - nobody has judged it by playing yet. Each feel is an asset
 in `Assets/Data/Movement/`; tuning during play is kept.
 
@@ -39,6 +46,7 @@ harness in `Tools/measure/`.
    knockback and speed zones: **built** (phase 1, 2026-11-14).
 2. **Facing and animation** - 4 or 8 directions, aim separate from walking: **built**
    (phase 2, 2026-11-14). 5 drawings + mirroring by default, true 8 as a setting.
+   **Camera and world layout** (roadmap 3): **built** (phase 3, 2026-11-14).
 3. **Interaction** - one key, best nearby target: chests, NPCs, items.
 4. **Pickups and inventory** - auto (coins, ammo) and manual (weapons, key items),
    inventory with a hotbar, chests as inventories.

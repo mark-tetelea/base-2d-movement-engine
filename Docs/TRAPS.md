@@ -569,3 +569,9 @@ setting, not just the running session (trap 6's fix).
 and look at `git status ProjectSettings` before committing.
 
 (next number is 78)
+
+## 78. Play-mode check times out early
+
+Symptom: the camera check failed with the player stopped half-way. Cause: timeouts were
+written in frames ("600 frames = 10 s"), but the unfocused editor ran ~300 fps, so they
+lasted 2 s. Rule: time play-mode check steps with `Time.time`, never frame counts.

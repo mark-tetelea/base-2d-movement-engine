@@ -11,6 +11,8 @@ namespace TopDownKit.TestArena
 
         [Tooltip("Push given by one press, in tiles per second.")]
         [Min(0f)] public float strength = 14f;
+        [Tooltip("Screen shake per press, in tiles (scaled by the rig's shake setting).")]
+        [Min(0f)] public float shake = 0.4f;
 
         bool pressed;
 
@@ -29,6 +31,8 @@ namespace TopDownKit.TestArena
             if (cam == null || m == null) return;
             Vector2 mouse = cam.ScreenToWorldPoint(m.position.ReadValue());
             player.AddPush(Knockback.Away(mouse, player.GetComponent<Rigidbody2D>().position, strength));
+            CameraRig rig = cam.GetComponent<CameraRig>();
+            if (rig != null) rig.Shake(shake);
         }
     }
 }

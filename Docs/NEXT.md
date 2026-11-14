@@ -1,20 +1,23 @@
 # Next
 
-> Overwritten at every `/handoff`. Written 2026-11-14, end of phase 2 (facing and aim).
+> Overwritten at every `/handoff`. Written 2026-11-14, end of phase 3 (camera and rooms).
 
 ## Do first
 
-1. **The user playtests phases 1 and 2** in `Assets/Scenes/TestArena.unity` (Play):
-   - Phase 1 list: keys 1-4 feels, Space dash, K knockback, the top strip zones.
-   - Phase 2: walk all 8 ways; F (4/8 facings), G (face walk / aim), H (aim from mouse / walk).
-     Is the walk cycle (8 fps) too fast? Does 4-facing diagonal behaviour feel right?
-2. Then phase 3 of `Docs/ROADMAP.md` (camera and world layout).
+1. **The user playtests phases 1-3** in `Assets/Scenes/TestArena.unity` (Play):
+   - Phases 1-2 as before (keys 1-4, Space, K, F/G/H).
+   - Phase 3: L cycles Open / Rooms slide / Rooms fade. Walk right into room B (doors
+     lock; C clears), up into big room C, onto the brown pad for area D. K shakes.
+     Questions: dead zone / smoothing / look-ahead feel; slide 0.5 s and fade 0.25 s;
+     should keys pause during a slide; is shake (0.4 tiles) too much at high fps (it
+     jitters every frame); is shake showing past room edges OK.
+2. Then phase 4 of `Docs/ROADMAP.md` (interaction).
 
 ## Half-done
 
-- `Assets/_Recovery/` (+ `.meta`): Unity's crash backup, not committed. Delete it in the
-  Project window.
+- `Assets/_Recovery/` (+ `.meta`): Unity's crash backup, not committed. Delete it in the Project window.
 - Not measured: dash and knockback into walls (`PlayerMover.TakeWallLoss`).
+- Fade quad is a runtime `SpriteRenderer` at sorting order 32767; once real UI exists it may belong there.
 
 ## Waiting on the user
 
@@ -22,8 +25,8 @@
 
 ## Don't
 
-- Don't add an Animator for idle/walk; `DirectionalSprites` swaps sprites.
-- Don't read the mouse outside `PlayerAim`; aim is data.
-- Don't re-measure by argument: `Tools/measure/movement.cs` and `facing.cs` in play mode.
-- After a check that sets `Application.runInBackground`, put the Player setting back (trap 77).
-- Don't push knockback into `Movement.Step`; don't move dash into the core mover.
+- Don't move the camera into `FixedUpdate`; it follows the interpolated player in `LateUpdate`.
+- Don't clamp shake to rooms without asking (decided against, LOG 2026-11-14).
+- Don't time play-mode checks in frames (trap 78).
+- Don't read the mouse outside `PlayerAim`; don't push knockback into `Movement.Step`.
+- Checks: `Tools/measure/movement.cs`, `facing.cs`, `camera.cs` in play mode. After one, put `runInBackground` back (trap 77).
