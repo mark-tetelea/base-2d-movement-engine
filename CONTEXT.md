@@ -74,4 +74,4 @@ settings panel does not shoot.
   speed), combat numbers, the RPG room (reach, facing vs closest, magnet), and now the screens
   (sizes, readability, the settings panel). Nobody has played any of it yet.
 - Real art for everything in `TO-DRAW.md` except the floor, wall, player and aim marker.
-- Phase 7: README, GIFs, WebGL build, licence.
+- WebGL build (module not installed), GIFs (only PNG screenshots in `Media/`), GitHub repo and push (the user's call).

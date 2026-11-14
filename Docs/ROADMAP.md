@@ -117,7 +117,7 @@ The tycoon idea is parked in `Docs/IDEAS.md`.
 - README with one short GIF per demo, a feature list, and "how to start a game from it".
 - A browser build (Unity WebGL) on itch.io or GitHub Pages, so people can play without
   installing anything.
-- MIT licence, clean folders, one namespace (`TopDownKit`).
+- Custom licence (use for own games, no redistributing the kit; LOG 2026-11-14), clean folders, one namespace (`TopDownKit`).
 - Later, maybe: install it as a Unity package.
 
 ## The order, one session per phase
@@ -134,7 +134,7 @@ the counselor chat, ending with `/handoff` and a commit.
 | 4 | Health, damage, shooting, enemies -> **Arena shooter demo** | first playable demo |
 | 5 | Interaction, pickups, inventory, chests, NPC text -> **RPG room demo** | |
 | 6 | Playground picker and the screens | built 2026-11-14: UI Toolkit screens, start menu |
-| 7 | GitHub polish: README, GIFs, WebGL build, licence | |
+| 7 | GitHub polish: README, GIFs, WebGL build, licence | 2026-11-14: README, LICENSE, PNG screenshots; WebGL blocked (module not installed) |
 
 ## Still not doing
 

@@ -111,3 +111,8 @@ InitTestScene*.unity*
 # pxkit scratch renders - regenerated on every review, never committed
 /Tools/pxkit/out/
 /Tools/pxkit/node_modules/
+
+# Kit: crash recovery scenes and measuring output
+/[Aa]ssets/_Recovery/
+/[Aa]ssets/_Recovery.meta
+/Tools/measure/out/

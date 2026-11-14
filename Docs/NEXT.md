@@ -1,39 +1,28 @@
 # Next
 
-> Overwritten at every `/handoff`. Written 2026-11-14, end of phase 6 (Playground picker, shared screens, start menu).
+> Overwritten at every `/handoff`. Written 2026-11-14, end of phase 7 (README, licence, screenshots).
 
 ## Do first
 
-1. **The user plays from the start menu** (`Assets/Scenes/StartMenu.unity`, ~10 min): is the
-   text readable at their screen size; is the settings panel (Tab) clear; does any click on
-   it fire a shot by mistake; Esc pause. Plus the earlier playtests (feel, facing, combat,
-   RPG room - see `CONTEXT.md`, "What is not done").
-2. Then phase 7 of `Docs/ROADMAP.md`: README, GIFs, WebGL build, licence. A WebGL build is
-   the first real build - check the screens and the start menu in it (nothing has been built
-   to a player yet).
+1. **The user decides on WebGL:** install the WebGL Build Support module in Unity Hub (the user's call), then build to `Builds/WebGL/` (git-ignored) and check it loads locally. It is the first real build: check the screens and start menu in it.
+2. **The counselor + user create the GitHub repo** (https://github.com/mark-tetelea) and push. Check the README renders there (tables, images from `Media/`).
+3. The playtests from `CONTEXT.md`, "What is not done".
 
 ## Half-done
 
-- `Assets/_Recovery/` (+ `.meta`): Unity's crash backup, not committed. Delete it in the Project window.
-- `Tools/measure/out/combat.csv`: written by `combat.cs`, not committed.
-- The real mouse clicking real buttons is unverified (trap 39): checks call `Picker.Click`,
-  `PauseMenu.Pause/Resume/MainMenu`, `StartMenu.Open`, `ChestScreen.Take/Put`, and queue mouse
-  events for the shoot guard.
-- The screens have been looked at only as a UI layer on its own (trap 81), never over the game.
-- Placeholder font is Unity's default (smooth, not pixel). A pixel font is a look decision for later.
+- GIFs: only PNG screenshots in `Media/`. A GIF needs a screen recorder (e.g. ScreenToGif) or a frame-sequence script + converter; keep each under ~5 MB.
+- `Assets/_Recovery/` still on disk (now git-ignored). Delete it in the Project window.
+- The real mouse clicking real buttons is unverified (trap 39).
+- Placeholder font is Unity's default (smooth, not pixel).
 - Old warning: `Pickup.All` hides `Interactable.All` (CS0108).
 
 ## Waiting on the user
 
-- The playtests above.
+- WebGL module install, repo creation and push, playtests.
 
 ## Don't
 
-- Don't add a second HUD: demos feed `Hud.Status` / `Hud.Banner` (`ArenaGoal`, `RpgGoal`).
-- Don't bring back test keys the picker replaced (F/G/H/L/C, 1-4 feels); add a picker row.
-- Don't read gameplay mouse without the UI guard (`KitUI.PointerOverUI` at the press), or
-  keys without `PauseMenu.IsPaused`.
+- Don't change the licence to MIT: the user chose a custom one (LOG 2026-11-14).
+- Don't push or add a remote without the user saying so.
+- Screenshots: `ScreenCapture.CaptureScreenshot` with an absolute path in `Media/`, in play mode with `runInBackground = true`; not `capture_game_view` (no UI, lands in `Assets/`).
 - Don't recompile until `EditorApplication.isPlaying` reads false (trap 83).
-- Checks: `movement.cs`, `facing.cs`, `camera.cs`, `screens.cs` on Playground; `combat.cs`,
-  `playthrough.cs`, `bullet-alloc.cs` on ArenaShooter; `rpg-playthrough.cs` on LittleRpg (play
-  mode); `inventory.cs` in edit mode. Afterwards check `runInBackground` is back to 0 (trap 77).

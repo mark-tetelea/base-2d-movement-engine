@@ -508,3 +508,20 @@ Brief: `Docs/prompt-phase6-playground.md`.
 - Looked at (UI rendered to a texture): picker + HUD at 1920x1080, text box, chest screen with icons. Not looked at over the game picture together.
 - Earlier checks all pass on the new scenes: movement (all OK, 30 = 144 fps), facing 18/18, camera ALL PASS, combat identical 30/144, bullet pool 150 B / 3.7 us vs Instantiate 3,980 B / 24 us, Arena playthrough ALL PASS (win banner through the new Hud), RPG playthrough 24/24, inventory 21/21.
 - Not verified: the real mouse clicking real buttons (trap 39 - checks call the entry points or queue mouse events); the look in a build; feel (playtest).
+
+## 2026-11-14 - Phase 7: GitHub polish
+
+**Decided:**
+- **Custom licence, not MIT.** Copyright (c) 2026 mark-tetelea. Anyone may use and change the kit to make their own games, commercial included; nobody may redistribute or sell the kit itself or claim it. **Why:** the user's choice, relayed by the counselor. **Consequence:** ROADMAP's "MIT" line changed.
+- **No GitHub repo, remote or push yet.** The user's call, via the counselor. Repo will live under https://github.com/mark-tetelea.
+
+**Built:**
+- `README.md` - what the kit is, choices per system, demos, controls, how to start a game, how it is built (measuring harness), folders, requirements, licence line.
+- `LICENSE` - short asset-pack style licence.
+- `Media/` - PNG screenshots at 1920x1080: `arena-shooter`, `little-rpg`, `start-menu`, `playground-picker` (settings panel open). No GIFs: the tools here capture single frames only.
+- `.gitignore` - adds `Assets/_Recovery/` (+ `.meta`) and `Tools/measure/out/`. Library, Temp, Logs, UserSettings, Builds were already ignored.
+
+**Measured / verified:**
+- `BuildPipeline.IsBuildTargetSupported(WebGL)` = False: WebGL module not installed. No build made.
+- `ScreenCapture.CaptureScreenshot` in play mode (absolute path outside `Assets/`) captures game AND UI Toolkit panel at the Game view size - unlike `capture_game_view` (trap 81). Play time stuck at 0.02 until `runInBackground = true` (trap 6). `ProjectSettings` unchanged afterwards (trap 77 checked by `git status`).
+- README markdown read back once; not rendered on GitHub yet.
