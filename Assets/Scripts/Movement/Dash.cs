@@ -39,6 +39,8 @@ namespace TopDownKit
         Vector2 velocity;
 
         public bool IsDashing => stepsLeft > 0;
+        // Every dash that starts (sounds, particles).
+        public static event Action<Dash> AnyStarted;
         // Read by damage later (phase 4).
         public bool IsInvulnerable => IsDashing && settings.invulnerable;
 
@@ -77,6 +79,7 @@ namespace TopDownKit
             velocity = DashVelocity(direction, settings, dt);
             stepsLeft = Steps(settings, dt);
             mover.DriveThisStep(velocity);
+            AnyStarted?.Invoke(this);
         }
 
         // Whole fixed steps one dash lasts (at least 1).

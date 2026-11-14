@@ -146,9 +146,12 @@ namespace TopDownKit
             v.style.borderLeftColor = v.style.borderRightColor = v.style.borderTopColor = v.style.borderBottomColor = c;
         }
 
+        // Every kit button press (a click sound).
+        public static event System.Action Clicked;
+
         public static Button Button(string text, System.Action click, int size = 9)
         {
-            var b = new Button(click) { text = text };
+            var b = new Button(() => { Clicked?.Invoke(); click?.Invoke(); }) { text = text };
             b.style.fontSize = size;
             b.style.color = Text;
             b.style.backgroundColor = Ink;

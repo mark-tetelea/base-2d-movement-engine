@@ -19,7 +19,11 @@ namespace TopDownKit
         public bool Cleared { get; private set; }
         public bool Locked { get; private set; }
 
+        // A room's doors shutting (true) or opening (false), not counting the first setup.
+        public static event System.Action<RoomLock, bool> AnyDoors;
+
         Room room;
+        bool setUp;
 
         void Start() { SetDoors(false); }
 
@@ -40,7 +44,10 @@ namespace TopDownKit
 
         void SetDoors(bool shut)
         {
+            bool changed = setUp && shut != Locked;
+            setUp = true;
             Locked = shut;
+            if (changed) AnyDoors?.Invoke(this, shut);
             if (doors == null) return;
             foreach (GameObject d in doors) if (d != null) d.SetActive(shut);
         }

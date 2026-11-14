@@ -41,10 +41,10 @@ namespace TopDownKit
         public static void Hurt(Health who, GroundRules rules, ref int stepsToHit, float dt)
         {
             if (who == null || who.Dead) return;
-            if (rules.kills) { who.Hit(who.maxHealth, Vector2.zero); return; }
+            if (rules.kills) { who.Hit(who.maxHealth, Vector2.zero, HitSource.Ground); return; }
             if (rules.damagePerSecond <= 0) { stepsToHit = 0; return; }
             if (stepsToHit > 0) { stepsToHit--; return; }
-            who.Hit(rules.damagePerSecond, Vector2.zero);
+            who.Hit(rules.damagePerSecond, Vector2.zero, HitSource.Ground);
             stepsToHit = Steps(1f, dt) - 1;
         }
 

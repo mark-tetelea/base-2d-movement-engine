@@ -1,0 +1,128 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69470c2ba6050a9498d67c397e530172, type: 3}
+  m_Name: KitFeel
+  m_EditorClassIdentifier: Assembly-CSharp::TopDownKit.FeelSet
+  slots:
+  - id: 0
+    clips:
+    - {fileID: 8300000, guid: 6faa7cca2542dad41bb95baadbc2bebb, type: 3}
+    volume: 0.35
+    pitchJitter: 0.15
+    effect: {fileID: 0}
+    effectLife: 0
+    hitStop: 0
+  - id: 1
+    clips:
+    - {fileID: 8300000, guid: e979b5c0e9c4336439be0222504733a0, type: 3}
+    volume: 0.5
+    pitchJitter: 0.08
+    effect: {fileID: 0}
+    effectLife: 0
+    hitStop: 0
+  - id: 2
+    clips:
+    - {fileID: 8300000, guid: a99b3d19531042a4e8ef269452caa2d0, type: 3}
+    volume: 0.6
+    pitchJitter: 0.1
+    effect: {fileID: 0}
+    effectLife: 0
+    hitStop: 0
+  - id: 3
+    clips:
+    - {fileID: 8300000, guid: f5a9502bd2cea8c4db6e79e56e98f184, type: 3}
+    volume: 0.6
+    pitchJitter: 0.05
+    effect: {fileID: 8829214178184288239, guid: d2093f4d85e1d9843889b6ae6e352521, type: 3}
+    effectLife: 0
+    hitStop: 0
+  - id: 4
+    clips:
+    - {fileID: 8300000, guid: acc8ada9091605b4fac05fcc5e856e38, type: 3}
+    volume: 0.6
+    pitchJitter: 0.1
+    effect: {fileID: 6375122626758280021, guid: 2b1d20864f1da554baa3da4789f1ea0a, type: 3}
+    effectLife: 0
+    hitStop: 0
+  - id: 5
+    clips:
+    - {fileID: 8300000, guid: c1065bbce9e45dd4c9700b683f12fc6a, type: 3}
+    volume: 0.8
+    pitchJitter: 0.1
+    effect: {fileID: 8043801807809286912, guid: 5fb8685a42ebff64b927c7259e85b094, type: 3}
+    effectLife: 0
+    hitStop: 0.08
+  - id: 6
+    clips:
+    - {fileID: 8300000, guid: 5f599f7b9f74feb419fb788365593932, type: 3}
+    volume: 0.8
+    pitchJitter: 0
+    effect: {fileID: 7185391682071056951, guid: e304cf2489838964a81320a4dabeb0b2, type: 3}
+    effectLife: 0
+    hitStop: 0.1
+  - id: 7
+    clips:
+    - {fileID: 8300000, guid: 9b753997f863d174fa1a9f03d27d1b54, type: 3}
+    volume: 0.7
+    pitchJitter: 0.1
+    effect: {fileID: 8297255287092951408, guid: f9648efbb6afdbd4eb407a05a9374ecc, type: 3}
+    effectLife: 0
+    hitStop: 0.06
+  - id: 8
+    clips:
+    - {fileID: 8300000, guid: 1c8171b6161be694aaa35aaa22fa8871, type: 3}
+    volume: 0.7
+    pitchJitter: 0.1
+    effect: {fileID: 1906926837312469686, guid: 003e2a7fc94f8784ab41f340b477c39e, type: 3}
+    effectLife: 0
+    hitStop: 0.04
+  - id: 9
+    clips:
+    - {fileID: 8300000, guid: 2a2e04acf49411747ac6734fa3a473ba, type: 3}
+    volume: 0.5
+    pitchJitter: 0.05
+    effect: {fileID: 5149914465807526261, guid: ffc2155205f5c1c4d8d9d769fa3ad478, type: 3}
+    effectLife: 0
+    hitStop: 0
+  - id: 10
+    clips:
+    - {fileID: 8300000, guid: af1f8efd5d8d21340bf05d45fe2ce28a, type: 3}
+    volume: 0.7
+    pitchJitter: 0
+    effect: {fileID: 0}
+    effectLife: 0
+    hitStop: 0
+  - id: 11
+    clips:
+    - {fileID: 8300000, guid: af1f8efd5d8d21340bf05d45fe2ce28a, type: 3}
+    volume: 0.7
+    pitchJitter: 0
+    effect: {fileID: 0}
+    effectLife: 0
+    hitStop: 0
+  - id: 12
+    clips:
+    - {fileID: 8300000, guid: f25597991ff07884485411a4830ffc5a, type: 3}
+    volume: 0.6
+    pitchJitter: 0.1
+    effect: {fileID: 3583642658851983067, guid: 85c11fb8392750d4b9553b5af5e5cc45, type: 3}
+    effectLife: 0
+    hitStop: 0
+  - id: 13
+    clips:
+    - {fileID: 8300000, guid: 9200f39684ecff14ba9a5de34ba8afe4, type: 3}
+    volume: 0.5
+    pitchJitter: 0
+    effect: {fileID: 0}
+    effectLife: 0
+    hitStop: 0
+  music: {fileID: 0}

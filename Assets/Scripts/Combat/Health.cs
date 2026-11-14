@@ -8,6 +8,9 @@ namespace TopDownKit
     // goes through the one rule (Damage.Apply); a hit that lands pushes the target with
     // the one knockback rule (if it has a PlayerMover), flashes its sprites and can shake
     // the camera. A Dash with its invulnerable flag on protects while it runs.
+    // Where a hit came from (Health.LastSource): add-ons such as sounds and hit-stop read it.
+    public enum HitSource { Other, Shot, Melee, Touch, Ground }
+
     public class Health : MonoBehaviour
     {
         [Min(1)] public int maxHealth = 5;
@@ -30,6 +33,11 @@ namespace TopDownKit
         public bool Invulnerable => invulnerableLeft > 0f;
         public event Action<Health> Damaged;
         public event Action<Health> Died;
+        // The same, for every Health at once (add-ons such as sounds and particles listen here).
+        public static event Action<Health> AnyDamaged;
+        public static event Action<Health> AnyDied;
+        // Where the last hit that landed came from.
+        public HitSource LastSource { get; private set; }
 
         static readonly List<Health> all = new List<Health>();
         public static IReadOnlyList<Health> All => all;
@@ -67,7 +75,7 @@ namespace TopDownKit
 
         // Damage with a knockback push (tiles/s, already pointing the way to push; zero for
         // none). Returns whether the hit landed.
-        public bool Hit(int amount, Vector2 push)
+        public bool Hit(int amount, Vector2 push, HitSource source = HitSource.Other)
         {
             Init();
             // Looked up here too, so a Dash or mover added after this woke up still counts (trap 14).
@@ -77,6 +85,7 @@ namespace TopDownKit
             int hp = Current;
             if (!Damage.Apply(ref hp, ref invulnerableLeft, amount, invulnerableTime, shielded)) return false;
             Current = hp;
+            LastSource = source;
             if (mover != null && push != Vector2.zero) mover.AddPush(push);
             flashLeft = flashTime;
             if (shakeOnHit > 0f)
@@ -86,9 +95,11 @@ namespace TopDownKit
                 if (rig != null) rig.Shake(shakeOnHit);
             }
             Damaged?.Invoke(this);
+            AnyDamaged?.Invoke(this);
             if (Current <= 0)
             {
                 Died?.Invoke(this);
+                AnyDied?.Invoke(this);
                 if (destroyOnDeath) Destroy(gameObject);
             }
             return true;

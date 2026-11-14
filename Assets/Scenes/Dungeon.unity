@@ -463,6 +463,7 @@ GameObject:
   - component: {fileID: 827345427}
   - component: {fileID: 827345429}
   - component: {fileID: 827345430}
+  - component: {fileID: 827345431}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -851,6 +852,97 @@ MonoBehaviour:
     magnetSpeed: 10
     collectReach: 0.6
   centre: {x: 0, y: 0}
+--- !u!114 &827345431
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 827345415}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5df2fa67e2a014e44aa33de90a8435fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TopDownKit.Footsteps
+  stride: 1
+--- !u!1 &833132026
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 833132029}
+  - component: {fileID: 833132028}
+  - component: {fileID: 833132027}
+  m_Layer: 0
+  m_Name: Feel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &833132027
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 833132026}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ede5b604a3d31574ba0f791aa61deff2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TopDownKit.DayNight
+  mode: 0
+  tint: {r: 0.55, g: 0.6, b: 0.9, a: 1}
+  cycleSeconds: 60
+  cycle:
+  - {r: 1, g: 1, b: 1, a: 1}
+  - {r: 1, g: 0.75, b: 0.55, a: 1}
+  - {r: 0.4, g: 0.45, b: 0.75, a: 1}
+  - {r: 0.85, g: 0.7, b: 0.85, a: 1}
+  startAt: 0
+  globalLight: {fileID: 0}
+--- !u!114 &833132028
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 833132026}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5d07d1db64269344b4a60ef36e53076, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TopDownKit.FeelPlayer
+  set: {fileID: 11400000, guid: 5e109f6d0e2e99c4a9206dd94b0c361a, type: 2}
+  sounds: 1
+  effects: 1
+  hitStop: 1
+  groundHitsFreeze: 0
+  master: 1
+  effectsVolume: 1
+  music: 0.6
+  playerTeam: 0
+  sameEventGap: 0.03
+  voices: 8
+--- !u!4 &833132029
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 833132026}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &994794616
 GameObject:
   m_ObjectHideFlags: 0
@@ -1754,3 +1846,4 @@ SceneRoots:
   - {fileID: 827345420}
   - {fileID: 1499963474}
   - {fileID: 994794618}
+  - {fileID: 833132029}

@@ -17,7 +17,10 @@ namespace TopDownKit
 
         void Start() { Apply(); }
 
-        public override void Use(Interactor who) { on = !on; Apply(); }
+        // Every pull of a lever (sounds).
+        public static event System.Action<Lever> AnyPulled;
+
+        public override void Use(Interactor who) { on = !on; Apply(); AnyPulled?.Invoke(this); }
 
         void Apply()
         {

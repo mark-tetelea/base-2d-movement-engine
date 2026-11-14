@@ -29,6 +29,10 @@ namespace TopDownKit.Playground
         public float[] magnets = { 0f, 2.5f, 5f };
         [Tooltip("Aim assist strengths the aim assist row cycles through; 0 = off.")]
         public float[] assists = { 0f, 0.35f, 0.7f };
+        public FeelPlayer feel;
+        public DayNight dayNight;
+        [Tooltip("Master volumes the volume row cycles through.")]
+        public float[] volumes = { 1f, 0.5f, 0.25f };
         public bool startOpen = true;
 
         [Tooltip("A small sprite placed along the aim, so aim is visible.")]
@@ -92,6 +96,13 @@ namespace TopDownKit.Playground
             Add("Magnet", () => collector != null && magnets.Length > 0,
                 () => collector.settings.magnetReach <= 0f ? "off" : Num(collector.settings.magnetReach) + " tiles",
                 () => collector.settings.magnetReach = magnets[Next(IndexOf(magnets, collector.settings.magnetReach), magnets.Length)]);
+            Add("Hit-stop", () => feel != null, () => feel.hitStop ? "on" : "off", () => feel.hitStop = !feel.hitStop);
+            Add("Particles", () => feel != null, () => feel.effects ? "on" : "off", () => feel.effects = !feel.effects);
+            Add("Sounds", () => feel != null, () => feel.sounds ? "on" : "off", () => feel.sounds = !feel.sounds);
+            Add("Volume", () => feel != null && volumes.Length > 0, () => Mathf.RoundToInt(feel.master * 100f) + "%",
+                () => feel.master = volumes[Next(IndexOf(volumes, feel.master), volumes.Length)]);
+            Add("Day/night", () => dayNight != null, () => dayNight.mode.ToString(),
+                () => dayNight.mode = (DayNightMode)(((int)dayNight.mode + 1) % 3));
             Add("Room", () => rig != null && rig.target != null, RoomText, ClearRoom);
         }
 

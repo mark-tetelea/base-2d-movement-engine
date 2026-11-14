@@ -1,6 +1,6 @@
 # Where the kit is now
 
-> Rewritten, never appended. True as of **2026-11-14**, end of phase 11 (generated rooms from room pieces, destructible crates, the Dungeon demo).
+> Rewritten, never appended. True as of **2026-11-14**, end of phase 12 (hit-stop, effects, sounds, day/night tint).
 
 ## How it starts
 
@@ -37,6 +37,8 @@ button; a click moves to the next value, live:
 - Aim assist: off / 0.35 / 0.7 (bends each shot toward the nearest enemy in a 15 degree cone)
 - Best target: facing / closest - Use: press / hold - Reach: 1 / 1.5 / 2.5 tiles
 - Magnet: off / 2.5 / 5 tiles - Room: shows the room; click clears a locked one
+- Hit-stop / Particles / Sounds: on / off - Volume: 100% / 50% / 25% - Day/night: Off / Fixed
+  (a blue night tint) / Cycle (day, evening, night, morning over 60 s)
 
 WASD move, mouse aims, left click shoots (not when the click lands on a screen), R reloads,
 1-6 pick a weapon (Sword swings an arc; Charger: hold to charge, release to fire, up to x4
@@ -76,6 +78,15 @@ one, and it may drop a coin, three coins or a heart. HUD status: "Rooms 2/6  Coi
 (the seed names the layout); "Dungeon cleared - you win" when the boss room is cleared; death or
 Restart gives a new layout. A fixed seed on the generator gives the same layout every time.
 
+## Sounds, effects, hit-stop, tint (phase 12)
+
+Every scene, the start menu included, has placeholder sounds: steps, shots, sword swings, dash,
+hits, a sword hit, the player getting hurt, deaths, a crate breaking, pickups, doors (room doors,
+the key door, levers), crumbling ground and UI clicks. Hits, deaths, dashes, pickups, crate breaks
+and crumbling ground throw a few pixel bits. Sword hits, the player getting hurt, deaths and crate
+breaks freeze the game for a moment (0.04-0.1 s); bullet hits do not. The day/night tint is off in
+every demo; the Playground's settings panel turns it on. No music (the slot is empty).
+
 ## Screens
 
 One set, used by all four: a HUD (health bar, weapon + ammo, hotbar, a status line, a centre
@@ -113,12 +124,14 @@ settings panel does not shoot.
 
 10. World additions - generated levels from room pieces (start, end, allowed pieces, room count,
    seed), destructible crates with a drop table: **built** (phase 11). Only the Dungeon uses them.
+11. Feel additions - hit-stop per hit kind, effect slots, swappable sound slots with placeholder
+   sounds and volumes, day/night tint: **built** (phase 12). All scenes.
 
 ## What is not done
 
 - Every playtest: movement feel (Instant vs Glide, wall slide), facing (8 directions, walk
   speed), combat numbers, the RPG room (reach, facing vs closest, magnet), and now the screens
   (sizes, readability, the settings panel), and now grid step (pace, slide time) and the
-  tiles (crumble timing, how forgiving red is), and the phase 9 weapons (swing, charge, bounce, assist), and the phase 10 enemies (boss difficulty, group spacing, trail damage), and the Dungeon (room sizes, wave difficulty, how often crates drop). Nobody has played any of it yet.
+  tiles (crumble timing, how forgiving red is), and the phase 9 weapons (swing, charge, bounce, assist), and the phase 10 enemies (boss difficulty, group spacing, trail damage), and the Dungeon (room sizes, wave difficulty, how often crates drop), and the sounds, bits, hit-stop lengths and tint colours. Nobody has played or heard any of it yet.
 - Real art for everything in `TO-DRAW.md` except the floor, wall, player and aim marker.
 - WebGL build (module not installed), GIFs (only PNG screenshots in `Media/`), GitHub repo and push (the user's call).

@@ -68,7 +68,7 @@ namespace TopDownKit
                 if (!Melee.InSweep(origin, aim, lastAngle, angle, reach, p, r)) continue;
                 if (WallBetween(origin, p)) continue;
                 hitThisSwing.Add(h);
-                h.Hit(damage, (p - origin).normalized * weapon.knockback);
+                h.Hit(damage, (p - origin).normalized * weapon.knockback, HitSource.Melee);
             }
             lastAngle = angle;
             PlaceBlade(angle);

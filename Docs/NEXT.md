@@ -1,30 +1,28 @@
 # Next
 
-> Overwritten at every `/handoff`. Written 2026-11-14, end of phase 11 (world additions).
+> Overwritten at every `/handoff`. Written 2026-11-14, end of phase 12 (feel additions).
 
 ## Do first
 
-1. **Phase 12 of `Docs/ROADMAP.md` (feel additions)** - hit-stop, particles, sound slots, day/night tint - when the counselor starts it. Crates and room doors are new sound/particle events to give slots (crate break, door shut/open).
-2. The playtests from `CONTEXT.md`, "What is not done" - now including the Dungeon (room size, waves, crate drop rate).
+1. **Phase 13 of `Docs/ROADMAP.md` (systems: save/load, coin shop, minimap, touch controls)** - when the counselor starts it. A shop buy and a save are new feel events: add them at the END of `FeelEvent` and call `FeelPlayer.Play`.
+2. The playtests from `CONTEXT.md`, "What is not done" - now including the sounds, the pixel bits, the hit-stop lengths and the day/night colours (nobody has heard or seen them).
 
 ## Half-done (for the phase 15 test pass)
 
-- **Phase 11 was checked by** `Tools/measure/dungeon-layouts.cs` (edit mode, ALL PASS: 200 seeds at 7 rooms + 50 at each count 2-12; every piece's doors connect) and `dungeon-play.cs` (play mode, ALL PASS on 3 random seeds), plus one manual run (lock, waves, door reopen, crate drop, coins, win banner). Keep both checks; re-run them after any change to a room piece or the layout rule. Not yet checked: Fade and Open camera layouts in the Dungeon (only slide seen), bullets stopping on a crate (not watched), Restart from the pause menu giving a new layout (by design: seed 0), load time with many rooms.
-- Unsure: enemies in a waiting wave of a room next door are switched off, so they never see through walls - but loose enemies put in a piece outside a wave would chase through doors from the next room (put enemies in waves); aim assist bends shots toward crates (team 2 is "another team") - may want crates ignored by aim assist; enemies walk into the Pool's red corners only if chasing straight (PathWalker avoids hurting ground on paths, not on straight runs - same as Playground); `dungeon-play.cs` counts crates as walkable (they break), so a ring of crates could hide a sealed pocket - none in the kit's pieces.
-- Layouts are trees (no loops); a "loop chance" setting is an idea, not built. Pieces bigger than one cell must be whole rectangles (no L shapes).
-- Phase 14 notes: World depends on Camera (`Room`, `RoomLock`), Combat (`Health`, `Gun`, `RoomWaves`), Enemies (`EnemyBrain`, `BossPhases`), Tiles (`GroundTile`, `TileDoor`), Inventory (`Bag`, `Item`, for `DungeonGoal`), Screens (`Hud`). `Drops` is generic (any Health) and may belong with Combat/Inventory when 13b connects enemy drops. `StartMenu.cs` defaults now list Dungeon.
-- From before: phase 10 smoke-only items (paths, groups, trails, boss phase switches), phase 9 smoke-only items, re-run `combat.cs` and `bullet-alloc.cs`, camera check flake (Open, B -> C, once), broken crumbling in "blocks" mode, tiles closing on someone, `screens.cs` at WXGA, WebGL module + build, GitHub push, GIFs, `Assets/_Recovery/` to delete, real-mouse clicks unverified (trap 39), default font, warning `Pickup.All` hides `Interactable.All`.
+- **Phase 12 was checked by** one smoke run only (LOG 2026-11-14): compiles, 0 errors, all scenes open; hit-stop freezes and returns, does not end a pause; DayNight Fixed tints the light. No check script was written (user: tests only when vital). Phase 15 should check: timeScale is 1 after any mix of freezes, pauses, restarts and scene loads; a freeze during a scene load (Restart from pause, death reload); hit-stop at 30 vs 144 fps (real-time length = different frame counts, same gameplay result); sound pool never allocates per play; effect pool reuses instances.
+- Unsure: Lever pulls play DoorOpen even when the lever closes a door (it cannot tell); enemy shots play the Shot sound too (may be noisy with many shooters - a per-team or per-Gun "silent" option may be wanted); `Footsteps` only on keyboard players, not enemies; the trail enemy's goo and red tiles play Hit sounds every damage tick (no freeze by default); DayNight multiplies the global light's own colour (a scene with a coloured global light gets a mixed tint); `Burst` uses `UnityEngine.Random` (looks only, not seeded).
+- Phase 14 notes: Feel depends on Combat (`Health`, `Gun`, `Weapon`), Movement (`Dash`), Inventory (`Pickup`), Camera (`RoomLock`), Interaction (`LockedDoor`, `Lever`), Tiles (`GroundMap`), Screens (`KitUI`, `PauseMenu`). Nothing depends on Feel except `Playground/Picker.cs` (rows). DayNight needs URP's `Light2D`.
+- From before: phase 11 unchecked items (Fade/Open camera in the Dungeon, bullets on crates, load time with many rooms), phase 10/9 smoke-only items, re-run `combat.cs` and `bullet-alloc.cs`, camera check flake (Open, B -> C, once), broken crumbling in "blocks" mode, tiles closing on someone, `screens.cs` at WXGA, WebGL module + build, GitHub push, GIFs, `Assets/_Recovery/` to delete, real-mouse clicks unverified (trap 39), default font, warning `Pickup.All` hides `Interactable.All`, aim assist bends toward crates.
 
 ## Waiting on the user
 
-- Playtests (all feels, grid step, tiles, phase 9 weapons, boss and phase 10 enemies, the Dungeon). WebGL module install, repo push.
+- Playtests (all feels, grid step, tiles, phase 9 weapons, boss and phase 10 enemies, the Dungeon, and now sounds / hit-stop / effects / tint). WebGL module install, repo push.
 
 ## Don't
 
-- Don't paint generated rooms into the scene by hand or give pieces their own colliders: pieces are stamped into the level's one floor and one wall tilemap at `Awake`.
-- Don't add a second door system for generated rooms: doors are door ground + a `TileDoor` per room half, on that room's `RoomLock`.
-- Don't make a Crate class: a crate is a prefab (sprite, static collider, `Health`, `Drops`).
+- Don't make core code call `FeelPlayer`: core raises a static event, Feel listens (keeps Feel deletable for phase 14).
+- Don't reorder `FeelEvent` - slots are saved by number; add at the end.
+- Don't make hit-stop count fixed steps or change dt: it is timeScale 0, like the pause.
+- Don't commit generated audio from anywhere but `Tools/sfx/make-sounds.py`; no downloaded sounds.
 - Don't write or run checks per phase beyond the vital ones (user, 2026-11-14).
-- Don't add a navmesh; don't give enemies tile code; don't make the trail kill by default; don't add a second melee hit path; don't put aim assist on the weapon (all from phase 10 and earlier).
-- Don't drive mouse presses through `Mouse.current` in checks (trap 84). Don't recompile until `EditorApplication.isPlaying` reads false (trap 83).
-- Don't change the licence to MIT; don't push or add a remote without the user saying so.
+- From before: no hand-painted generated rooms, no second door system, no Crate class, no navmesh, no tile code in enemies, don't drive mouse presses through `Mouse.current` (trap 84), don't recompile while `isPlaying` (trap 83), don't change the licence, don't push or add a remote without the user saying so.

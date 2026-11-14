@@ -35,6 +35,8 @@ namespace TopDownKit
         public int Ammo { get { Init(); return ammo.Length > 0 ? ammo[current] : 0; } }
         public bool Reloading => reloadLeft > 0f;
         public int ShotsFired { get; private set; }
+        // Every shot or swing of every Gun, after it starts (sounds, particles). Read Current for the weapon.
+        public static event System.Action<Gun> AnyShot;
         // 0..1 while a charge weapon is held, else 0 (for a HUD or a glow).
         public float Charge01 { get { Weapon w = Current; return charging && w != null && w.chargeTime > 0f ? Mathf.Clamp01(charged / w.chargeTime) : 0f; } }
 
@@ -143,6 +145,7 @@ namespace TopDownKit
                 cooldown = Mathf.Max(cooldown, 0f) + 1f / w.fireRate;
             }
             if (w.magazine > 0) ammo[current]--;
+            AnyShot?.Invoke(this);
             if (mover != null && w.recoil > 0f) mover.AddPush(-dir * w.recoil);
             if (w.shakeOnShot > 0f)
             {

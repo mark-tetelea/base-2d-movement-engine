@@ -118,7 +118,7 @@ namespace TopDownKit
                 }
                 if (hitHealth != null || bouncesLeft <= 0)
                 {
-                    if (hitHealth != null) hitHealth.Hit(damage, dir * knockback);
+                    if (hitHealth != null) hitHealth.Hit(damage, dir * knockback, HitSource.Shot);
                     Release();
                     return;
                 }

@@ -135,6 +135,15 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
   bar at the level; `Awake` order -100), `Drops` (add-on: weighted drop table on death), `DungeonGoal`.
   Crate = prefab (sprite, static collider, `Health` team 2, `Drops`). Pieces in `Assets/Prefabs/Rooms/`,
   `Crate` in `Prefabs/World/`, `Coin`/`Heart` in `Prefabs/Pickups/`. A new piece = a new prefab, no code.
+- `Assets/Scripts/Feel/` (phase 12, add-on: delete it and the game is silent, nothing breaks) -
+  `FeelPlayer` (one per scene, on "Feel") listens to the core's static events (`Health.AnyDamaged/AnyDied`
+  + `LastSource`, `Gun.AnyShot`, `Dash.AnyStarted`, `Pickup.AnyCollected`, `RoomLock.AnyDoors`,
+  `LockedDoor.AnyOpened`, `Lever.AnyPulled`, `GroundMap.TileChanged`, `KitUI.Clicked`) and plays the
+  `FeelSet` asset's slot per `FeelEvent` (clips, volume, effect prefab, hit-stop seconds; 0/empty = off);
+  `Play(id, pos)` for a game's own events. Hit-stop = timeScale 0 for real seconds, never ends a pause.
+  `FeelOverride` (other slots for one object; Crate breaks), `Footsteps`, `Burst` (placeholder effect),
+  `DayNight` (Off / Fixed / Cycle on the global Light2D). Set `Assets/Data/Feel/KitFeel.asset`, sounds
+  `Assets/Audio/Placeholder/` (made by `Tools/sfx/make-sounds.py`), effects `Assets/Prefabs/Effects/`.
 - `Assets/Scripts/Interaction/` - `Interaction.Pick` (the one best-target rule, plain points),
   `Interactable` base + targets `Talker`, `LockedDoor`, `Lever` (and `Chest`, `Pickup`),
   `Interactor` (E as data; open panels pause walking), `InteractPrompt`, `TextBox` +

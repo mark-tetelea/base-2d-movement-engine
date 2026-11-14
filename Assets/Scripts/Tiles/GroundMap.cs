@@ -28,6 +28,9 @@ namespace TopDownKit
         static readonly List<GroundMap> all = new List<GroundMap>();
         public static IReadOnlyList<GroundMap> All => all;
 
+        // A crumbling tile changing state: Warning (cracks), Broken, Normal (back). Cell in this map.
+        public static event System.Action<GroundMap, Vector3Int, GroundState> TileChanged;
+
         Tilemap map, solid, low, overlay;
         TilemapCollider2D solidCollider, lowCollider;
         CompositeCollider2D solidShape, lowShape;
@@ -164,7 +167,7 @@ namespace TopDownKit
                 GroundState was = cell.state;
                 cell.state = Ground.Crumble(was, ref cell.stepsLeft, stepped.Contains(c), TileAt(c), dt);
                 if (cell.state == GroundState.Normal) cells.Remove(c); else cells[c] = cell;
-                if (cell.state != was) Changed(c);
+                if (cell.state != was) { Changed(c); TileChanged?.Invoke(this, c, cell.state); }
             }
 
             // Deadly ground, after this step's breaks.

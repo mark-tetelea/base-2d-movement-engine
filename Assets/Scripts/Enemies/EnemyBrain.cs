@@ -121,7 +121,7 @@ namespace TopDownKit
             }
 
             if (sees && touchRange > 0f && touchDamage > 0 && dist < touchRange && targetHealth != null)
-                targetHealth.Hit(touchDamage, Knockback.Away(me, target.position, touchKnockback));
+                targetHealth.Hit(touchDamage, Knockback.Away(me, target.position, touchKnockback), HitSource.Touch);
         }
 
         // Straight at a point, or round the walls with a PathWalker.

@@ -23,6 +23,8 @@ namespace TopDownKit
 
         static readonly List<Pickup> pickups = new List<Pickup>();
         public static IReadOnlyList<Pickup> All => pickups;
+        // Every pickup that gives something (sounds, particles). The second value is who took it.
+        public static event System.Action<Pickup, GameObject> AnyCollected;
 
         float age;
 
@@ -76,6 +78,7 @@ namespace TopDownKit
                 Gun g = who.GetComponent<Gun>();
                 if (g != null) { g.Refill(); refillAmmo = false; }
             }
+            AnyCollected?.Invoke(this, who);
             if (stack.Empty && heal <= 0 && !refillAmmo) Destroy(gameObject);
             return true;
         }
