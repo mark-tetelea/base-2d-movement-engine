@@ -618,3 +618,13 @@ stop, which was still running: the domain reload restored private fields - a nul
 came back as an empty one, a `System.Random` as null. Rule: wait until
 `EditorApplication.isPlaying` reads false before `recompile`; open-state tests read the
 data they index (`TextBox.IsOpen` checks the index). Found 2026-11-14.
+
+## 84. Scripted mouse press never lands; both press checks fail
+
+Symptom: `screens.cs` reported "press on picker does not shoot (startedOnUI False)" and
+"press on floor shoots (shots 0 -> 0)": no press arrived at all, though every setting from
+trap 82 was in place. A queued press read `isPressed` false a second later. Cause: the real
+mouse (`Mouse.current`) keeps sending its own state events, which overwrite a queued state
+with the buttons up. A virtual mouse made current shot at once. Rule: drive presses through
+your own device - `InputSystem.AddDevice<Mouse>("...")`, `MakeCurrent()`, queue on it,
+`RemoveDevice` at the end. Found 2026-11-14 (phase 8).

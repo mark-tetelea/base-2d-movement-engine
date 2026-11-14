@@ -18,7 +18,10 @@ var picker = UnityEngine.Object.FindFirstObjectByType<TopDownKit.Playground.Pick
 var player = GameObject.Find("Player");
 var gun = player.GetComponent<TopDownKit.Gun>();
 var shooter = player.GetComponent<TopDownKit.PlayerShooter>();
-var mouse = UnityEngine.InputSystem.Mouse.current;
+// Its own mouse: the real mouse's state events overwrite queued presses (trap 84).
+var mouse = UnityEngine.InputSystem.InputSystem.GetDevice("ScreensMouse") as UnityEngine.InputSystem.Mouse;
+if (mouse == null) mouse = UnityEngine.InputSystem.InputSystem.AddDevice<UnityEngine.InputSystem.Mouse>("ScreensMouse");
+mouse.MakeCurrent();
 if (!picker.IsOpen) picker.Toggle();
 
 // Where is the first picker button on screen? Panel coords * scale, Y flipped.
@@ -94,6 +97,7 @@ if (state == "pressFloor")
     pm.Resume();
     string rz = (Time.timeScale == 1f && !TopDownKit.PauseMenu.IsPaused ? "PASS" : "FAIL") + " resume sets timeScale 1";
     D.SetData("sc_state", null);
+    UnityEngine.InputSystem.InputSystem.RemoveDevice(mouse);
     ins.editorInputBehaviorInPlayMode = (UnityEngine.InputSystem.InputSettings.EditorInputBehaviorInPlayMode)D.GetData("sc_eb");
     ins.backgroundBehavior = (UnityEngine.InputSystem.InputSettings.BackgroundBehavior)D.GetData("sc_bb");
     return "done\n" + results[0] + "\n" + D.GetData("sc_floor") + "\n" + D.GetData("sc_ui") + "\n" + floorShot + "\n" + pk + "\n" + back + "\n" + pz + "\n" + rz;

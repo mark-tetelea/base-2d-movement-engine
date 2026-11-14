@@ -7,7 +7,7 @@ namespace TopDownKit
     // along the distance it is about to cover, so a fast bullet cannot skip through a thin
     // wall or a target. The first solid thing in the way stops it: a wall, or anything with
     // a Health of another team (it takes the damage and a push along the bullet's path).
-    // Same-team colliders and triggers are flown through.
+    // Same-team colliders, triggers and low barriers (ShootOver) are flown through.
     // Bullets are reused through Unity's own ObjectPool (Bullet.Spawn); see LOG 2026-11-14
     // for the measurement that asked for it.
     [RequireComponent(typeof(Rigidbody2D))]
@@ -93,6 +93,7 @@ namespace TopDownKit
             Health hitHealth = null;
             for (int i = 0; i < n; i++)
             {
+                if (hits[i].collider.GetComponent<ShootOver>() != null) continue;   // a low barrier
                 Health h = hits[i].collider.GetComponentInParent<Health>();
                 if (h != null && (h.team == team || h.Dead)) continue;
                 if (hits[i].distance < nearest) { nearest = hits[i].distance; hitCollider = hits[i].collider; hitHealth = h; }

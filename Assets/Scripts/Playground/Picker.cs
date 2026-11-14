@@ -14,6 +14,8 @@ namespace TopDownKit.Playground
     {
         public PlayerMover mover;
         public MoveFeel[] feels;
+        [Tooltip("Grid-step feels the Grid step row cycles through (after off).")]
+        public MoveFeel[] gridFeels;
         public Dash dash;
         public PlayerFacing facing;
         public PlayerAim aim;
@@ -62,6 +64,8 @@ namespace TopDownKit.Playground
             Add("Feel", () => mover != null && feels != null && feels.Length > 0,
                 () => mover.feel != null ? mover.feel.name : "-",
                 () => mover.feel = feels[Next(Array.IndexOf(feels, mover.feel), feels.Length)]);
+            Add("Grid step", () => mover != null && gridFeels != null && gridFeels.Length > 0,
+                () => mover.feel != null && mover.feel.settings.gridStep ? mover.feel.name : "off", NextGrid);
             Add("Dash (Space)", () => dash != null, () => dash.enabled ? "on" : "off", () => dash.enabled = !dash.enabled);
             Add("Facings", () => facing != null, () => ((int)facing.settings.directions).ToString(),
                 () => facing.settings.directions = facing.settings.directions == FacingCount.Eight ? FacingCount.Four : FacingCount.Eight);
@@ -84,6 +88,16 @@ namespace TopDownKit.Playground
                 () => collector.settings.magnetReach <= 0f ? "off" : Num(collector.settings.magnetReach) + " tiles",
                 () => collector.settings.magnetReach = magnets[Next(IndexOf(magnets, collector.settings.magnetReach), magnets.Length)]);
             Add("Room", () => rig != null && rig.target != null, RoomText, ClearRoom);
+        }
+
+        // off -> each grid feel -> off (back to the last free feel).
+        MoveFeel lastFree;
+        void NextGrid()
+        {
+            int i = Array.IndexOf(gridFeels, mover.feel);
+            if (i < 0 && mover.feel != null && !mover.feel.settings.gridStep) lastFree = mover.feel;
+            if (i + 1 < gridFeels.Length) mover.feel = gridFeels[i + 1];
+            else mover.feel = lastFree != null ? lastFree : feels != null && feels.Length > 0 ? feels[0] : mover.feel;
         }
 
         string RoomText()

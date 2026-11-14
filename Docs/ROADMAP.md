@@ -27,7 +27,7 @@ gives a different-feeling game with no code change. The kit's design test still 
 | **Dash / dodge roll** - distance, time, cooldown, invulnerable or not | add-on | to build |
 | **Knockback / recoil** - own decaying push, added after `Step` | add-on | designed |
 | **Boosts and slowdowns** - speed pads, mud, ice floor zones | add-on | designed |
-| **Grid step** (one tile per press, Pokemon-style) **(new)** | add-on | idea |
+| **Grid step** (one tile per press, Pokemon-style) | setting (`MoveSettings.gridStep`; feels `Grid`, `Grid 8`, `Grid tap`) | built 2026-11-14 (phase 8) |
 | **Tank controls** (turn, then drive) **(new)** | add-on | idea |
 
 ### 2. Facing, aim and animation
@@ -136,7 +136,28 @@ the counselor chat, ending with `/handoff` and a commit.
 | 6 | Playground picker and the screens | built 2026-11-14: UI Toolkit screens, start menu |
 | 7 | GitHub polish: README, GIFs, WebGL build, licence | 2026-11-14: README, LICENSE, PNG screenshots; WebGL blocked (module not installed) |
 
+## Round 2 - asked for by the user, 2026-11-14
+
+Same rules as round 1: each difference is a setting, each extra is an add-on piece, one
+copy of each rule, checks before `/handoff`.
+
+| # | Phase | What it adds |
+|---|---|---|
+| 8 | **Ground tiles + grid-step** - built 2026-11-14 | Tile types, each one a small asset: **normal** ground; **red** (kills you); **blue** (can't be stepped on - a wall you can see over and shoot across); **crumbling** (breaks a set time after you step on it, comes back after a set time); **door ground** (opens/closes on a switch, a key or a cleared room - reuses phase 3's `RoomLock`). Plus **grid-step movement**: one tile per press, as a movement setting, with a "frames per step" / step time setting for smoothness. |
+| 9 | **Combat additions** | Melee swing, charge shots, bullets that bounce off walls, aim assist (strength as a setting, 0 = off). |
+| 10 | **Enemy additions** | Pathfinding around walls (fixes the stuck-behind-pillar limit), a boss with phases, groups that move together, enemies that leave a trail (can use the red-tile rule). |
+| 11 | **World additions** | Procedural rooms (a new layout every run, built from room pieces), destructible crates. |
+| 12 | **Feel additions** | Hit-stop (tiny freeze on hits), particles, sound effects, day/night tint. All settings, all off-able. **Sounds are swappable**: each event (step, shot, hit, pickup, door, UI click...) points at a sound slot you fill with your own clip or leave empty. |
+| 13 | **Systems** | Save and load, a coin shop, a minimap, touch controls for phones. These lift "saving" and "touch" off `CLAUDE.md`'s "Do NOT build yet" - the user asked for them. |
+| 13b | **Item pickup pass** | How an item is picked up is a **per-item setting**: walk over it, come close and press interact, or pulled in by a magnet. Items come from any source the same way - the floor, chests, the shop, enemy drops. Every item can be **dropped** from the inventory back onto the floor. (Phase 5 built auto/manual pickups, the magnet, chests and dropping - this pass makes the mode a per-item choice and connects the shop and enemy drops.) |
+| 14 | **Make everything swappable** | The final pass. Any tile, character, enemy, wall or weapon is swapped by dropping in your own art/asset - no code. Animations: any number of frames, any frame rate, per action (idle, walk, attack, hurt...). Sounds: any clip per event slot. **Controls**: every key is a setting, with a rebind screen in the pause menu (input still arrives as data, so touch keeps working). **UI**: colours, fonts, box and button art, and layout swapped through the theme and panel art - no code. Every system lives in its own folder and can be **deleted without breaking the rest** - a check deletes each one in turn and compiles. A short "how to replace / remove X" guide per system in the README. |
+| 15 | **Full test pass** | One pass at the end of round 2 (user, 2026-11-14: from phase 8 on, per-phase tests only when vital - it compiles, plus a check only where a bug would be hard to find later (e.g. save/load, the generator always making a finishable level)). Re-run every check in `Tools/measure/`, add checks for the round-2 systems, run all demo bots, fix what breaks. |
+
+**A note for phase 14:** `CLAUDE.md` says "no config systems until three real callers
+exist". By then there are three demos plus the Playground, so the three callers exist -
+the phase names them when it adds anything shared.
+
 ## Still not doing
 
-Gamepad, touch and mobile builds, saving, online play - until a game needs them
-(`CLAUDE.md`, "Do NOT build yet"). Tycoon / management - parked.
+Gamepad and online play - until a game needs them (`CLAUDE.md`, "Do NOT build yet").
+Tycoon / management - parked. Third demo (roguelike dungeon) - an idea, not asked for yet.

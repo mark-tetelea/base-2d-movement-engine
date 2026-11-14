@@ -1,28 +1,28 @@
 # Next
 
-> Overwritten at every `/handoff`. Written 2026-11-14, end of phase 7 (README, licence, screenshots).
+> Overwritten at every `/handoff`. Written 2026-11-14, end of phase 8 (ground tiles, grid-step).
 
 ## Do first
 
-1. **The user decides on WebGL:** install the WebGL Build Support module in Unity Hub (the user's call), then build to `Builds/WebGL/` (git-ignored) and check it loads locally. It is the first real build: check the screens and start menu in it.
-2. **The counselor + user create the GitHub repo** (https://github.com/mark-tetelea) and push. Check the README renders there (tables, images from `Media/`).
-3. The playtests from `CONTEXT.md`, "What is not done".
+1. **Phase 9 of `Docs/ROADMAP.md` (combat additions)** - melee swing, charge shots, bouncing bullets, aim assist - when the counselor starts it. Bouncing bullets must keep flying over `ShootOver` (blue ground) and stop on "Ground blocks" (closed doors).
+2. If the camera check's Open-layout "walk B -> C" fails again (it did once this session, stopped at y 17.5 with nothing solid there, then passed 11/11), find out why before trusting it.
+3. The playtests from `CONTEXT.md`, "What is not done" - now including grid step and the tile garden.
 
 ## Half-done
 
-- GIFs: only PNG screenshots in `Media/`. A GIF needs a screen recorder (e.g. ScreenToGif) or a frame-sequence script + converter; keep each under ~5 MB.
-- `Assets/_Recovery/` still on disk (now git-ignored). Delete it in the Project window.
-- The real mouse clicking real buttons is unverified (trap 39).
-- Placeholder font is Unity's default (smooth, not pixel).
-- Old warning: `Pickup.All` hides `Interactable.All` (CS0108).
+- Not checked: broken crumbling tiles in "blocks" mode, and a tile or door closing on someone standing on it (physics should push them out). Same collider path as closed doors, which is checked.
+- `screens.cs` was not re-run at WXGA 1366x768 this phase (UI code unchanged).
+- No demo uses the tiles (the brief allowed it only if natural). A later demo could use red trails (phase 10's "enemies that leave a trail").
+- From before: WebGL module + build, GitHub repo and push, GIFs, `Assets/_Recovery/` to delete, real-mouse clicks unverified (trap 39), default font, warning `Pickup.All` hides `Interactable.All`.
 
 ## Waiting on the user
 
-- WebGL module install, repo creation and push, playtests.
+- Playtests (all feels, grid step, tiles). WebGL module install, repo creation and push.
 
 ## Don't
 
-- Don't change the licence to MIT: the user chose a custom one (LOG 2026-11-14).
-- Don't push or add a remote without the user saying so.
-- Screenshots: `ScreenCapture.CaptureScreenshot` with an absolute path in `Media/`, in play mode with `runInBackground = true`; not `capture_game_view` (no UI, lands in `Assets/`).
+- Don't add tile code to movers, bullets or enemies: tiles block through `GroundMap`'s runtime colliders; bullets skip `ShootOver`. A new tile kind is a new `GroundTile` asset.
+- Don't add a second door system: door ground is a `TileDoor` object switched by `RoomLock` / `Lever` / `LockedDoor`.
+- Don't drive mouse presses through `Mouse.current` in checks - use your own virtual mouse (trap 84).
+- Don't change the licence to MIT; don't push or add a remote without the user saying so.
 - Don't recompile until `EditorApplication.isPlaying` reads false (trap 83).

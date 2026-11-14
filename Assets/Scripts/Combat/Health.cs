@@ -70,6 +70,9 @@ namespace TopDownKit
         public bool Hit(int amount, Vector2 push)
         {
             Init();
+            // Looked up here too, so a Dash or mover added after this woke up still counts (trap 14).
+            if (dash == null) dash = GetComponent<Dash>();
+            if (mover == null) mover = GetComponent<PlayerMover>();
             bool shielded = dash != null && dash.IsInvulnerable;
             int hp = Current;
             if (!Damage.Apply(ref hp, ref invulnerableLeft, amount, invulnerableTime, shielded)) return false;

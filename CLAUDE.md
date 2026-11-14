@@ -76,16 +76,28 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
   0 = instant), `MoveFeel` (the asset), `PlayerMover` (keys -> direction in `Update`,
   latched until a step uses it; `Step` in `FixedUpdate` on an interpolated Rigidbody2D,
   reading the body's velocity back so walls take speed away). The body gets walking
-  velocity + a knockback push, kept apart.
+  velocity + a knockback push, kept apart. **Grid step** is a feel setting
+  (`MoveSettings.gridStep`, `stepTime`, `holdToWalk`, `eightDirections`): `GridStep` is its
+  one rule (tile centres at n + 0.5, `StandPoint` = collider centre, blocked = any solid
+  collider in the target tile); pushes and dashes move freely, then it slides back onto a centre.
 - Movement add-ons (phase 1): `Knockback` (the one push rule: `Away`, `Step`; decay is
   `MoveSettings.knockbackStopRate`), `Dash` (add-on component, `DashSettings`, exact distance
   in whole steps), `SpeedZone` (trigger; scales speed or swaps the feel).
-- `Assets/Data/Movement/` - `Instant`, `Glide`, `Ice`, `Heavy` feels, `NoFriction` (player collider).
+- `Assets/Data/Movement/` - `Instant`, `Glide`, `Ice`, `Heavy`, `Grid`, `Grid 8`, `Grid tap` feels, `NoFriction` (player collider).
+- `Assets/Scripts/Tiles/` (phase 8) - `GroundTile` (the asset: art + `GroundRules` blocks walking /
+  blocks bullets / kills / damage per second, plus crumbling and door settings), `Ground` (the one
+  rule: `Crumble`, `Hurt`), `GroundMap` (on the floor tilemap: hurts anything with a `Health` by
+  where it stands, runs crumbling, door state, art by state; blocking = runtime collider tilemaps
+  "Ground blocks" and "Ground low blocks" (`ShootOver`), so movement and bullets need no tile
+  code), `TileDoor` (active = its door tiles closed; drive it with `RoomLock`/`Lever`/`LockedDoor`).
+  Tiles in `Assets/Data/Tiles/`: Normal, Red, Blue, Crumbling, Door. A new kind = a new asset.
 - `Assets/Scenes/Playground.unity` (was TestArena) - Pixel Perfect Camera 640x360 / 16 PPU,
   Pixel Snapping, Windowbox; floor and wall tilemaps (walls: one merged collider, trap 74);
   the player with every system. `Assets/Scripts/Playground/Picker.cs` (Tab) switches every
   setting live and places the aim marker; K knocks the player from the mouse (`KnockKey.cs`);
-  speed pad, mud and ice patch under `Zones`; a chest, the Guide, coins in A; wanderers in D.
+  speed pad, mud and ice patch under `Zones`; a chest, the Guide, coins in A; wanderers in D;
+  the tile garden (every ground tile, a lever door, a key door) in the lower left of C; B's
+  north door is door ground.
 - `Assets/Scripts/Facing/` - `Facing` (the one facing rule: index 0-7 counter-clockwise
   from right, `Step`/`Snap`, zero direction keeps the facing; `FacingSettings`: 4 or 8,
   face walk or aim), `PlayerAim` (mouse or walk -> `Direction`, data), `PlayerFacing`
@@ -99,7 +111,7 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
 - `Assets/Scripts/Combat/` - `Damage` (the one damage rule), `Health` (teams, invulnerable
   time, flash, knockback on the target, dash protects), `Weapon` (asset, settings only),
   `Gun` (input as data: aim, trigger, reload, select), `Bullet` (fixed step, circle sweep,
-  `ObjectPool`), `PlayerShooter` (mouse/keys -> Gun), `EnemyBrain` (Chase / KeepDistanceAndShoot
+  `ObjectPool`; flies over `ShootOver` colliders), `PlayerShooter` (mouse/keys -> Gun), `EnemyBrain` (Chase / KeepDistanceAndShoot
   / Wander on a `PlayerMover` with `readKeyboard` off), add-ons `RoomWaves` (clears a
   `RoomLock`), `RestartOnDeath`; `ArenaGoal` (the demo's win/wave text into the `Hud`). Weapons in `Assets/Data/Weapons/`,
   enemies in `Assets/Prefabs/Enemies/`. Enemies walk straight: no pathfinding.
@@ -120,7 +132,7 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
 - `Assets/Scenes/ArenaShooter.unity` - the Arena shooter demo (death reloads by build index). `Warp` moves only the camera's target.
 - `Tools/measure/` - measuring harness: `movement.cs` (run with `eval_file` in play mode;
   drives the real key path through a virtual keyboard, logs every fixed step) and
-  `analyse-movement.js`; it also checks dash distance and knockback decay at 30 vs 144 fps. Re-run it after any change to movement. `combat.cs` (30 vs 144 fps), `bullet-alloc.cs`, `playthrough.cs` on ArenaShooter; `inventory.cs` (edit mode), `rpg-playthrough.cs` on LittleRpg; `screens.cs` on Playground (UI scale, click guard, picker, pause; run at 1920x1080 and WXGA). The movement/facing/camera checks run on Playground.
+  `analyse-movement.js`; it also checks dash distance and knockback decay at 30 vs 144 fps. Re-run it after any change to movement. `combat.cs` (30 vs 144 fps), `bullet-alloc.cs`, `playthrough.cs` on ArenaShooter; `inventory.cs` (edit mode), `rpg-playthrough.cs` on LittleRpg; `screens.cs` on Playground (UI scale, click guard, picker, pause; run at 1920x1080 and WXGA); `tiles.cs` on Playground (every tile rule, grid step at 30 vs 144 fps). The movement/facing/camera checks run on Playground.
 - `Assets/Art/Palette/endesga-32.gpl` - the one palette; pxkit and Aseprite both load it.
   Never written by a script that also reads it (trap 70).
 - `Assets/Art/PixelSprite16.preset` - import default for PNGs under `Assets/Art/**`.
@@ -142,7 +154,7 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
 ## Traps
 
 > One line each: symptom -> rule. The full story is in `Docs/TRAPS.md` under the same
-> number. Add the day a trap is found; next free number is **84**.
+> number. Add the day a trap is found; next free number is **85**.
 
 **The editor lies about your own edits**
 1. Code right, game wrong -> a changed `[SerializeField]` default does not change a scene that already saved it; edit the scene in edit mode and save.
@@ -250,6 +262,7 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
 81. `capture_game_view` shows no UI -> it renders the camera only; render the panel to a RenderTexture (`targetTexture`) to look at screens.
 82. Scripted mouse reads (0,0) or the real mouse -> route all input to the Game view, `QueueStateEvent` a `MouseState`, judge "over UI" at the press, not by hovering.
 83. Burst of exceptions after a recompile -> play mode was still stopping; wait for `isPlaying` false before `recompile`.
+84. Scripted mouse press never lands -> the real mouse's events overwrite it; `AddDevice<Mouse>`, `MakeCurrent`, queue on that, remove after.
 
 ## Environment
 

@@ -21,5 +21,20 @@ namespace TopDownKit
         [Tooltip("How fast a knockback push dies away, in tiles per second lost every second. "
             + "Higher = shrugs hits off sooner. 0 = pushes stop at once.")]
         [Min(0f)] public float knockbackStopRate;
+
+        [Header("Grid step (one tile per press)")]
+        [Tooltip("On: the mover goes one whole tile at a time and lands on tile centres (Pokemon style); "
+            + "speed is then tiles per second while walking, and the two times above are not used. Off: free movement.")]
+        public bool gridStep;
+
+        [Tooltip("Grid step: seconds the slide from one tile to the next takes - the smoothness. "
+            + "0 = jumps. Never longer than one tile at the speed above.")]
+        [Min(0f)] public float stepTime;
+
+        [Tooltip("Grid step: holding a direction keeps walking. Off: one press, one tile.")]
+        public bool holdToWalk;
+
+        [Tooltip("Grid step: diagonal steps allowed (8 directions). Off: 4 directions.")]
+        public bool eightDirections;
     }
 }

@@ -19,3 +19,7 @@
 | Key item (manual pickup + icon) | 16x16 | centre | fire, steel | Claude | no |
 | Bullet | 8x8 | centre | fire, steel | Claude | no |
 | Interaction prompt | 8x8 | centre | steel | Claude | no |
+| Ground: red (deadly) | 16x16 | tile | fire | Claude | yes - `ground-red.js` (2026-11-14) |
+| Ground: blue (low barrier, water) | 16x16 | tile | blue, steel | Claude | yes - `ground-blue.js` (2026-11-14) |
+| Ground: crumbling - whole, warning, broken | 16x16 x3 | tile | wood, steel | Claude | yes - `crumble*.js` (2026-11-14) |
+| Ground: door - open, closed | 16x16 x2 | tile | steel, plum | Claude | yes - `door-open.js`, `door-closed.js` (2026-11-14) |

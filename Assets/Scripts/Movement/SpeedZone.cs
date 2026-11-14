@@ -43,6 +43,10 @@ namespace TopDownKit
             MoveSettings s = basic;
             for (int i = 0; i < zones.Count; i++)
                 if (zones[i] != null && zones[i].isActiveAndEnabled && zones[i].feel != null) s = zones[i].feel.settings;
+            // A zone never switches a mover between free and grid-step movement: the grid
+            // settings stay the mover's own (on grid step, a zone's speedScale changes the pace).
+            s.gridStep = basic.gridStep; s.stepTime = basic.stepTime;
+            s.holdToWalk = basic.holdToWalk; s.eightDirections = basic.eightDirections;
             for (int i = 0; i < zones.Count; i++)
                 if (zones[i] != null && zones[i].isActiveAndEnabled) s.speed *= zones[i].speedScale;
             return s;

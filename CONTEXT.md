@@ -1,6 +1,6 @@
 # Where the kit is now
 
-> Rewritten, never appended. True as of **2026-11-14**, end of phase 6 (Playground picker, shared screens, start menu).
+> Rewritten, never appended. True as of **2026-11-14**, end of phase 8 (ground tiles, grid-step movement).
 
 ## How it starts
 
@@ -16,10 +16,18 @@ room C above, and area D reached by a brown warp pad in C. Along the top of A: a
 speed pad (x1.6), brown mud (x0.5) and a cyan ice patch. In A: a chest (a key and 10 coins),
 the green Guide to talk to, a row of coins. In D: two green wanderers to shoot.
 
+The **tile garden** in the lower left of C has every kind of ground: a red pool (kills), a
+blue strip (water you cannot walk through but can shoot over), a crumbling bridge across a
+red moat (it cracks when stepped on, breaks 0.75 s later into a deadly hole, is back 3 s
+after), a door in a short wall opened by a lever, and a door opened with the chest's key.
+B's north door is door ground too: it shuts while B is locked and opens when B is cleared.
+
 A **settings panel** on the left (Tab hides it) shows every choice the kit has, each as a
 button; a click moves to the next value, live:
 
 - Feel: Instant (like Deltarune) / Glide (like Diep.io) / Ice / Heavy
+- Grid step: off / Grid (one tile at a time, hold to walk) / Grid 8 (diagonals too) /
+  Grid tap (one press, one tile)
 - Dash (Space): on / off - Facings: 4 / 8 - Face towards: walk / aim - Aim from: mouse / walk
 - Camera: Open / Rooms slide / Rooms fade - Weapon: Pistol / Shotgun / Rapid
 - Best target: facing / closest - Use: press / hold - Reach: 1 / 1.5 / 2.5 tiles
@@ -54,7 +62,10 @@ numbers like the game (x3 at 1920x1080, x2 at 1366x768).
 
 ## What is measured
 
-Same keys give the same movement step for step at 30 and 144 fps; combat too. Reused bullets
+Same keys give the same movement step for step at 30 and 144 fps; combat too; grid steps
+land exactly on tile centres and on the same tiles at both. Each tile rule is checked: red
+kills (a dash over it protects until it ends there), blue blocks walking but not bullets,
+crumbling breaks and returns on time, door ground opens by lever, key and cleared room. Reused bullets
 cost ~4 us and ~150 B against ~24 us and ~4 KB. Bots clear the Arena shooter and finish the
 RPG room. The UI scale matches the camera at 1920x1080 and 1366x768, and a click on the
 settings panel does not shoot.
@@ -67,11 +78,14 @@ settings panel does not shoot.
 4. Pickups and inventory - auto and manual, hotbar, chests as inventories: **built**.
 5. Shooting - weapons, reused bullets, health, damage, recoil, tiny enemies: **built**.
 6. Screens and the Playground picker: **built** (phase 6).
+7. Ground tiles (normal, red, blue, crumbling, door) and grid-step movement: **built** (phase 8,
+   round 2). Only the Playground uses them; no demo does.
 
 ## What is not done
 
 - Every playtest: movement feel (Instant vs Glide, wall slide), facing (8 directions, walk
   speed), combat numbers, the RPG room (reach, facing vs closest, magnet), and now the screens
-  (sizes, readability, the settings panel). Nobody has played any of it yet.
+  (sizes, readability, the settings panel), and now grid step (pace, slide time) and the
+  tiles (crumble timing, how forgiving red is). Nobody has played any of it yet.
 - Real art for everything in `TO-DRAW.md` except the floor, wall, player and aim marker.
 - WebGL build (module not installed), GIFs (only PNG screenshots in `Media/`), GitHub repo and push (the user's call).

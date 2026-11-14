@@ -32,6 +32,19 @@ namespace TopDownKit
         Vector2 drivenVelocity;
         readonly List<SpeedZone> zones = new List<SpeedZone>();
 
+        // Grid step (MoveSettings.gridStep): one slide to a tile centre at a time.
+        bool sliding;
+        int slideLeft;             // fixed steps until the slide arrives
+        int paceLeft;              // fixed steps until the next step may start
+        Vector2 slideTo;           // stand point it arrives at
+        Vector2 slideVelocity;
+        Vector2 pendingStep;       // a press no grid step has used yet (buffered)
+        readonly Vector2Int[] candidates = new Vector2Int[3];
+
+        // Grid step: whether a slide is under way, and the tile centre it ends on.
+        public bool Sliding => sliding;
+        public Vector2 SlideTarget => slideTo;
+
         public Vector2 MoveVelocity => move;
         public Vector2 Push => push;
         // The last direction asked for (right before any), for a dash with no keys held.
@@ -86,7 +99,8 @@ namespace TopDownKit
         {
             if (body == null) body = GetComponent<Rigidbody2D>();
             Vector2 direction = held != Vector2.zero ? held : pressedSinceStep;
-            if (inputPaused) direction = Vector2.zero;
+            bool newPress = pressedSinceStep != Vector2.zero;
+            if (inputPaused) { direction = Vector2.zero; newPress = false; pendingStep = Vector2.zero; }
             pressedSinceStep = Vector2.zero;
             InputDirection = direction;
             if (direction != Vector2.zero) LastMoveDirection = direction.normalized;
@@ -96,12 +110,71 @@ namespace TopDownKit
 
             TakeWallLoss();
 
+            if (s.gridStep && !driven) { GridFixedStep(direction, newPress, s, dt); return; }
+            sliding = false; paceLeft = 0; pendingStep = Vector2.zero;
+
             move = driven ? drivenVelocity : Movement.Step(move, direction, s, dt);
             driven = false;
             sentVelocity = move + push;
             body.linearVelocity = sentVelocity;
             // The push decays after it was used, so a fresh push moves one full step.
             push = Knockback.Step(push, s.knockbackStopRate, dt);
+        }
+
+        // Grid step, one fixed step. Arrives (snapping the last thousandth of a tile), then
+        // starts the next step when the pace allows: back onto a tile centre first if
+        // something left it between two (a dash, a push, a shove), else in the direction
+        // asked for - held (holdToWalk) or a buffered press. Nothing starts while a push
+        // is moving it. Blocked steps are not taken (GridStep.CanStep).
+        void GridFixedStep(Vector2 direction, bool newPress, MoveSettings s, float dt)
+        {
+            if (newPress) pendingStep = direction;
+            Vector2 offset = GridStep.StandPoint(body) - body.position;
+
+            if (sliding && --slideLeft <= 0)
+            {
+                sliding = false;
+                // Arrived unless something stopped it on the way; then it lines up below.
+                if ((GridStep.StandPoint(body) - slideTo).sqrMagnitude < 0.01f) body.position = slideTo - offset;
+            }
+            if (paceLeft > 0) paceLeft--;
+
+            if (!sliding && paceLeft <= 0 && push == Vector2.zero)
+            {
+                Vector2 at = GridStep.StandPoint(body);
+                int perTile = GridStep.StepsPerTile(s.speed, dt);
+                if (perTile > 0)
+                {
+                    if (!GridStep.OnCentre(at))
+                    {
+                        if (GridStep.NearestFree(at, body, out Vector2 c)) StartSlide(at, c, perTile, s, dt, offset);
+                    }
+                    else
+                    {
+                        Vector2 want = s.holdToWalk && direction != Vector2.zero ? direction : pendingStep;
+                        pendingStep = Vector2.zero;
+                        int n = GridStep.Candidates(want, s.eightDirections, candidates);
+                        for (int i = 0; i < n; i++)
+                            if (GridStep.CanStep(at, candidates[i], body)) { StartSlide(at, at + (Vector2)candidates[i], perTile, s, dt, offset); break; }
+                    }
+                }
+            }
+
+            move = sliding ? slideVelocity : Vector2.zero;
+            sentVelocity = move + push;
+            body.linearVelocity = sentVelocity;
+            push = Knockback.Step(push, s.knockbackStopRate, dt);
+        }
+
+        void StartSlide(Vector2 from, Vector2 to, int perTile, MoveSettings s, float dt, Vector2 offset)
+        {
+            int slide = GridStep.SlideSteps(s.stepTime, perTile, dt);
+            paceLeft = perTile;
+            slideTo = to;
+            if (slide <= 0) { body.position = to - offset; sliding = false; slideVelocity = Vector2.zero; return; }
+            sliding = true;
+            slideLeft = slide;
+            slideVelocity = GridStep.SlideVelocity(from, to, slide, dt);
         }
 
         // After the physics step the body has lost whatever a wall (or anything else) took
