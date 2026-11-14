@@ -153,10 +153,12 @@ MonoBehaviour:
   - Playground
   - Arena shooter
   - Little RPG room
+  - Dungeon
   scenes:
   - Playground
   - ArenaShooter
   - LittleRpg
+  - Dungeon
 --- !u!4 &667672198
 Transform:
   m_ObjectHideFlags: 0

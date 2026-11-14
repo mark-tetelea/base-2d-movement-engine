@@ -127,6 +127,14 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
   `ShotClear` - shooters go round walls), `EnemyGroup` (on a leader: followers hold a shape, break off
   near the target), `BossPhases` (phases at health levels swap behaviour, weapon, feel; boss bar
   `Hud.Boss`), `TrailMaker` (leaves temporary ground behind it).
+- `Assets/Scripts/World/` (phase 11) - `Layout` (the one layout rule: plain data, a tree of pieces on a
+  grid of 40x22-tile cells, end piece last on the deepest room; `Reachable`/`Problems` checks), `RoomPiece`
+  (prefab: `Room` + own Floor/Walls tilemaps painted closed + door spots side/cell), `RoomGenerator`
+  (settings: start/end/allowed pieces, room count, seed 0 = random; stamps tiles into the level's
+  tilemaps, cuts doors as door ground + `TileDoor` on each room's `RoomLock`, points enemies/locks/boss
+  bar at the level; `Awake` order -100), `Drops` (add-on: weighted drop table on death), `DungeonGoal`.
+  Crate = prefab (sprite, static collider, `Health` team 2, `Drops`). Pieces in `Assets/Prefabs/Rooms/`,
+  `Crate` in `Prefabs/World/`, `Coin`/`Heart` in `Prefabs/Pickups/`. A new piece = a new prefab, no code.
 - `Assets/Scripts/Interaction/` - `Interaction.Pick` (the one best-target rule, plain points),
   `Interactable` base + targets `Talker`, `LockedDoor`, `Lever` (and `Chest`, `Pickup`),
   `Interactor` (E as data; open panels pause walking), `InteractPrompt`, `TextBox` +
@@ -139,12 +147,12 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
   `IsPaused`; Resume / Restart / Main menu), `StartMenu`. `TextBox` and `ChestScreen` draw on
   the same panel. Panel asset: `Assets/Resources/KitPanel.asset` + `Assets/UI/KitTheme.tss`.
   Keyboard readers ignore keys while paused; a press that starts on a screen never shoots.
-- Build list: `StartMenu` (0, buttons to the three demos), `ArenaShooter` (1), `LittleRpg` (2,
-  the Little RPG room demo), `Playground` (3). Pause -> Main menu loads index 0.
+- Build list: `StartMenu` (0, buttons to the demos), `ArenaShooter` (1), `LittleRpg` (2,
+  the Little RPG room demo), `Playground` (3), `Dungeon` (4, generated rooms). Pause -> Main menu loads index 0.
 - `Assets/Scenes/ArenaShooter.unity` - the Arena shooter demo (death reloads by build index). `Warp` moves only the camera's target.
 - `Tools/measure/` - measuring harness: `movement.cs` (run with `eval_file` in play mode;
   drives the real key path through a virtual keyboard, logs every fixed step) and
-  `analyse-movement.js`; it also checks dash distance and knockback decay at 30 vs 144 fps. Re-run it after any change to movement. `combat.cs` (30 vs 144 fps), `bullet-alloc.cs`, `playthrough.cs` on ArenaShooter (rooms B, C, D, boss room E; its bot paths round walls); `inventory.cs` (edit mode), `rpg-playthrough.cs` on LittleRpg; `screens.cs` on Playground (UI scale, click guard, picker, pause; run at 1920x1080 and WXGA); `tiles.cs` on Playground (every tile rule, grid step at 30 vs 144 fps). The movement/facing/camera checks run on Playground.
+  `analyse-movement.js`; it also checks dash distance and knockback decay at 30 vs 144 fps. Re-run it after any change to movement. `combat.cs` (30 vs 144 fps), `bullet-alloc.cs`, `playthrough.cs` on ArenaShooter (rooms B, C, D, boss room E; its bot paths round walls); `inventory.cs` (edit mode), `rpg-playthrough.cs` on LittleRpg; `screens.cs` on Playground (UI scale, click guard, picker, pause; run at 1920x1080 and WXGA); `tiles.cs` on Playground (every tile rule, grid step at 30 vs 144 fps); `dungeon-layouts.cs` (edit mode: 200 seeds finishable, pieces' doors connect) and `dungeon-play.cs` (play mode on Dungeon: flood over real colliders reaches every room). The movement/facing/camera checks run on Playground.
 - `Assets/Art/Palette/endesga-32.gpl` - the one palette; pxkit and Aseprite both load it.
   Never written by a script that also reads it (trap 70).
 - `Assets/Art/PixelSprite16.preset` - import default for PNGs under `Assets/Art/**`.

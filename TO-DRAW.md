@@ -27,3 +27,4 @@
 | Group leader (enemy with a crown) | 16x16 | centre | plum, steel, fire | Claude | yes - `enemy-leader.js` (2026-11-14) |
 | Trail enemy | 16x16 | centre | rust, steel | Claude | yes - `enemy.js --swap plum:rust` (2026-11-14) |
 | Ground: trail (goo over the floor) | 16x16 | tile | fire | Claude | yes - `ground-trail.js` (2026-11-14) |
+| Crate (destructible) | 16x16 | centre | wood, steel | Claude | yes - `crate.js` (2026-11-14) |

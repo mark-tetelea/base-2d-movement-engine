@@ -10,8 +10,8 @@ namespace TopDownKit
     {
         public string title = "Top-down starter kit";
         [Tooltip("Button text and scene name, in pairs.")]
-        public string[] labels = { "Playground", "Arena shooter", "Little RPG room" };
-        public string[] scenes = { "Playground", "ArenaShooter", "LittleRpg" };
+        public string[] labels = { "Playground", "Arena shooter", "Little RPG room", "Dungeon" };
+        public string[] scenes = { "Playground", "ArenaShooter", "LittleRpg", "Dungeon" };
 
         VisualElement root;
 

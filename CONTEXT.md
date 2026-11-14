@@ -1,11 +1,11 @@
 # Where the kit is now
 
-> Rewritten, never appended. True as of **2026-11-14**, end of phase 10 (pathfinding, a boss with phases, groups, a trail enemy).
+> Rewritten, never appended. True as of **2026-11-14**, end of phase 11 (generated rooms from room pieces, destructible crates, the Dungeon demo).
 
 ## How it starts
 
-Press Play on `Assets/Scenes/StartMenu.unity` (first in the build list): a title and three
-buttons - **Playground**, **Arena shooter**, **Little RPG room**. In every demo **Esc**
+Press Play on `Assets/Scenes/StartMenu.unity` (first in the build list): a title and four
+buttons - **Playground**, **Arena shooter**, **Little RPG room**, **Dungeon**. In every demo **Esc**
 pauses (the game stops; Resume, Restart, Main menu).
 
 ## The Playground
@@ -63,9 +63,22 @@ in front (an "E" shows over it), 1-5 pick a hotbar slot, Q drops one. Talk to th
 pick up coins (magnet 2.5 tiles), find the key in a chest in C, open the pink door, take the
 crown in B to win. Chests open a transfer screen (click a slot, T takes all, E closes).
 
+## The Dungeon demo (phase 11)
+
+`Assets/Scenes/Dungeon.unity`. Plays like the Arena shooter (glide, faces the mouse, rooms slide,
+Pistol / Shotgun / Rapid, dash), but **the level is new every run**: 7 screen-sized rooms joined
+by doors, built from hand-made room pieces - a start room with crates, Pillars, Storeroom (lots of
+crates, wanderers), a long Hall (two screens wide), Pool (blue water to shoot over, red corners), a
+tall Tower (two screens high), and always last, as far from the start as the layout allows, the
+Boss room with the horned blob. Walking into a room shuts its doors (door ground) and sends two
+waves; clearing it opens them. **Crates** (wooden boxes) block walking and bullets; three hits break
+one, and it may drop a coin, three coins or a heart. HUD status: "Rooms 2/6  Coins 3  Seed 12345"
+(the seed names the layout); "Dungeon cleared - you win" when the boss room is cleared; death or
+Restart gives a new layout. A fixed seed on the generator gives the same layout every time.
+
 ## Screens
 
-One set, used by all three: a HUD (health bar, weapon + ammo, hotbar, a status line, a centre
+One set, used by all four: a HUD (health bar, weapon + ammo, hotbar, a status line, a centre
 banner, a help line - each demo shows only what it has), the text box, the chest screen, the
 pause menu, the start menu, and the Playground's settings panel. Placeholder look: dark
 Endesga 32 boxes, the default font, drawn in the game's 640x360 pixels and scaled by whole
@@ -98,11 +111,14 @@ settings panel does not shoot.
    HUD bar, groups that move together, a trail enemy: **built** (phase 10). The boss is in the Arena;
    groups, trail and grid-step enemies are in the Playground.
 
+10. World additions - generated levels from room pieces (start, end, allowed pieces, room count,
+   seed), destructible crates with a drop table: **built** (phase 11). Only the Dungeon uses them.
+
 ## What is not done
 
 - Every playtest: movement feel (Instant vs Glide, wall slide), facing (8 directions, walk
   speed), combat numbers, the RPG room (reach, facing vs closest, magnet), and now the screens
   (sizes, readability, the settings panel), and now grid step (pace, slide time) and the
-  tiles (crumble timing, how forgiving red is), and the phase 9 weapons (swing, charge, bounce, assist), and the phase 10 enemies (boss difficulty, group spacing, trail damage). Nobody has played any of it yet.
+  tiles (crumble timing, how forgiving red is), and the phase 9 weapons (swing, charge, bounce, assist), and the phase 10 enemies (boss difficulty, group spacing, trail damage), and the Dungeon (room sizes, wave difficulty, how often crates drop). Nobody has played any of it yet.
 - Real art for everything in `TO-DRAW.md` except the floor, wall, player and aim marker.
 - WebGL build (module not installed), GIFs (only PNG screenshots in `Media/`), GitHub repo and push (the user's call).
