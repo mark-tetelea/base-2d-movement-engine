@@ -1,6 +1,6 @@
 # Where the kit is now
 
-> Rewritten, never appended. True as of **2026-11-14**, end of phase 9 (melee, charge shots, bouncing bullets, aim assist).
+> Rewritten, never appended. True as of **2026-11-14**, end of phase 10 (pathfinding, a boss with phases, groups, a trail enemy).
 
 ## How it starts
 
@@ -14,7 +14,11 @@ pauses (the game stops; Resume, Restart, Main menu).
 arena of four rooms: A (start), B to the right (its doors lock once you are inside), big
 room C above, and area D reached by a brown warp pad in C. Along the top of A: a yellow
 speed pad (x1.6), brown mud (x0.5) and a cyan ice patch. In A: a chest (a key and 10 coins),
-the green Guide to talk to, a row of coins. In D: two green wanderers to shoot.
+the green Guide to talk to, a row of coins. In D: two green wanderers to shoot and a
+red grid-step chaser that hops one tile at a time and goes round walls. In the upper part of C: a
+group - a crowned leader wandering with three red chasers in a V behind it (they break off and
+chase you when you come within 4 tiles) - and a brown trail enemy that leaves a fading trail of
+red goo (1 damage a second to stand in).
 
 The **tile garden** in the lower left of C has every kind of ground: a red pool (kills), a
 blue strip (water you cannot walk through but can shoot over), a crumbling bridge across a
@@ -44,8 +48,13 @@ weapon and ammo, the hotbar (click a slot) and the controls.
 `Assets/Scenes/ArenaShooter.unity`. Glide feel, faces the mouse, rooms slide. WASD, mouse aim,
 left click shoots, R reloads, 1-3 or the wheel pick Pistol / Shotgun / Rapid, Space dashes
 (invulnerable). Walking into B, C or D shuts the doors and sends waves (red chasers, purple
-shooters, green wanderers); the last wave opens them. HUD: health bar, weapon and ammo,
-"wave 2/3", "Arena cleared - you win", "You died" (the scene restarts after 1.5 s).
+shooters, green wanderers); the last wave opens them. Chasers and shooters walk round pillars and
+walls (shooters go round a wall that blocks their shot). Clearing B opens a door in its east wall
+to **room E, the boss room** (pillars and a wall in the middle): a big horned blob with a health
+bar at the top of the screen, three phases - bouncing 3-shot spread, then slow charged shots from
+60% health, then from 30% it rushes you and swings a wide sword. HUD: health bar, weapon and ammo,
+"wave 2/3", the boss bar, "Arena cleared - you win" (all of B, C, D and E), "You died" (the scene
+restarts after 1.5 s).
 
 ## The Little RPG room demo (phase 5)
 
@@ -68,7 +77,8 @@ Same keys give the same movement step for step at 30 and 144 fps; combat too; gr
 land exactly on tile centres and on the same tiles at both. Each tile rule is checked: red
 kills (a dash over it protects until it ends there), blue blocks walking but not bullets,
 crumbling breaks and returns on time, door ground opens by lever, key and cleared room. Reused bullets
-cost ~4 us and ~150 B against ~24 us and ~4 KB. Bots clear the Arena shooter and finish the
+cost ~4 us and ~150 B against ~24 us and ~4 KB. Bots clear the Arena shooter (boss room included; enemies
+walk round walls) and finish the
 RPG room. The UI scale matches the camera at 1920x1080 and 1366x768, and a click on the
 settings panel does not shoot.
 
@@ -84,12 +94,15 @@ settings panel does not shoot.
    round 2). Only the Playground uses them; no demo does.
 8. Combat additions - melee swing, charge shots, bouncing bullets, aim assist: **built** (phase 9).
    Only the Playground has the Sword, Charger and Bouncer; the demos keep their weapons.
+9. Enemy additions - pathfinding round walls (free and grid-step walkers), a boss with phases and a
+   HUD bar, groups that move together, a trail enemy: **built** (phase 10). The boss is in the Arena;
+   groups, trail and grid-step enemies are in the Playground.
 
 ## What is not done
 
 - Every playtest: movement feel (Instant vs Glide, wall slide), facing (8 directions, walk
   speed), combat numbers, the RPG room (reach, facing vs closest, magnet), and now the screens
   (sizes, readability, the settings panel), and now grid step (pace, slide time) and the
-  tiles (crumble timing, how forgiving red is), and the phase 9 weapons (swing, charge, bounce, assist). Nobody has played any of it yet.
+  tiles (crumble timing, how forgiving red is), and the phase 9 weapons (swing, charge, bounce, assist), and the phase 10 enemies (boss difficulty, group spacing, trail damage). Nobody has played any of it yet.
 - Real art for everything in `TO-DRAW.md` except the floor, wall, player and aim marker.
 - WebGL build (module not installed), GIFs (only PNG screenshots in `Media/`), GitHub repo and push (the user's call).

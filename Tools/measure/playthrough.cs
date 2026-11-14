@@ -1,8 +1,8 @@
 // Arena shooter playthrough. Run IN PLAY MODE on Assets/Scenes/ArenaShooter.unity:
 //     unity command eval_file --file Tools/measure/playthrough.cs
 // poll:  unity command eval --code 'return System.AppDomain.CurrentDomain.GetData("pt_state") as string;'
-// A bot plays the demo with the real Gun (the rapid weapon, with its reloads): it is put
-// into room B, C, then area D (as the doors and the warp would take it), walks towards
+// Room E holds the boss (phase 10; 60 s allowed there). The bot walks round walls with a PathWalker when its shot is blocked. A bot plays the demo with the real Gun (the rapid weapon, with its reloads): it is put
+// into room B, C, area D, then room E (as the doors and the warp would take it), walks towards
 // the nearest enemy in its room when far and shoots it. The player is given 999 health so the run is
 // about the rooms, not the bot's skill. Checks each room locks, runs all its waves and
 // clears (doors open), and that the HUD's win state is reached. Then it lets the enemies
@@ -16,15 +16,18 @@ var hp = player.GetComponent<TopDownKit.Health>();
 var gun = player.GetComponent<TopDownKit.Gun>();
 var mover = player.GetComponent<TopDownKit.PlayerMover>();
 var input = player.GetComponent<TopDownKit.PlayerShooter>();
-var rooms = new[] { ("Room B", new Vector2(40f, 0f)), ("Room C", new Vector2(20f, 26f)), ("Area D", new Vector2(104f, 0f)) };
+var rooms = new[] { ("Room B", new Vector2(40f, 0f)), ("Room C", new Vector2(20f, 26f)), ("Area D", new Vector2(104f, 0f)), ("Room E", new Vector2(64f, 0.5f)) };
 var results = new System.Collections.Generic.List<string>();
 int failed = 0, index = -1; float start = 0f; string phase = "next"; string error = null;
 int sceneLoads = 0; float deathTime = 0f;
-TopDownKit.RoomLock lk = null; TopDownKit.RoomWaves rw = null; int maxWave = 0;
+TopDownKit.RoomLock lk = null; TopDownKit.RoomWaves rw = null; int maxWave = 0; int bossPhase = -1;
 Application.runInBackground = true;
 input.enabled = false; mover.readKeyboard = false;
 hp.maxHealth = 999; hp.Restore();
 gun.Select(2); gun.Refill();
+// Phase 10: the bot walks round walls when its shot is blocked (same PathWalker as enemies).
+var botWalker = player.GetComponent<TopDownKit.PathWalker>();
+if (botWalker == null) botWalker = player.AddComponent<TopDownKit.PathWalker>();   // not ?? (trap 33)
 UnityEngine.SceneManagement.SceneManager.sceneLoaded += (s, m) => sceneLoads++;
 
 void Check(string name, bool ok, string detail) { if (!ok) failed++; results.Add((ok ? "PASS " : "FAIL ") + name + " (" + detail + ")"); }
@@ -56,7 +59,8 @@ void OnFixed()
     Vector2 to = (Vector2)best.transform.position - rb.position;
     gun.SetAim(to);
     gun.SetTrigger(true);
-    mover.SetMoveDirection(to.magnitude > 6f ? to.normalized : Vector2.zero);
+    bool blocked = !TopDownKit.PathWalker.ShotClear(rb.position, best.transform.position);
+    mover.SetMoveDirection(to.magnitude > 6f || blocked ? botWalker.Steer(best.transform.position) : Vector2.zero);
 }
 
 string Where()
@@ -102,15 +106,16 @@ void OnFrame()
         if (phase == "fight")
         {
             maxWave = Mathf.Max(maxWave, rw.WaveNumber);
+            foreach (var bp in UnityEngine.Object.FindObjectsByType<TopDownKit.BossPhases>(FindObjectsSortMode.None)) bossPhase = Mathf.Max(bossPhase, bp.Phase);
             if (lk.Cleared)
             {
                 bool doorsOpen = true;
                 if (lk.doors != null) foreach (var d in lk.doors) doorsOpen &= !d.activeSelf;
                 Check(rooms[index].Item1 + " cleared", doorsOpen && maxWave >= rw.WaveCount,
-                    "waves seen " + maxWave + "/" + rw.WaveCount + ", doors open " + doorsOpen + ", " + t.ToString("0.0") + " s, player hit " + (999 - hp.Current) + " times");
+                    "waves seen " + maxWave + "/" + rw.WaveCount + ", doors open " + doorsOpen + ", " + t.ToString("0.0") + " s, player hit " + (999 - hp.Current) + " times" + (bossPhase >= 0 ? ", boss phases seen " + (bossPhase + 1) : ""));
                 phase = "next";
             }
-            else if (t > 30f)
+            else if (t > (rw.GetComponent<TopDownKit.Room>().name == "Room E" ? 60f : 30f))
             {
                 Check(rooms[index].Item1 + " cleared", false, "timed out; locked " + lk.Locked + ", wave " + rw.WaveNumber + ", living " + TopDownKit.RoomWaves.Living(rw.waves[Mathf.Max(0, rw.WaveNumber - 1)]) + ", player " + rb.position + Where());
                 phase = "next";

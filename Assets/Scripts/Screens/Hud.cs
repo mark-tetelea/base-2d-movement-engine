@@ -5,7 +5,8 @@ namespace TopDownKit
 {
     // The kit's one HUD: a health bar (when a Health is set), the weapon and ammo (when a
     // Gun is set), the hotbar (when a Hotbar is set; click a slot to select it), a status
-    // line and a centre banner that game rules fill in (Status, Banner), and a help line.
+    // line and a centre banner that game rules fill in (Status, Banner), a boss bar (Boss),
+    // and a help line.
     // Every part is optional, so each demo sets only what it has.
     public class Hud : MonoBehaviour
     {
@@ -20,10 +21,13 @@ namespace TopDownKit
         // Filled in by game rules (ArenaGoal, RpgGoal, ...). Empty hides them.
         public string Status { get; set; } = "";
         public string Banner { get; set; } = "";
+        // A boss bar along the top while set and alive (BossPhases fills it in).
+        public Health Boss { get; set; }
+        public string BossName { get; set; } = "";
 
-        VisualElement root, hpFill, hotbarRow;
+        VisualElement root, hpFill, hotbarRow, bossRow, bossFill;
         VisualElement[] slots;
-        Label hpText, ammo, status, banner, helpLabel;
+        Label hpText, ammo, status, banner, helpLabel, bossLabel;
 
         void Build()
         {
@@ -71,6 +75,24 @@ namespace TopDownKit
             hotbarRow.style.justifyContent = Justify.Center;
             root.Add(hotbarRow);
 
+            // Top-centre: the boss bar.
+            bossRow = KitUI.Group();
+            bossRow.style.position = Position.Absolute; bossRow.style.top = 18;
+            bossRow.style.left = 0; bossRow.style.right = 0;
+            bossRow.style.alignItems = Align.Center;
+            bossLabel = KitUI.Label("", 8, KitUI.Gold);
+            bossRow.Add(bossLabel);
+            var bossBack = new VisualElement { pickingMode = PickingMode.Ignore };
+            bossBack.style.width = 200; bossBack.style.height = 6;
+            bossBack.style.backgroundColor = KitUI.Ink;
+            KitUI.Border(bossBack, KitUI.Edge, 1f);
+            bossFill = new VisualElement { pickingMode = PickingMode.Ignore };
+            bossFill.style.height = Length.Percent(100);
+            bossFill.style.backgroundColor = KitUI.Red;
+            bossBack.Add(bossFill);
+            bossRow.Add(bossBack);
+            root.Add(bossRow);
+
             banner = KitUI.Label("", 14, KitUI.Gold);
             banner.style.position = Position.Absolute; banner.style.left = 0; banner.style.right = 0; banner.style.top = 90;
             banner.style.unityTextAlign = TextAnchor.MiddleCenter;
@@ -101,6 +123,14 @@ namespace TopDownKit
                 float f = health.maxHealth > 0 ? Mathf.Clamp01((float)health.Current / health.maxHealth) : 0f;
                 hpFill.style.width = Length.Percent(f * 100f);
                 hpText.text = health.Current + "/" + health.maxHealth;
+            }
+
+            bool showBoss = Boss != null && !Boss.Dead;
+            bossRow.style.display = showBoss ? DisplayStyle.Flex : DisplayStyle.None;
+            if (showBoss)
+            {
+                bossFill.style.width = Length.Percent(Mathf.Clamp01((float)Boss.Current / Mathf.Max(1, Boss.maxHealth)) * 100f);
+                bossLabel.text = BossName ?? "";
             }
 
             string a = "";

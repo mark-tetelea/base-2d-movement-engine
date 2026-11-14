@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 2512500183457659112}
   - component: {fileID: 5152043978372676679}
   - component: {fileID: 5590758235287794204}
+  - component: {fileID: 7462835333744246077}
   m_Layer: 0
   m_Name: Shooter
   m_TagString: Untagged
@@ -153,6 +154,10 @@ MonoBehaviour:
   team: 1
   muzzleDistance: 0.5
   seed: 1
+  aimAssist:
+    strength: 0
+    cone: 15
+    range: 10
 --- !u!114 &5590758235287794204
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -170,10 +175,26 @@ MonoBehaviour:
   sightRange: 14
   keepDistance: 6
   turnEvery: 1.2
+  alwaysFire: 0
   touchRange: 0.9
   touchDamage: 1
   touchKnockback: 10
   seed: 1
+--- !u!114 &7462835333744246077
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4318442639698110231}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29370504c3b765740a7a02fda4e852b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TopDownKit.PathWalker
+  replanEvery: 0.5
+  giveUpDistance: 30
+  avoidHurtingGround: 1
 --- !u!1 &6182177190531021404
 GameObject:
   m_ObjectHideFlags: 0

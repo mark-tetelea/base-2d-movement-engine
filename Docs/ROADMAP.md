@@ -145,7 +145,7 @@ copy of each rule, checks before `/handoff`.
 |---|---|---|
 | 8 | **Ground tiles + grid-step** - built 2026-11-14 | Tile types, each one a small asset: **normal** ground; **red** (kills you); **blue** (can't be stepped on - a wall you can see over and shoot across); **crumbling** (breaks a set time after you step on it, comes back after a set time); **door ground** (opens/closes on a switch, a key or a cleared room - reuses phase 3's `RoomLock`). Plus **grid-step movement**: one tile per press, as a movement setting, with a "frames per step" / step time setting for smoothness. |
 | 9 | **Combat additions** - built 2026-11-14 | Melee swing, charge shots, bullets that bounce off walls, aim assist (strength as a setting, 0 = off). |
-| 10 | **Enemy additions** | Pathfinding around walls (fixes the stuck-behind-pillar limit), a boss with phases, groups that move together, enemies that leave a trail (can use the red-tile rule). |
+| 10 | **Enemy additions** - built 2026-11-14 | Pathfinding around walls (fixes the stuck-behind-pillar limit), a boss with phases, groups that move together, enemies that leave a trail (can use the red-tile rule). |
 | 11 | **World additions** | Procedural rooms (a new layout every run, built from room pieces), destructible crates. |
 | 12 | **Feel additions** | Hit-stop (tiny freeze on hits), particles, sound effects, day/night tint. All settings, all off-able. **Sounds are swappable**: each event (step, shot, hit, pickup, door, UI click...) points at a sound slot you fill with your own clip or leave empty. |
 | 13 | **Systems** | Save and load, a coin shop, a minimap, touch controls for phones. These lift "saving" and "touch" off `CLAUDE.md`'s "Do NOT build yet" - the user asked for them. |

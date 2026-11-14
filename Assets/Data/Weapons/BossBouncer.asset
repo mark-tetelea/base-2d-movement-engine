@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d4255634bac5d44e8d498eb30e8fbd8, type: 3}
+  m_Name: BossBouncer
+  m_EditorClassIdentifier: Assembly-CSharp::TopDownKit.Weapon
+  kind: 0
+  fireRate: 0.9
+  automatic: 1
+  bulletsPerShot: 3
+  spread: 30
+  bulletSpeed: 7
+  range: 22
+  damage: 1
+  knockback: 5
+  recoil: 0
+  magazine: 0
+  reloadTime: 1
+  bulletRadius: 0.2
+  bounces: 2
+  shakeOnShot: 0
+  bulletSprite: {fileID: 21300000, guid: 1a22e7f146e220c4caa0b2651205f861, type: 3}
+  bulletColor: {r: 0.70980394, g: 0.3137255, b: 0.53333336, a: 1}
+  chargeTime: 0
+  chargeDamage: 1
+  chargeSize: 1
+  chargeSpeed: 1
+  melee:
+    arc: 120
+    reach: 1.5
+    swingTime: 0.15
+    cooldown: 0.25
+    sprite: {fileID: 0}
+    width: 0.15
+    color: {r: 1, g: 1, b: 1, a: 1}

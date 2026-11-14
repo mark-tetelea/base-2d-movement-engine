@@ -628,3 +628,12 @@ mouse (`Mouse.current`) keeps sending its own state events, which overwrite a qu
 with the buttons up. A virtual mouse made current shot at once. Rule: drive presses through
 your own device - `InputSystem.AddDevice<Mouse>("...")`, `MakeCurrent()`, queue on it,
 `RemoveDevice` at the end. Found 2026-11-14 (phase 8).
+
+## 85. Long eval_file reports a timeout, but the work is done
+
+Symptom: `unity command eval_file --file Tools/measure/setup-phase10.cs` failed with "Pipeline
+server returned 400 ... Main thread operation timed out after 5000ms". Cause: the reply has a
+5 s main-thread limit, but the script keeps running on the main thread to the end (it made
+every asset, prefab and saved both scenes). Rule: after this error, check what the script
+was meant to leave (`git status`, an `eval` that reads it back) before re-running it; a
+re-run of a non-idempotent script would do the work twice. Found 2026-11-14 (phase 10).

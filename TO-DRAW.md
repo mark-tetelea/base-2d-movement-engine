@@ -23,3 +23,7 @@
 | Ground: blue (low barrier, water) | 16x16 | tile | blue, steel | Claude | yes - `ground-blue.js` (2026-11-14) |
 | Ground: crumbling - whole, warning, broken | 16x16 x3 | tile | wood, steel | Claude | yes - `crumble*.js` (2026-11-14) |
 | Ground: door - open, closed | 16x16 x2 | tile | steel, plum | Claude | yes - `door-open.js`, `door-closed.js` (2026-11-14) |
+| Boss | 32x32 | centre | plum, fire, steel | Claude | yes - `boss.js` (2026-11-14) |
+| Group leader (enemy with a crown) | 16x16 | centre | plum, steel, fire | Claude | yes - `enemy-leader.js` (2026-11-14) |
+| Trail enemy | 16x16 | centre | rust, steel | Claude | yes - `enemy.js --swap plum:rust` (2026-11-14) |
+| Ground: trail (goo over the floor) | 16x16 | tile | fire | Claude | yes - `ground-trail.js` (2026-11-14) |
