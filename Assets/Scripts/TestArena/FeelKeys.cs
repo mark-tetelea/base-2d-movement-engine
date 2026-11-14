@@ -22,13 +22,13 @@ namespace TopDownKit.TestArena
         void OnGUI()
         {
             if (player == null || player.feel == null) return;
-            MoveSettings s = player.feel.settings;
+            MoveSettings s = player.CurrentSettings;
             string list = "";
             for (int i = 0; i < feels.Length && i < 9; i++)
                 if (feels[i] != null) list += "  " + (i + 1) + " " + feels[i].name;
-            GUI.Label(new Rect(8, 8, 900, 24),
-                player.feel.name + ": " + s.speed + " tiles/s, " + s.timeToFullSpeed + " s to full speed, "
-                + s.timeToStop + " s to stop.    Keys:" + list);
+            GUI.Label(new Rect(8, 8, 1200, 24),
+                player.feel.name + " (now " + s.speed + " tiles/s, " + s.timeToFullSpeed + " s to full speed, "
+                + s.timeToStop + " s to stop)    Keys:" + list + "   Space dash   K knockback from mouse");
         }
     }
 }

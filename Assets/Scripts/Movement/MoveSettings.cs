@@ -17,5 +17,9 @@ namespace TopDownKit
 
         [Tooltip("Seconds from top speed to standing still after letting go. 0 = instant.")]
         [Min(0f)] public float timeToStop;
+
+        [Tooltip("How fast a knockback push dies away, in tiles per second lost every second. "
+            + "Higher = shrugs hits off sooner. 0 = pushes stop at once.")]
+        [Min(0f)] public float knockbackStopRate;
     }
 }

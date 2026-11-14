@@ -335,3 +335,40 @@ with a frictionless material so sliding along a wall does not drag.
   `capture_game_view --save_path` writes under `Assets/`.
 - `eval` / `eval_file` compile the code as a method body: no `using` lines (write names
   in full), and `Object` is ambiguous (write `UnityEngine.Object`).
+
+## 2026-11-14 - Phase 1: movement add-ons (Ice, Heavy, dash, knockback, zones)
+
+**Decided:**
+- **The mover keeps two velocities: walking (`Movement.Step`) and a knockback push
+  (`Knockback.Step`); the body gets their sum.** Why: the 2026-10-18 design - Instant would
+  cancel a push pushed into Step. Consequence: after physics, what a wall took is removed
+  from the into-wall part of both (`PlayerMover.TakeWallLoss`); with no push the walking
+  velocity is the body's velocity exactly, as before.
+- **How fast a push dies away is a feel setting, `MoveSettings.knockbackStopRate`**
+  (tiles/s lost per second; 0 = pushes stop at once). Why: a heavy mover shrugs hits off,
+  ice slides on - a difference in feel, so a setting.
+- **Dash is an add-on component that drives the mover's walking velocity for whole fixed
+  steps** (`PlayerMover.DriveThisStep`), speed set so the distance is exact. At the end it
+  hands back at most the feel's top speed in the dash direction. Why: exact distance at
+  any frame rate; Glide would otherwise coast at dash speed. Knockback still adds on top.
+- **Speed zones change the settings passed to Step** (`SpeedZone.Apply`): the last zone with
+  a feel replaces the feel, then every zone's `speedScale` multiplies the speed. Why: the
+  2026-10-18 design; mud on ice is slow ice.
+
+**Built:**
+- `Assets/Scripts/Movement/Knockback.cs` - the one push rule: `Away(source, target, speed)`, `Step(push, stopRate, dt)`.
+- `Assets/Scripts/Movement/Dash.cs` - `DashSettings` (distance, duration, cooldown, invulnerable - stored for phase 4) and the `Dash` add-on; Space in the arena.
+- `Assets/Scripts/Movement/SpeedZone.cs` - trigger zone add-on.
+- `PlayerMover.cs` - push, zones, `CurrentSettings`, `FacingDirection` (last asked direction; dash with no keys uses it), add-on entry points.
+- `Assets/Data/Movement/Ice.asset` (6 tiles/s, 1.0 s up, 2.0 s stop, push stop 12), `Heavy.asset` (4, 0.5, 0.15, push stop 80); Instant and Glide got push stop 40. Keys 3 and 4.
+- `Assets/Scripts/TestArena/KnockKey.cs` - K pushes the player 14 tiles/s away from the mouse.
+- TestArena: `Zones` (Speed pad x1.6, Mud x0.5, Ice patch -> Ice feel) in the free strip at the top, y 6-9; placeholder `Assets/Art/Placeholders/white-square.png` tinted.
+- `Tools/measure/setup-phase1.cs` - the edit-mode script that made the above (re-runnable).
+- Harness: `dash` and `knock` segments at 30 and 144 fps, Instant and Glide.
+
+**Measured / verified (one harness run, 22 segments):**
+- Old checks unchanged: lane runs identical step for step at 30/144 fps, 8 directions at 6.000, 10 of 10 taps moved, walls hold at x -18.62.
+- Dash: 12 steps at 15.000 tiles/s, distance 3.0000 at 30 and 144 fps, Instant and Glide; max difference 0 between frame rates.
+- Knockback 14 tiles/s, Instant: 21 steps (0.35 s), 2.5667 tiles; Glide 2.5910; 30 vs 144 fps max difference 0. (Stepped sum, so a bit above the continuous v*v/2a = 2.45.)
+- Zones, one check each in play mode: speed pad 9.6 tiles/s, mud 3, ice patch gives Ice's 1 s / 2 s.
+- Not verified: the feel of any of it (needs the user's playtest); dash and knockback into walls.

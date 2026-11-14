@@ -1,6 +1,6 @@
 # Where the kit is now
 
-> Rewritten, never appended. True as of **2026-10-18**, end of the movement session.
+> Rewritten, never appended. True as of **2026-11-14**, end of phase 1 (movement add-ons).
 
 ## How it plays
 
@@ -9,12 +9,18 @@ directions (WASD or the arrows) in a stone arena that fills the 640x360 view: a 
 at the screen edge, a pillar, a bar, a single block, diagonal steps and a one-tile
 corridor. Walls stop the player; pushing diagonally into a wall slides along it.
 
-Two feels, swapped with keys **1** and **2** (the top-left label names the one in use):
+Four feels, swapped with keys **1**-**4** (the top-left label names the one in use and the speed in force now):
 
 - **Instant** (like Deltarune): 6 tiles/s, full speed at once, stops at once.
 - **Glide** (like Diep.io): 6 tiles/s, 0.4 s to full speed, 0.8 s to stop.
+- **Ice**: 6 tiles/s, 1.0 s to full speed, 2.0 s to stop; pushes slide far.
+- **Heavy**: 4 tiles/s, 0.5 s to full speed, 0.15 s to stop; shrugs pushes off.
 
-Both are starting guesses - nobody has judged them by playing yet. Each feel is an asset
+**Space** dashes 3 tiles in 0.2 s (0.4 s cooldown; invulnerable flag stored for damage
+later). **K** knocks the player away from the mouse. Along the top of the arena: a yellow
+speed pad (x1.6), brown mud (x0.5) and a cyan ice patch (Ice feel while on it).
+
+All of it is starting guesses - nobody has judged it by playing yet. Each feel is an asset
 in `Assets/Data/Movement/`; tuning during play is kept.
 
 Measured: the same keys give the same movement step for step at 30 and 144 fps (LOG,
@@ -24,8 +30,8 @@ harness in `Tools/measure/`.
 
 ## What the kit will have (the user's list, in the order to build it)
 
-1. **Movement** - 8 directions and instant-to-glide feel: **built**. Boosts, slowdowns and
-   knockback/recoil: designed, not built (they wait for a real caller).
+1. **Movement** - 8 directions and instant-to-glide feel: **built**. Ice/Heavy presets, dash,
+   knockback and speed zones: **built** (phase 1, 2026-11-14).
 2. **Facing and animation** - 4 or 8 directions, aim separate from walking.
 3. **Interaction** - one key, best nearby target: chests, NPCs, items.
 4. **Pickups and inventory** - auto (coins, ammo) and manual (weapons, key items),

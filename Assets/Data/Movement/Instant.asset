@@ -16,3 +16,4 @@ MonoBehaviour:
     speed: 6
     timeToFullSpeed: 0
     timeToStop: 0
+    knockbackStopRate: 40

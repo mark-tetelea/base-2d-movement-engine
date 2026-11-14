@@ -72,14 +72,19 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
   one movement rule; `MoveSettings` (speed in tiles/s, time to full speed, time to stop;
   0 = instant), `MoveFeel` (the asset), `PlayerMover` (keys -> direction in `Update`,
   latched until a step uses it; `Step` in `FixedUpdate` on an interpolated Rigidbody2D,
-  reading the body's velocity back so walls take speed away).
-- `Assets/Data/Movement/` - `Instant.asset`, `Glide.asset`, `NoFriction` (player collider).
+  reading the body's velocity back so walls take speed away). The body gets walking
+  velocity + a knockback push, kept apart.
+- Movement add-ons (phase 1): `Knockback` (the one push rule: `Away`, `Step`; decay is
+  `MoveSettings.knockbackStopRate`), `Dash` (add-on component, `DashSettings`, exact distance
+  in whole steps), `SpeedZone` (trigger; scales speed or swaps the feel).
+- `Assets/Data/Movement/` - `Instant`, `Glide`, `Ice`, `Heavy` feels, `NoFriction` (player collider).
 - `Assets/Scenes/TestArena.unity` - Pixel Perfect Camera 640x360 / 16 PPU, Pixel Snapping,
   Windowbox; floor and wall tilemaps (walls: one merged collider, trap 74); the player.
-  Keys 1-9 swap the feel (`Assets/Scripts/TestArena/FeelKeys.cs`, test arena only).
+  Keys 1-9 swap the feel (`Assets/Scripts/TestArena/FeelKeys.cs`), Space dashes, K knocks
+  the player from the mouse (`KnockKey.cs`); speed pad, mud and ice patch under `Zones`.
 - `Tools/measure/` - measuring harness: `movement.cs` (run with `eval_file` in play mode;
   drives the real key path through a virtual keyboard, logs every fixed step) and
-  `analyse-movement.js`. Re-run it after any change to movement.
+  `analyse-movement.js`; it also checks dash distance and knockback decay at 30 vs 144 fps. Re-run it after any change to movement.
 - `Assets/Art/Palette/endesga-32.gpl` - the one palette; pxkit and Aseprite both load it.
   Never written by a script that also reads it (trap 70).
 - `Assets/Art/PixelSprite16.preset` - import default for PNGs under `Assets/Art/**`.

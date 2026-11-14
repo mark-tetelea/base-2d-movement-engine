@@ -67,3 +67,44 @@ for (const [run, rs] of runs) {
   console.log(`  ${String(run).padStart(2)} ${rs[0].kind.padEnd(5)} ${rs[0].feel.padEnd(7)} min x ${Math.min(...rs.map(r => r.x)).toFixed(4)}; ` +
     `late in the hold v=(${late.vx.toFixed(3)}, ${late.vy.toFixed(3)})`);
 }
+
+// DASH: D + Space for one frame. Dash steps are the ones moving faster than any feel's top
+// speed; their distance must equal the Dash setting (3 tiles by default) at every frame rate.
+console.log('\nDASH (D + Space one frame; dash steps = speed above 7 tiles/s)');
+const dashSeqs = {};
+for (const [run, rs] of runs) {
+  if (rs[0].kind !== 'dash') continue;
+  const i0 = rs.findIndex(r => r.vx > 7);
+  if (i0 < 1) { console.log(`  ${run}: no dash seen DIFFERENT`); continue; }
+  let i1 = i0; while (i1 + 1 < rs.length && rs[i1 + 1].vx > 7) i1++;
+  const steps = i1 - i0 + 1;
+  const dist = rs[i1].x - rs[i0 - 1].x;  // rows are logged after each step's physics
+  const total = rs[rs.length - 1].x - rs[i0 - 1].x;
+  console.log(`  ${String(run).padStart(2)} ${rs[0].fps} fps ${rs[0].feel.padEnd(7)} | ${steps} dash steps at ${rs[i0].vx.toFixed(3)} tiles/s | dash distance ${dist.toFixed(4)} | total with the walk ${total.toFixed(4)}`);
+  (dashSeqs[rs[0].feel] ||= []).push({ run, fps: rs[0].fps, steps, dist, xs: rs.slice(i0 - 1, i0 + 60).map(r => r.x - rs[i0 - 1].x) });
+}
+for (const [feel, list] of Object.entries(dashSeqs)) {
+  for (const s of list.slice(1)) {
+    let d = 0; for (let i = 0; i < Math.min(s.xs.length, list[0].xs.length); i++) d = Math.max(d, Math.abs(s.xs[i] - list[0].xs[i]));
+    console.log(`  ${feel}: run ${s.run} (${s.fps} fps) vs run ${list[0].run} (${list[0].fps} fps): max difference ${d} tiles ${d === 0 ? 'OK' : 'DIFFERENT'}`);
+  }
+}
+
+// KNOCKBACK: a 14 tiles/s push, no keys. It must decay the same at every frame rate.
+console.log('\nKNOCKBACK (14 tiles/s push to the right, no keys)');
+const knockSeqs = {};
+for (const [run, rs] of runs) {
+  if (rs[0].kind !== 'knock') continue;
+  const i0 = rs.findIndex(r => r.vx > 1e-6);
+  if (i0 < 1) { console.log(`  ${run}: no push seen DIFFERENT`); continue; }
+  const moving = rs.filter(r => r.vx > 1e-6).length;
+  const dist = rs[rs.length - 1].x - rs[i0 - 1].x;
+  console.log(`  ${String(run).padStart(2)} ${rs[0].fps}(${fpsOf(rs).toFixed(1)}) fps ${rs[0].feel.padEnd(7)} | first step ${rs[i0].vx.toFixed(3)} tiles/s | moving steps ${moving} (${(moving / 60).toFixed(3)} s) | distance ${dist.toFixed(4)}`);
+  (knockSeqs[rs[0].feel] ||= []).push({ run, fps: rs[0].fps, xs: rs.slice(i0 - 1, i0 + 60).map(r => r.x - rs[i0 - 1].x) });
+}
+for (const [feel, list] of Object.entries(knockSeqs)) {
+  for (const s of list.slice(1)) {
+    let d = 0; for (let i = 0; i < Math.min(s.xs.length, list[0].xs.length); i++) d = Math.max(d, Math.abs(s.xs[i] - list[0].xs[i]));
+    console.log(`  ${feel}: run ${s.run} (${s.fps} fps) vs run ${list[0].run} (${list[0].fps} fps): max difference ${d} tiles ${d === 0 ? 'OK' : 'DIFFERENT'}`);
+  }
+}

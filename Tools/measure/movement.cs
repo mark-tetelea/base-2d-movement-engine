@@ -27,6 +27,7 @@ var mover = player.GetComponent<TopDownKit.PlayerMover>();
 var startFeel = mover.feel;
 var instant = AssetDatabase.LoadAssetAtPath<TopDownKit.MoveFeel>("Assets/Data/Movement/Instant.asset");
 var glide = AssetDatabase.LoadAssetAtPath<TopDownKit.MoveFeel>("Assets/Data/Movement/Glide.asset");
+var Space = UnityEngine.InputSystem.Key.Space;
 var W = UnityEngine.InputSystem.Key.W; var A = UnityEngine.InputSystem.Key.A;
 var S = UnityEngine.InputSystem.Key.S; var D = UnityEngine.InputSystem.Key.D;
 
@@ -48,12 +49,16 @@ kb.MakeCurrent();
 //   taps  - from (0, -2): settle 0.5 s, 10 taps of D each visible to exactly one frame
 //   wall  - from (-15, 0): hold A 2.0 s into the left wall
 //   slide - from (-17, -5): hold W+A 2.0 s, diagonally into the left wall and along it
+//   dash  - from (-15, 1): settle 0.6 s, D + Space for one frame, wait 1.5 s
+//   knock - from (-15, 1): settle 0.6 s, a 14 tiles/s push to the right (AddPush), wait 1.5 s
 var plan = new System.Collections.Generic.List<(string kind, int fps, TopDownKit.MoveFeel feel)>
 {
     ("lane", 30, instant), ("lane", 144, instant), ("lane", 30, glide), ("lane", 144, glide),
     ("lane", 30, instant), ("lane", 144, instant), ("lane", 30, glide), ("lane", 144, glide),
     ("dirs", 60, instant), ("taps", 144, instant),
     ("wall", 60, instant), ("slide", 60, instant), ("wall", 60, glide), ("slide", 60, glide),
+    ("dash", 30, instant), ("dash", 144, instant), ("dash", 30, glide), ("dash", 144, glide),
+    ("knock", 30, instant), ("knock", 144, instant), ("knock", 30, glide), ("knock", 144, glide),
 };
 var combos = new UnityEngine.InputSystem.Key[][] {
     new[] { W }, new[] { W, D }, new[] { D }, new[] { S, D }, new[] { S }, new[] { S, A }, new[] { A }, new[] { W, A } };
@@ -105,7 +110,8 @@ void OnFrame()
             Application.targetFrameRate = p.fps;
             mover.feel = p.feel;
             rb.position = p.kind == "dirs" ? new Vector2(0f, 0f) : p.kind == "taps" ? new Vector2(0f, -2f)
-                : p.kind == "slide" ? new Vector2(-17f, -5f) : new Vector2(-15f, 0f);
+                : p.kind == "slide" ? new Vector2(-17f, -5f)
+                : p.kind == "dash" || p.kind == "knock" ? new Vector2(-15f, 1f) : new Vector2(-15f, 0f);
             rb.linearVelocity = Vector2.zero;
             Keys();
             sub = 0;
@@ -119,6 +125,8 @@ void OnFrame()
             else if (k == "wall") { Keys(A); Phase("hold"); }
             else if (k == "slide") { Keys(W, A); Phase("hold"); }
             else if (k == "dirs") { Keys(combos[0]); Phase("dir"); }
+            else if (k == "dash") { Keys(D, Space); tapFrame = Time.frameCount; Phase("dtap"); }
+            else if (k == "knock") { mover.AddPush(new Vector2(14f, 0f)); Phase("after"); }
             else { Keys(D); tapFrame = Time.frameCount; Phase("tap"); }
         }
         else if (phase == "hold" && t >= 2.0f) { Keys(); Phase("after"); }
@@ -129,6 +137,7 @@ void OnFrame()
             if (sub < combos.Length) { Keys(combos[sub]); Phase("dir"); }
             else { Keys(); sub = 0; Phase("after"); }
         }
+        else if (phase == "dtap" && Time.frameCount == tapFrame + 1) { Keys(); Phase("after"); }
         else if (phase == "tap" && Time.frameCount == tapFrame + 1) { Keys(); Phase("tapwait"); }
         else if (phase == "tapwait" && t >= 0.3f)
         {
