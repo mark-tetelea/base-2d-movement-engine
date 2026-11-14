@@ -1,6 +1,6 @@
 # Where the kit is now
 
-> Rewritten, never appended. True as of **2026-11-14**, end of phase 1 (movement add-ons).
+> Rewritten, never appended. True as of **2026-11-14**, end of phase 2 (facing and aim).
 
 ## How it plays
 
@@ -15,6 +15,11 @@ Four feels, swapped with keys **1**-**4** (the top-left label names the one in u
 - **Glide** (like Diep.io): 6 tiles/s, 0.4 s to full speed, 0.8 s to stop.
 - **Ice**: 6 tiles/s, 1.0 s to full speed, 2.0 s to stop; pushes slide far.
 - **Heavy**: 4 tiles/s, 0.5 s to full speed, 0.15 s to stop; shrugs pushes off.
+
+The player faces where it walks (8 directions, idle + a 2-step walk; the left side is the
+right side flipped) and a yellow diamond shows the aim, towards the mouse. **F** switches
+4 / 8 facings, **G** face walk / aim, **H** aim from mouse / walk; the second label line
+names them. Standing still keeps the facing.
 
 **Space** dashes 3 tiles in 0.2 s (0.4 s cooldown; invulnerable flag stored for damage
 later). **K** knocks the player away from the mouse. Along the top of the arena: a yellow
@@ -32,7 +37,8 @@ harness in `Tools/measure/`.
 
 1. **Movement** - 8 directions and instant-to-glide feel: **built**. Ice/Heavy presets, dash,
    knockback and speed zones: **built** (phase 1, 2026-11-14).
-2. **Facing and animation** - 4 or 8 directions, aim separate from walking.
+2. **Facing and animation** - 4 or 8 directions, aim separate from walking: **built**
+   (phase 2, 2026-11-14). 5 drawings + mirroring by default, true 8 as a setting.
 3. **Interaction** - one key, best nearby target: chests, NPCs, items.
 4. **Pickups and inventory** - auto (coins, ammo) and manual (weapons, key items),
    inventory with a hotbar, chests as inventories.
@@ -42,15 +48,14 @@ The order is a suggestion, not a decision.
 
 ## Screens
 
-None. The test arena has a one-line developer label (which feel is in use), not kit UI.
+None. The test arena has a one-line developer label (which feel is in use, and the facing settings), not kit UI.
 
 ## What is not done
 
 - The feel playtest (Instant vs Glide, and whether a wall slide should keep full speed).
 - Everything after movement in the list above, and every placeholder in `TO-DRAW.md`
-  except the floor, wall and the player's one direction.
-- **Open question for the facing work:** 8-direction art as eight drawings, or five with
-  mirroring.
+  except the floor, wall, the player and the aim marker. The facing playtest (does 8 feel
+  right, walk-cycle speed 8 fps).
 - **Open question for when shooting is built:** "reused bullets" (the user's spec) against
   the working agreement's "no pooling that no measurement asked for". Likely answer:
   Unity's built-in `UnityEngine.Pool.ObjectPool<T>` (no custom framework), justified by a

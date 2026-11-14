@@ -72,7 +72,7 @@ namespace TopDownKit
             if (cooldownLeft > 0f) { cooldownLeft -= dt; return; }
             if (!start) return;
 
-            direction = mover.FacingDirection;
+            direction = mover.LastMoveDirection;
             velocity = DashVelocity(direction, settings, dt);
             stepsLeft = Steps(settings, dt);
             mover.DriveThisStep(velocity);

@@ -560,4 +560,12 @@ a `.meta`, and a path outside the project is refused outright. **Rule:** copy th
 and delete the folder with `AssetDatabase.DeleteAsset` (never leave it for git), or read
 the inline image instead of saving.
 
-(next number is 77)
+## 77. Test run leaves a ProjectSettings change
+
+**Symptom:** after a play-mode check, `ProjectSettings.asset` shows `runInBackground: 1`.
+**Cause:** setting `Application.runInBackground = true` in the editor writes the Player
+setting, not just the running session (trap 6's fix).
+**Rule:** after any check that sets it, put `PlayerSettings.runInBackground = false` back
+and look at `git status ProjectSettings` before committing.
+
+(next number is 78)

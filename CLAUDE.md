@@ -62,6 +62,9 @@ What the player meets, in order:
   only wraps a plain `MoveSettings` struct, and the rule takes the struct.** The user's
   choice: play-mode tuning is kept and movers share feels. An exception for movement
   feel, not a config system. (LOG, 2026-10-18)
+- **Directional art is 5 drawings + mirroring** (right, up-right, up, down-right, down;
+  left = right flipped). `DirectionalSprites.mirrorLeft` off lets a game supply true 8.
+  The user's choice. (LOG, 2026-11-14)
 
 ## What exists
 
@@ -82,6 +85,12 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
   Windowbox; floor and wall tilemaps (walls: one merged collider, trap 74); the player.
   Keys 1-9 swap the feel (`Assets/Scripts/TestArena/FeelKeys.cs`), Space dashes, K knocks
   the player from the mouse (`KnockKey.cs`); speed pad, mud and ice patch under `Zones`.
+- `Assets/Scripts/Facing/` - `Facing` (the one facing rule: index 0-7 counter-clockwise
+  from right, `Step`/`Snap`, zero direction keeps the facing; `FacingSettings`: 4 or 8,
+  face walk or aim), `PlayerAim` (mouse or walk -> `Direction`, data), `PlayerFacing`
+  (rule on the fixed step), `DirectionalSprites` (sprite swap idle / 2-step walk, flips the
+  left side; no Animator). Test arena: `FacingKeys` (F 4/8, G walk/aim, H aim source, aim
+  marker). Player sprites are 48x24 sheets of 3 frames sliced by `Tools/pxkit/slice-sheet.cs`.
 - `Tools/measure/` - measuring harness: `movement.cs` (run with `eval_file` in play mode;
   drives the real key path through a virtual keyboard, logs every fixed step) and
   `analyse-movement.js`; it also checks dash distance and knockback decay at 30 vs 144 fps. Re-run it after any change to movement.
@@ -106,7 +115,7 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
 ## Traps
 
 > One line each: symptom -> rule. The full story is in `Docs/TRAPS.md` under the same
-> number. Add the day a trap is found; next free number is **77**.
+> number. Add the day a trap is found; next free number is **78**.
 
 **The editor lies about your own edits**
 1. Code right, game wrong -> a changed `[SerializeField]` default does not change a scene that already saved it; edit the scene in edit mode and save.
@@ -207,6 +216,7 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
 74. Wall tilemap has no collision -> toggle the TilemapCollider2D after painting, read shapes next call, then save.
 75. Numbers split across CSV columns -> this editor writes decimal commas; use `CultureInfo.InvariantCulture`.
 76. `capture_game_view --save_path` made an asset -> it writes under `Assets/`; copy out and `DeleteAsset` the folder.
+77. `runInBackground: 1` appears in ProjectSettings after a test -> setting it at runtime writes the Player setting; put it back, check `git status`.
 
 ## Environment
 

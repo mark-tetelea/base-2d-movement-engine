@@ -8,7 +8,8 @@
 |---|---|---|---|---|---|
 | Floor tile (test arena) | 16x16 | tile | steel | Claude | yes - `floor.js` (2026-10-18) |
 | Wall tile | 16x16 | tile | steel | Claude | yes - `wall.js` (2026-10-18) |
-| Player, 8 directions, idle + walk | 16x24 | bottom-centre | blue, skin, steel | Claude | 1 of 8: facing the camera, idle (`player.js`) |
+| Player, 8 directions, idle + walk | 16x24 | bottom-centre | blue, skin, steel | Claude | yes - 5 sheets (idle + 2 steps) + mirroring, `player-*.js` (2026-11-14) |
+| Aim marker (test arena) | 8x8 | centre | fire, steel | Claude | yes - `aim-marker.js` (2026-11-14) |
 | Enemy | 16x16 | bottom-centre | plum, steel | Claude | no |
 | NPC | 16x24 | bottom-centre | green, skin, steel | Claude | no |
 | Chest, closed + open | 16x16 | bottom-centre | wood, steel | Claude | no |

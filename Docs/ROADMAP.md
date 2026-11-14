@@ -37,7 +37,7 @@ gives a different-feeling game with no code change. The kit's design test still 
 | 4 or 8 facing directions | setting |
 | Face where you walk, or where you aim | setting |
 | Aim from the mouse, or from the walk direction | setting |
-| 8 drawings, or 5 drawings with mirroring | open question (art) |
+| 5 drawings + mirroring, or true 8 | setting (`mirrorLeft`); default 5 + mirroring (user, 2026-11-14) |
 | Idle / walk animation, flip on left | built-in |
 
 ### 3. Camera and world layout **(new - every demo needs one)**

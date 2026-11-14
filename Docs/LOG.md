@@ -372,3 +372,36 @@ with a frictionless material so sliding along a wall does not drag.
 - Knockback 14 tiles/s, Instant: 21 steps (0.35 s), 2.5667 tiles; Glide 2.5910; 30 vs 144 fps max difference 0. (Stepped sum, so a bit above the continuous v*v/2a = 2.45.)
 - Zones, one check each in play mode: speed pad 9.6 tiles/s, mud 3, ice patch gives Ice's 1 s / 2 s.
 - Not verified: the feel of any of it (needs the user's playtest); dash and knockback into walls.
+
+## 2026-11-14 - Phase 2: facing, aim and animation
+
+**Decided:**
+- **8-direction art is 5 drawings + mirroring; true 8 is a setting (`mirrorLeft`).** Why: the
+  user's choice - fewer drawings for every game. Consequence: left facings 3/4/5 show 1/0/7 flipped.
+- **Facing is an index 0-7 counter-clockwise from right; a zero direction keeps it.** Why:
+  standing still keeps the last facing; one integer is cheap to test and to send online.
+- **With 4 facings an exact diagonal keeps the current facing if it is one of the two
+  nearest, else goes sideways.** Why: no flicker walking diagonally. Starting rule, playtest.
+- **Animation is a plain sprite swap, no Animator.** Why: idle + 2 steps per direction did
+  not earn one. Walk cycle step, idle, step, idle at 8 fps; idle under 0.1 tiles/s.
+- `PlayerMover.FacingDirection` renamed `LastMoveDirection` (it is not facing); new `InputDirection`.
+
+**Built:**
+- `Assets/Scripts/Facing/Facing.cs` - the one facing rule + `FacingSettings`.
+- `PlayerAim.cs` - mouse or walk -> aim direction as data; the rules never read the mouse.
+- `PlayerFacing.cs` - runs the rule on the fixed step. `DirectionalSprites.cs` - sprite swap + flip.
+- `TestArena/FacingKeys.cs` - F/G/H switches, aim marker, label line.
+- `Tools/pxkit/sprites/player-{right,up-right,up,down-right,down}.js` (48x24 sheets, 3 frames)
+  and `aim-marker.js`; `Tools/pxkit/slice-sheet.cs` slices sheets (bottom-centre pivots). Old
+  `player.js`/`player.png` became `player-down`.
+- `Tools/measure/facing.cs` - facing check through a virtual keyboard and mouse.
+
+**Measured / verified:**
+- Compiles with 0 errors, 0 warnings.
+- `facing.cs`: 18/18 pass, one run - all 8 walk directions with sprite and flip (3/4/5 flip),
+  standing keeps facing, 4-direction diagonals, face aim (mouse left) while walking right,
+  face walk while mouse left, aim from walk.
+- Movement harness re-run after the change: unchanged (0 tiles difference 30 vs 144 fps,
+  8 directions 6.000, 10/10 taps, dash 3.0000, knockback 2.5667 / 2.5910).
+- Down sprite judged in a game render (snapshot); others judged from pxkit review only.
+- Not verified: the feel (needs a playtest); the real mouse path (the check used a virtual mouse).

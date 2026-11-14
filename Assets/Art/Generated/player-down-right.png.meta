@@ -1,7 +1,16 @@
 fileFormatVersion: 2
-guid: ae4ea8baf0c67c04a8110af2ab57fb7d
+guid: a7b37165e06f96e4fac5606599778af4
 TextureImporter:
-  internalIDToNameTable: []
+  internalIDToNameTable:
+  - first:
+      213: 700622318572515742
+    second: player-down-right_0
+  - first:
+      213: 630997735281634720
+    second: player-down-right_1
+  - first:
+      213: 4799633895057451423
+    second: player-down-right_2
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -43,10 +52,10 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
-  alignment: 7
+  alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 16
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
@@ -110,23 +119,67 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: _preset_0
+      name: player-down-right_0
       rect:
         serializedVersion: 2
-        x: 1
-        y: 1
-        width: 14
-        height: 14
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 0
+        y: 0
+        width: 16
+        height: 24
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 20e6c97fabfd34710800000000000000
-      internalID: 1676429480423091714
+      spriteID: e91b934694c19b900800000000000000
+      internalID: 700622318572515742
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player-down-right_1
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 0
+        width: 16
+        height: 24
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0ada989d811c1c800800000000000000
+      internalID: 630997735281634720
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player-down-right_2
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 0
+        width: 16
+        height: 24
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f99e2d61999bb9240800000000000000
+      internalID: 4799633895057451423
       vertices: []
       indices: 
       edges: []
@@ -146,6 +199,9 @@ TextureImporter:
       entries: []
     nameFileIdTable:
       _preset_0: 1676429480423091714
+      player-down-right_0: 700622318572515742
+      player-down-right_1: 630997735281634720
+      player-down-right_2: 4799633895057451423
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

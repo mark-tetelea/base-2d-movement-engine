@@ -31,7 +31,9 @@ namespace TopDownKit
         public Vector2 MoveVelocity => move;
         public Vector2 Push => push;
         // The last direction asked for (right before any), for a dash with no keys held.
-        public Vector2 FacingDirection { get; private set; } = Vector2.right;
+        public Vector2 LastMoveDirection { get; private set; } = Vector2.right;
+        // The direction the last step walked in (zero when no keys), for facing.
+        public Vector2 InputDirection { get; private set; }
 
         // The settings in force now: the feel, changed by any zones the mover stands in.
         public MoveSettings CurrentSettings => feel == null ? default : SpeedZone.Apply(feel.settings, zones);
@@ -63,7 +65,7 @@ namespace TopDownKit
             if (keys != held && keys != Vector2.zero) pressedSinceStep = keys;
             held = keys;
             // Updated here too, so a dash pressed together with a new direction uses it.
-            if (keys != Vector2.zero) FacingDirection = keys.normalized;
+            if (keys != Vector2.zero) LastMoveDirection = keys.normalized;
         }
 
         void FixedUpdate()
@@ -71,7 +73,8 @@ namespace TopDownKit
             if (body == null) body = GetComponent<Rigidbody2D>();
             Vector2 direction = held != Vector2.zero ? held : pressedSinceStep;
             pressedSinceStep = Vector2.zero;
-            if (direction != Vector2.zero) FacingDirection = direction.normalized;
+            InputDirection = direction;
+            if (direction != Vector2.zero) LastMoveDirection = direction.normalized;
             if (feel == null) return;
             float dt = Time.fixedDeltaTime;
             MoveSettings s = CurrentSettings;

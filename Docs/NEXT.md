@@ -1,36 +1,29 @@
 # Next
 
-> Overwritten at every `/handoff`. Written 2026-11-14, end of phase 1 (movement add-ons).
+> Overwritten at every `/handoff`. Written 2026-11-14, end of phase 2 (facing and aim).
 
 ## Do first
 
-1. **The user playtests phase 1** in `Assets/Scenes/TestArena.unity` (Play). Things to try:
-   - Keys **1-4**: Instant, Glide, Ice, Heavy. Ice and Heavy values are guesses.
-   - **Space** dash (3 tiles, 0.2 s, 0.4 s cooldown) with each feel. Too short/long/slow?
-     Should Glide keep more speed after a dash (now capped at top speed)?
-   - **K** with the mouse beside the player: is 14 tiles/s a good test hit? Does Ice slide
-     too far (push stop 12), Heavy too little (80)?
-   - Walk over the top strip: speed pad (x1.6), mud (x0.5), ice patch.
-   Tune in `Assets/Data/Movement/*.asset` and the Player's `Dash` component; play-mode
-   changes to the assets are kept, to the component are not (trap 3).
-2. Then phase 2 of `Docs/ROADMAP.md`.
+1. **The user playtests phases 1 and 2** in `Assets/Scenes/TestArena.unity` (Play):
+   - Phase 1 list: keys 1-4 feels, Space dash, K knockback, the top strip zones.
+   - Phase 2: walk all 8 ways; F (4/8 facings), G (face walk / aim), H (aim from mouse / walk).
+     Is the walk cycle (8 fps) too fast? Does 4-facing diagonal behaviour feel right?
+2. Then phase 3 of `Docs/ROADMAP.md` (camera and world layout).
 
 ## Half-done
 
-- `Assets/_Recovery/0.unity` (+ `.meta`): Unity's crash backup from opening the editor; it
-  is the same TestArena. Not committed. Delete it in the Project window (deleting it from
-  this session was blocked).
-- Not measured: dash and knockback into walls (the wall-loss split in
-  `PlayerMover.TakeWallLoss`). Looks right by reasoning only.
+- `Assets/_Recovery/` (+ `.meta`): Unity's crash backup, not committed. Delete it in the
+  Project window.
+- Not measured: dash and knockback into walls (`PlayerMover.TakeWallLoss`).
 
 ## Waiting on the user
 
-- The playtest above. Also still open from 2026-10-18: wall-slide speed (4.24 tiles/s).
+- The playtest above. Still open: wall-slide speed (4.24 tiles/s).
 
 ## Don't
 
-- Don't push knockback into `Movement.Step`'s velocity; use `PlayerMover.AddPush`.
-- Don't move dash into the core mover: it is an add-on driving `DriveThisStep`.
-- Don't re-measure by argument - re-run `Tools/measure/movement.cs` (play mode, TestArena)
-  and `node Tools/measure/analyse-movement.js` after any movement change (~90 s).
-- Don't switch to the template's `InputSystem_Actions` asset (gamepad bindings).
+- Don't add an Animator for idle/walk; `DirectionalSprites` swaps sprites.
+- Don't read the mouse outside `PlayerAim`; aim is data.
+- Don't re-measure by argument: `Tools/measure/movement.cs` and `facing.cs` in play mode.
+- After a check that sets `Application.runInBackground`, put the Player setting back (trap 77).
+- Don't push knockback into `Movement.Step`; don't move dash into the core mover.
