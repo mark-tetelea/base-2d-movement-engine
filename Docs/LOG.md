@@ -557,3 +557,25 @@ Brief: `Docs/prompt-phase6-playground.md`.
 - Earlier checks: movement harness unchanged (Instant 12.0 / Glide 13.2 tiles, stop 2.35, dash 3.0000, knockback 2.5667 / 2.5910, 30 = 144 fps); facing 18/18; camera 11/11 on a second run (first run: Open layout "walk B -> C" stopped at y 17.5 - nothing solid there, not repeated; watch it); screens 8/8 at 1920x1080 (WXGA not re-run); combat 561 steps 0 differing 30 vs 144; bullets pooled 150 B / 4 us vs Instantiate 3,951 B / 38 us; Arena bot ALL PASS; RPG bot 24/24; inventory 21/21.
 - Looked at once in game (screenshot): the tile garden reads - red, blue, crumbling, closed and open doors are told apart.
 - Not verified: broken-crumble "blocks" mode and a door/tile closing on someone standing there (physics push-out); feel of grid step (playtest).
+
+## 2026-11-14 - Phase 9: melee swing, charge shots, bouncing bullets, aim assist
+
+**Decided:**
+- **Melee is a weapon kind (`Weapon.kind` Gun / Melee) with a `MeleeSettings` block (arc, reach in tiles, swing time, cooldown, blade art/width/colour); damage and knockback are the weapon's own.** **Why:** brief - one weapon list, one picker, same `Health.Hit`. The swing itself is an add-on component, `MeleeSwing`, that `Gun` adds on first use. **Consequence:** `Gun` names `MeleeSwing` - phase 14's "delete a folder" check must keep them together (or give Gun a hook then).
+- **A swing sweeps from -arc/2 to +arc/2 along the aim over `swingTime`, follows the wielder, keeps its starting aim, hits each target once per swing; walls between stop it, low barriers (`ShootOver`) do not.** Melee ignores `fireRate`: the next swing waits `swingTime + cooldown`. One rule: `Melee.BladeAngle` / `Melee.InSweep` (target size counted: reach to the collider edge, angle widened by its radius).
+- **Charge is a weapon setting: `chargeTime` (0 = off), and multipliers at full charge `chargeDamage`, `chargeSize` (bullet radius + art; melee reach), `chargeSpeed`.** Hold to charge, release to fire; scale is linear in the charge (0..1). A press and release between two steps fires uncharged. Charging waits for the cooldown and stops on reload/switch. `automatic` is ignored while charging. `Gun.Charge01` is shown in the HUD's ammo line.
+- **Bounces are a weapon setting, `Weapon.bounces` (0 = none).** A wall reflects the bullet inside the same step (no distance lost); range counts the whole path; at most 4 bounces per step. Bullets still fly over `ShootOver` and bounce off "Ground blocks" (closed doors); a Health of another team always stops it.
+- **Aim assist is a shooter setting on `Gun` (`AimAssistSettings`: strength 0..1, cone degrees each side, range tiles; strength 0 = off), not a weapon setting.** The rule `AimAssist.Nudge` turns the aim toward the NEAREST living target of another team inside the cone by `strength` of the angle; applied at each shot and swing start (aim still arrives as data). It sees through walls, like enemy sight. Shipped off (0) everywhere; the Playground picker cycles off / 0.35 / 0.7.
+
+**Built:**
+- `Assets/Scripts/Combat/`: `Melee.cs` (the one melee rule), `MeleeSwing.cs` (add-on swing + blade art: a plain bar from `Texture2D.whiteTexture`, stretched to reach), `AimAssist.cs` (settings + rule). `Weapon` (kind, melee, charge, bounces), `Gun` (charge state, `Shoot` for both kinds, aim assist, recoil along the assisted aim), `Bullet` (`Spawn` takes damage/size scales; bounce loop; scale reset per launch).
+- `Assets/Data/Weapons/`: `Sword` (melee: 2 dmg, arc 120, reach 1.5, swing 0.15 s, cooldown 0.2 s, knockback 10), `Charger` (1 s charge to x4 damage, x2.5 size, x1.5 speed; 6 shots), `Bouncer` (3 bounces, range 24; 8 shots).
+- Playground: the player carries Pistol, Shotgun, Rapid, Sword, Charger, Bouncer (keys 1-6, picker "Weapon"); picker row "Aim assist"; help line says 1-6. `Hud` adds "charge NN%". No demo changed.
+
+**Measured / verified (one smoke run in play mode, not a saved check):**
+- Compiles, 0 errors; StartMenu, ArenaShooter, LittleRpg, Playground open with 0 console errors.
+- Sword: one swing at a target 30 deg off the aim, 1.2 tiles away: hp 5 -> 3 (one hit of 2, not repeated in the swing).
+- Charger held to full charge: one hit of 4 (x4).
+- Bouncer fired down at the arena wall: came back flying up (y 6.2, dir (0, 1)).
+- `AimAssist.Nudge`: target 30 deg off, strength 0.5, cone 40 -> 15.0 deg; strength 0 -> 0; cone 10 -> 0.
+- Not verified: feel (playtest), bounce into corners and off door ground, melee through `ShootOver` and blocked by walls, charge bullet look, the existing combat/bot checks (old weapons have charge 0, bounces 0, kind Gun, so their path is the same code order - left for the phase 15 pass).

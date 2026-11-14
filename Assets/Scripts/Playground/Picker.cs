@@ -27,6 +27,8 @@ namespace TopDownKit.Playground
         public float[] reaches = { 1f, 1.5f, 2.5f };
         [Tooltip("Magnet reach values (tiles) the magnet row cycles through; 0 = off.")]
         public float[] magnets = { 0f, 2.5f, 5f };
+        [Tooltip("Aim assist strengths the aim assist row cycles through; 0 = off.")]
+        public float[] assists = { 0f, 0.35f, 0.7f };
         public bool startOpen = true;
 
         [Tooltip("A small sprite placed along the aim, so aim is visible.")]
@@ -78,6 +80,9 @@ namespace TopDownKit.Playground
             Add("Weapon", () => gun != null && gun.weapons != null && gun.weapons.Length > 0,
                 () => gun.Current != null ? gun.Current.name : "-",
                 () => gun.Select(Next(gun.CurrentIndex, gun.weapons.Length)));
+            Add("Aim assist", () => gun != null && assists.Length > 0,
+                () => gun.aimAssist.strength <= 0f ? "off" : Num(gun.aimAssist.strength),
+                () => gun.aimAssist.strength = assists[Next(IndexOf(assists, gun.aimAssist.strength), assists.Length)]);
             Add("Best target", () => interactor != null, () => interactor.settings.best.ToString(),
                 () => interactor.settings.best = interactor.settings.best == BestTarget.Facing ? BestTarget.Closest : BestTarget.Facing);
             Add("Use", () => interactor != null, () => interactor.settings.use.ToString(),

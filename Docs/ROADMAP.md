@@ -89,7 +89,7 @@ One key uses the **best nearby target** - one shared system for everything.
 | Recoil on the shooter (uses knockback) | setting |
 | Bullets reused (Unity's own `ObjectPool`, once a measurement asks) | built-in |
 | Health, invulnerable time after a hit, hit flash, knockback on the target | setting |
-| Melee swing **(new)** | add-on, later |
+| Melee swing (`Weapon.kind` Melee), charge shots, bouncing bullets, aim assist | settings + add-on `MeleeSwing`, built phase 9 |
 
 ### 7. Enemies **(new - the shooter demo needs something to shoot)**
 
@@ -144,7 +144,7 @@ copy of each rule, checks before `/handoff`.
 | # | Phase | What it adds |
 |---|---|---|
 | 8 | **Ground tiles + grid-step** - built 2026-11-14 | Tile types, each one a small asset: **normal** ground; **red** (kills you); **blue** (can't be stepped on - a wall you can see over and shoot across); **crumbling** (breaks a set time after you step on it, comes back after a set time); **door ground** (opens/closes on a switch, a key or a cleared room - reuses phase 3's `RoomLock`). Plus **grid-step movement**: one tile per press, as a movement setting, with a "frames per step" / step time setting for smoothness. |
-| 9 | **Combat additions** | Melee swing, charge shots, bullets that bounce off walls, aim assist (strength as a setting, 0 = off). |
+| 9 | **Combat additions** - built 2026-11-14 | Melee swing, charge shots, bullets that bounce off walls, aim assist (strength as a setting, 0 = off). |
 | 10 | **Enemy additions** | Pathfinding around walls (fixes the stuck-behind-pillar limit), a boss with phases, groups that move together, enemies that leave a trail (can use the red-tile rule). |
 | 11 | **World additions** | Procedural rooms (a new layout every run, built from room pieces), destructible crates. |
 | 12 | **Feel additions** | Hit-stop (tiny freeze on hits), particles, sound effects, day/night tint. All settings, all off-able. **Sounds are swappable**: each event (step, shot, hit, pickup, door, UI click...) points at a sound slot you fill with your own clip or leave empty. |

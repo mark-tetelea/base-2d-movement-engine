@@ -110,8 +110,10 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
   `Tools/measure/camera.cs` checks pixels and room bounds in all layouts.
 - `Assets/Scripts/Combat/` - `Damage` (the one damage rule), `Health` (teams, invulnerable
   time, flash, knockback on the target, dash protects), `Weapon` (asset, settings only),
-  `Gun` (input as data: aim, trigger, reload, select), `Bullet` (fixed step, circle sweep,
-  `ObjectPool`; flies over `ShootOver` colliders), `PlayerShooter` (mouse/keys -> Gun), `EnemyBrain` (Chase / KeepDistanceAndShoot
+  `Gun` (input as data: aim, trigger, reload, select; charge = hold/release; aim assist
+  `AimAssist.Nudge`, strength 0 = off), `Bullet` (fixed step, circle sweep, `ObjectPool`;
+  flies over `ShootOver` colliders; `Weapon.bounces` reflects off walls), melee = `Weapon.kind`
+  Melee: `Melee` (the one swing rule) + add-on `MeleeSwing` (Gun adds it), `PlayerShooter` (mouse/keys -> Gun), `EnemyBrain` (Chase / KeepDistanceAndShoot
   / Wander on a `PlayerMover` with `readKeyboard` off), add-ons `RoomWaves` (clears a
   `RoomLock`), `RestartOnDeath`; `ArenaGoal` (the demo's win/wave text into the `Hud`). Weapons in `Assets/Data/Weapons/`,
   enemies in `Assets/Prefabs/Enemies/`. Enemies walk straight: no pathfinding.

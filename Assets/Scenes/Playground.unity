@@ -1995,7 +1995,7 @@ MonoBehaviour:
   gun: {fileID: 827345427}
   hotbar: {fileID: 827345426}
   interactor: {fileID: 827345425}
-  help: 'WASD move  mouse aim  click shoot  R reload  1-3 weapon
+  help: 'WASD move  mouse aim  click shoot  R reload  1-6 weapon
 
     Space dash 
     E use  K knockback  Tab settings  Esc pause'
@@ -2051,6 +2051,10 @@ MonoBehaviour:
   - 0
   - 2.5
   - 5
+  assists:
+  - 0
+  - 0.35
+  - 0.7
   startOpen: 1
   aimMarker: {fileID: 704321530}
   markerDistance: 1.5
@@ -2447,9 +2451,16 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 3de50b7962839124a9410601be91f7a3, type: 2}
   - {fileID: 11400000, guid: a6643592025881f43b2df5cd55632a2e, type: 2}
   - {fileID: 11400000, guid: 39d337c724056c54fa79c73145a837f4, type: 2}
+  - {fileID: 11400000, guid: 49652454fcefefd44a4711099680e1a6, type: 2}
+  - {fileID: 11400000, guid: dda9b671d2a138648a7e0a87f51e9871, type: 2}
+  - {fileID: 11400000, guid: 8fd09a1e5e1707c47bf7ec6fdf42e758, type: 2}
   team: 0
   muzzleDistance: 0.5
   seed: 1
+  aimAssist:
+    strength: 0
+    cone: 15
+    range: 10
 --- !u!114 &827345428
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,6 +1,6 @@
 # Where the kit is now
 
-> Rewritten, never appended. True as of **2026-11-14**, end of phase 8 (ground tiles, grid-step movement).
+> Rewritten, never appended. True as of **2026-11-14**, end of phase 9 (melee, charge shots, bouncing bullets, aim assist).
 
 ## How it starts
 
@@ -29,12 +29,14 @@ button; a click moves to the next value, live:
 - Grid step: off / Grid (one tile at a time, hold to walk) / Grid 8 (diagonals too) /
   Grid tap (one press, one tile)
 - Dash (Space): on / off - Facings: 4 / 8 - Face towards: walk / aim - Aim from: mouse / walk
-- Camera: Open / Rooms slide / Rooms fade - Weapon: Pistol / Shotgun / Rapid
+- Camera: Open / Rooms slide / Rooms fade - Weapon: Pistol / Shotgun / Rapid / Sword / Charger / Bouncer
+- Aim assist: off / 0.35 / 0.7 (bends each shot toward the nearest enemy in a 15 degree cone)
 - Best target: facing / closest - Use: press / hold - Reach: 1 / 1.5 / 2.5 tiles
 - Magnet: off / 2.5 / 5 tiles - Room: shows the room; click clears a locked one
 
 WASD move, mouse aims, left click shoots (not when the click lands on a screen), R reloads,
-1-3 pick a weapon, E uses, K knocks the player away from the mouse. The HUD shows health,
+1-6 pick a weapon (Sword swings an arc; Charger: hold to charge, release to fire, up to x4
+damage; Bouncer: bullets bounce off walls 3 times), E uses, K knocks the player away from the mouse. The HUD shows health,
 weapon and ammo, the hotbar (click a slot) and the controls.
 
 ## The Arena shooter demo (phase 4)
@@ -80,12 +82,14 @@ settings panel does not shoot.
 6. Screens and the Playground picker: **built** (phase 6).
 7. Ground tiles (normal, red, blue, crumbling, door) and grid-step movement: **built** (phase 8,
    round 2). Only the Playground uses them; no demo does.
+8. Combat additions - melee swing, charge shots, bouncing bullets, aim assist: **built** (phase 9).
+   Only the Playground has the Sword, Charger and Bouncer; the demos keep their weapons.
 
 ## What is not done
 
 - Every playtest: movement feel (Instant vs Glide, wall slide), facing (8 directions, walk
   speed), combat numbers, the RPG room (reach, facing vs closest, magnet), and now the screens
   (sizes, readability, the settings panel), and now grid step (pace, slide time) and the
-  tiles (crumble timing, how forgiving red is). Nobody has played any of it yet.
+  tiles (crumble timing, how forgiving red is), and the phase 9 weapons (swing, charge, bounce, assist). Nobody has played any of it yet.
 - Real art for everything in `TO-DRAW.md` except the floor, wall, player and aim marker.
 - WebGL build (module not installed), GIFs (only PNG screenshots in `Media/`), GitHub repo and push (the user's call).

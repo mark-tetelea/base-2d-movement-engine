@@ -108,6 +108,7 @@ namespace TopDownKit
             {
                 Weapon w = gun.Current;
                 a = w.name + "  " + (w.magazine <= 0 ? "inf" : gun.Reloading ? "reloading" : gun.Ammo + "/" + w.magazine);
+                if (gun.Charge01 > 0f) a += "  charge " + Mathf.RoundToInt(gun.Charge01 * 100f) + "%";
             }
             ammo.text = a;
 
