@@ -144,6 +144,22 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
   `FeelOverride` (other slots for one object; Crate breaks), `Footsteps`, `Burst` (placeholder effect),
   `DayNight` (Off / Fixed / Cycle on the global Light2D). Set `Assets/Data/Feel/KitFeel.asset`, sounds
   `Assets/Audio/Placeholder/` (made by `Tools/sfx/make-sounds.py`), effects `Assets/Prefabs/Effects/`.
+- `Assets/Scripts/Save/` (phase 13, add-on) - `SaveGame` (one per scene: `parts` flags Scene/Player/Bag/
+  Coins/Chests/Doors/Rooms/Pickups/Shops, `slots`, `Capture`/`Apply`, `Save(slot)`, `Load(slot)` reloads the
+  saved scene - a generated level by `RoomGenerator.NextSeed` - and applies on top in `Start`; objects named
+  by hierarchy path `IdOf`; a settings file for chosen component fields), `SaveData` (the versioned shape),
+  `SaveFiles` (read: version, upgrade steps on every file, every field required, backup fallback; write: temp
+  file, old good file -> `.bak.json`, a broken/newer file kept aside, never overwritten), `SaveJson` (parser +
+  shape check), `SaveMenu` (Save / Load in the pause menu via `PauseMenu.AddButton`). Change the shape ->
+  raise `SaveGame.Version` + an upgrade step. `Tools/measure/save.cs` is its check.
+- `Assets/Scripts/Shop/` (phase 13, add-on) - `Shop` (an `Interactable`; the trade rule `Buy`/`Sell` tries
+  the whole trade on a copy of the bag; sell price = stock price x `sellRate`), `ShopStock` (asset: item,
+  price, amount, -1 endless; in `Assets/Data/Shops/`), `ShopScreen` (buy/sell on the shared panel).
+- `Assets/Scripts/Map/` (phase 13, add-on) - `Minimap` (Off / Corner / FullOnKey, M or a click opens the full
+  map; rooms appear when visited = `Room.Visited`; enemies and items optional). Looks only.
+- `Assets/Scripts/Touch/` (phase 13, add-on) - `TouchControls` (Auto / On / Off; move stick, aim stick that
+  fires, Fire, Dash, Use, Gun, pause; feeds `PlayerMover.SetMoveDirection`, `PlayerAim.Hold`,
+  `PlayerShooter.SetOtherTrigger`, `Dash.Request`, `Interactor.SetOtherHeld`; one pointer id per finger).
 - `Assets/Scripts/Interaction/` - `Interaction.Pick` (the one best-target rule, plain points),
   `Interactable` base + targets `Talker`, `LockedDoor`, `Lever` (and `Chest`, `Pickup`),
   `Interactor` (E as data; open panels pause walking), `InteractPrompt`, `TextBox` +
@@ -153,7 +169,7 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
 - `Assets/Scripts/Screens/` - UI Toolkit built in code: `KitUI` (the one panel, 640x360 scaled
   by the camera's `pixelRatio`; EventSystem; `PointerOverUI`; shared box/button/slot looks),
   `Hud` (health, ammo, hotbar, status, banner, boss bar, help - all optional), `PauseMenu` (Esc,
-  `IsPaused`; Resume / Restart / Main menu), `StartMenu`. `TextBox` and `ChestScreen` draw on
+  `IsPaused`; Resume / Restart / add-on buttons via `AddButton` / Main menu), `StartMenu`. `TextBox` and `ChestScreen` draw on
   the same panel. Panel asset: `Assets/Resources/KitPanel.asset` + `Assets/UI/KitTheme.tss`.
   Keyboard readers ignore keys while paused; a press that starts on a screen never shoots.
 - Build list: `StartMenu` (0, buttons to the demos), `ArenaShooter` (1), `LittleRpg` (2,
@@ -172,18 +188,16 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
 ## Do NOT build yet
 
 - **Gamepad support** - the user said no gamepad. Comes off when a game needs it.
-- **Touch controls and mobile builds** - until the first mobile game starts. "Input
-  arrives as data" keeps the door open.
+- **Mobile builds** (Android/iOS build targets) - until the first mobile game starts.
+  Touch controls exist (phase 13, the user asked for them, LOG 2026-11-14).
 - **Bit-exact determinism / lockstep netcode** - until a game needs online play.
-- **Saving** - not in the kit's list. Comes off when a game needs it; read traps 46-50
-  first.
 - **Managers, event bus, ScriptableObject config systems, custom pooling frameworks** -
   until three real callers exist (see How we work). `MoveFeel` is the user's one exception.
 
 ## Traps
 
 > One line each: symptom -> rule. The full story is in `Docs/TRAPS.md` under the same
-> number. Add the day a trap is found; next free number is **86**.
+> number. Add the day a trap is found; next free number is **87**.
 
 **The editor lies about your own edits**
 1. Code right, game wrong -> a changed `[SerializeField]` default does not change a scene that already saved it; edit the scene in edit mode and save.
@@ -252,6 +266,7 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
 48. Never-saved field breaks loading -> `GetFields()` includes `[NonSerialized]`; skip `IsNotSerialized`.
 49. New version number on old shape -> no recompiling while someone plays.
 50. Old backup would delete progress -> fresh backup before every play session; play mode may save at once.
+86. Settings file written empty on a scene change -> other components are already destroyed in `OnDisable`; write the last values seen while the scene ran.
 
 **Tooling outside Unity**
 51. Passes outside, CS0171 inside Unity -> assign every struct field in constructors; let Unity compile.

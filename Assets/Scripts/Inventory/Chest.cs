@@ -20,9 +20,16 @@ namespace TopDownKit
 
         public override void Use(Interactor who)
         {
-            Opened = true;
-            if (art != null && openSprite != null) art.sprite = openSprite;
+            SetOpened(true);
             ChestScreen.Current.Show(who, this);
+        }
+
+        // Shows it opened or closed (loading a save); does not open the screen.
+        public void SetOpened(bool value)
+        {
+            Opened = value;
+            Sprite s = value ? openSprite : closedSprite;
+            if (art != null && s != null) art.sprite = s;
         }
     }
 }

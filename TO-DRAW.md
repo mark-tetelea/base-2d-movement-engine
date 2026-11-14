@@ -28,3 +28,6 @@
 | Trail enemy | 16x16 | centre | rust, steel | Claude | yes - `enemy.js --swap plum:rust` (2026-11-14) |
 | Ground: trail (goo over the floor) | 16x16 | tile | fire | Claude | yes - `ground-trail.js` (2026-11-14) |
 | Crate (destructible) | 16x16 | centre | wood, steel | Claude | yes - `crate.js` (2026-11-14) |
+| Potion (shop item + icon) | 12x12 | centre | plum, wood, steel | Claude | yes - `potion.js` (2026-11-14) |
+| Gem (shop item + icon) | 12x12 | centre | blue, steel | Claude | yes - `gem.js` (2026-11-14) |
+| Shopkeeper (LittleRpg) | 16x24 | bottom-centre | - | Claude | no - the player-down sprite tinted plum, like the other NPCs |

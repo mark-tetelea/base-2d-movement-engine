@@ -16,8 +16,12 @@ namespace TopDownKit
         PlayerAim aim;
         PlayerMover mover;
         bool pressStartedOnUI;
+        bool otherTrigger;
 
         public bool PressStartedOnUI => pressStartedOnUI;
+
+        // Input as data from elsewhere (a touch fire button or aim stick), added to the mouse.
+        public void SetOtherTrigger(bool down) { otherTrigger = down; }
 
         void Update()
         {
@@ -29,7 +33,8 @@ namespace TopDownKit
             // A press that starts on a screen (button, slot, picker) never shoots, even
             // while held after the screen closes (trap 21).
             if (m != null && m.leftButton.wasPressedThisFrame) pressStartedOnUI = KitUI.PointerOverUI;
-            gun.SetTrigger(!paused && !pressStartedOnUI && m != null && m.leftButton.isPressed);
+            bool mouse = !pressStartedOnUI && m != null && m.leftButton.isPressed;
+            gun.SetTrigger(!paused && (mouse || otherTrigger));
 
             Keyboard k = Keyboard.current;
             if (k != null)

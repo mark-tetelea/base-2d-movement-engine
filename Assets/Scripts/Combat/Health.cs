@@ -65,6 +65,14 @@ namespace TopDownKit
         // Back to full health (a restart without reloading the scene).
         public void Restore() { Init(); Current = maxHealth; invulnerableLeft = 0f; }
 
+        // Sets health outright, clamped to 1..maxHealth (loading a save). No hit, no events.
+        public void Set(int amount)
+        {
+            Init();
+            Current = Mathf.Clamp(amount, 1, maxHealth);
+            invulnerableLeft = 0f;
+        }
+
         // Gives health back, up to maxHealth (a health pickup). Not while dead.
         public void Heal(int amount)
         {

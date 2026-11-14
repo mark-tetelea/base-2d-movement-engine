@@ -14,6 +14,9 @@ namespace TopDownKit
         static readonly List<Room> all = new List<Room>();
         public static IReadOnlyList<Room> All => all;
 
+        // The player has been inside (set by whoever tracks it - the minimap; kept by saves).
+        public bool Visited { get; set; }
+
         public Rect Bounds => new Rect((Vector2)transform.position - size * 0.5f, size);
 
         void OnEnable() { if (!all.Contains(this)) all.Add(this); }

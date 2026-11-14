@@ -23,7 +23,7 @@ namespace TopDownKit
         [Tooltip("Where reach and facing are measured from, from this object's pivot (tiles).")]
         public Vector2 centre = Vector2.zero;
 
-        bool held, pressed, usedThisHold;
+        bool held, pressed, usedThisHold, otherHeld;
         float holdFor;
         PlayerMover mover;
         PlayerFacing facing;
@@ -56,6 +56,10 @@ namespace TopDownKit
             held = down;
         }
 
+        // Input as data from elsewhere (a touch button), added to the E key while
+        // readKeyboard is on. With readKeyboard off, call SetUseHeld instead.
+        public void SetOtherHeld(bool down) { otherHeld = down; }
+
         public void OpenPanel(IUsePanel p) { Panel = p; Pause(true); }
         public void ClosePanel(IUsePanel p)
         {
@@ -75,7 +79,7 @@ namespace TopDownKit
         {
             if (!readKeyboard || PauseMenu.IsPaused) return;
             Keyboard k = Keyboard.current;
-            SetUseHeld(k != null && k.eKey.isPressed);
+            SetUseHeld((k != null && k.eKey.isPressed) || otherHeld);
         }
 
         void FixedUpdate()

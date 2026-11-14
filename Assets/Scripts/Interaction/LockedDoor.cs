@@ -35,9 +35,10 @@ namespace TopDownKit
         // Every locked door that opens (sounds).
         public static event System.Action<LockedDoor> AnyOpened;
 
-        public void Open()
+        // Silent: no event, no sound (loading a save).
+        public void Open(bool silent = false)
         {
-            if (!IsOpen) AnyOpened?.Invoke(this);
+            if (!IsOpen && !silent) AnyOpened?.Invoke(this);
             IsOpen = true;
             if (blockers == null) return;
             foreach (GameObject b in blockers) if (b != null) b.SetActive(false);

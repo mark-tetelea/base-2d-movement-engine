@@ -22,6 +22,9 @@ namespace TopDownKit
 
         public override void Use(Interactor who) { on = !on; Apply(); AnyPulled?.Invoke(this); }
 
+        // Sets the lever without a pull (loading a save): no event, no sound.
+        public void Set(bool value) { on = value; Apply(); }
+
         void Apply()
         {
             if (offWhenOn != null) foreach (GameObject g in offWhenOn) if (g != null) g.SetActive(!on);

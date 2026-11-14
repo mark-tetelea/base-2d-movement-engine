@@ -125,4 +125,28 @@ MonoBehaviour:
     effect: {fileID: 0}
     effectLife: 0
     hitStop: 0
+  - id: 14
+    clips:
+    - {fileID: 8300000, guid: 2a2e04acf49411747ac6734fa3a473ba, type: 3}
+    volume: 0.6
+    pitchJitter: 0.05
+    effect: {fileID: 0}
+    effectLife: 0
+    hitStop: 0
+  - id: 15
+    clips:
+    - {fileID: 8300000, guid: 2a2e04acf49411747ac6734fa3a473ba, type: 3}
+    volume: 0.5
+    pitchJitter: 0.2
+    effect: {fileID: 0}
+    effectLife: 0
+    hitStop: 0
+  - id: 16
+    clips:
+    - {fileID: 8300000, guid: 9200f39684ecff14ba9a5de34ba8afe4, type: 3}
+    volume: 0.7
+    pitchJitter: 0
+    effect: {fileID: 0}
+    effectLife: 0
+    hitStop: 0
   music: {fileID: 0}

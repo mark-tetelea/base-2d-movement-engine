@@ -376,6 +376,15 @@ a game that saves on its first frame of play writes before any CLI call can swit
 saving off. **Take a fresh backup right before every play session, compare checksums,
 and assume play mode writes the save at once.**
 
+**86. (2026-11-14, phase 13) A settings file written when a scene ends comes out empty.**
+`SaveGame.OnDisable` read the settings (volume, minimap mode, touch mode) from their
+components to write them on a scene change - but in a scene unload those components are
+destroyed first, so it found none and wrote an empty list over the player's settings; the
+next scene then had nothing to read. It was only seen by opening the real settings file
+after a smoke run. **Write the last values seen while the scene was running (looked at on
+a timer), merge with keys the file already has, and read components in `OnDisable` only
+when every one of them is still there.**
+
 ## Tooling outside Unity
 
 **51. (JS 62) Code that passes every check outside Unity fails to compile inside it.** A

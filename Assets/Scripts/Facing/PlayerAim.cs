@@ -16,11 +16,23 @@ namespace TopDownKit
         public Camera view;
 
         PlayerMover mover;
+        bool holding;
 
         public Vector2 Direction { get; private set; } = Vector2.down;
 
+        // Input as data from elsewhere (a touch aim stick): aim this way until Release;
+        // the mouse / walk is not read meanwhile.
+        public void Hold(Vector2 direction)
+        {
+            holding = true;
+            if (direction.sqrMagnitude > 1e-6f) Direction = direction.normalized;
+        }
+
+        public void Release() { holding = false; }
+
         void Update()
         {
+            if (holding) return;
             if (mover == null) mover = GetComponent<PlayerMover>();
             Vector2 d = Vector2.zero;
             if (aimFrom == AimFrom.Walk)

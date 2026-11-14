@@ -90,6 +90,10 @@ namespace TopDownKit
 
         public static int PickSeed(int seed) => seed != 0 ? seed : new System.Random().Next(1, int.MaxValue);
 
+        // A seed for the next Build only, in any generator (replaying a layout, loading a
+        // save). 0 = none; used up by the build that reads it.
+        public static int NextSeed;
+
         public bool Build()
         {
             if (Built) return true;
@@ -103,7 +107,8 @@ namespace TopDownKit
             foreach (RoomPiece p in all)
                 if (p.cellTiles != cellTiles) { Debug.LogError("RoomGenerator: " + p.name + " has cell size " + p.cellTiles + ", the start piece " + cellTiles + ".", this); return false; }
 
-            UsedSeed = PickSeed(seed);
+            UsedSeed = PickSeed(NextSeed != 0 ? NextSeed : seed);
+            NextSeed = 0;
             var layout = new Layout.Result();
             if (!Layout.Generate(Shapes(all), 0, 1, Allowed(all), roomCount, UsedSeed, layout))
             {

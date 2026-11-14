@@ -9,7 +9,8 @@ namespace TopDownKit
     {
         Step, Shot, Swing, Dash,
         Hit, MeleeHit, PlayerHurt, Death, Break,
-        Pickup, DoorOpen, DoorShut, Crumble, UiClick
+        Pickup, DoorOpen, DoorShut, Crumble, UiClick,
+        Buy, Sell, Save
     }
 
     // One event's slot: a sound, an effect and a freeze. Each part may be left empty.

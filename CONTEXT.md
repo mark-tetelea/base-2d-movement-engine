@@ -1,12 +1,13 @@
 # Where the kit is now
 
-> Rewritten, never appended. True as of **2026-11-14**, end of phase 12 (hit-stop, effects, sounds, day/night tint).
+> Rewritten, never appended. True as of **2026-11-14**, end of phase 13 (save and load, coin shop, minimap, touch controls).
 
 ## How it starts
 
 Press Play on `Assets/Scenes/StartMenu.unity` (first in the build list): a title and four
 buttons - **Playground**, **Arena shooter**, **Little RPG room**, **Dungeon**. In every demo **Esc**
-pauses (the game stops; Resume, Restart, Main menu).
+pauses (the game stops; Resume, Restart, Save, Load, Main menu). Save and Load open a list of
+3 slots (scene and time, or empty); loading a slot from any demo goes to the demo it was saved in.
 
 ## The Playground
 
@@ -63,7 +64,10 @@ restarts after 1.5 s).
 `Assets/Scenes/LittleRpg.unity`. Instant feel, 4 facings, rooms fade. E uses the best target
 in front (an "E" shows over it), 1-5 pick a hotbar slot, Q drops one. Talk to the Guide,
 pick up coins (magnet 2.5 tiles), find the key in a chest in C, open the pink door, take the
-crown in B to win. Chests open a transfer screen (click a slot, T takes all, E closes).
+crown in B to win. Chests open a transfer screen (click a slot, T takes all, E closes). A plum
+**shopkeeper** in A sells potions (4 coins, 5 of them) and gems (15 coins, 2); click a line to buy
+one, click a bag slot to sell one back for half (only what the shop sells). Potions and gems do
+nothing yet.
 
 ## The Dungeon demo (phase 11)
 
@@ -87,11 +91,29 @@ and crumbling ground throw a few pixel bits. Sword hits, the player getting hurt
 breaks freeze the game for a moment (0.04-0.1 s); bullet hits do not. The day/night tint is off in
 every demo; the Playground's settings panel turns it on. No music (the slot is empty).
 
+## Saving, the map and touch (phase 13)
+
+Every demo saves and loads from the pause menu: where the player is and their health, the bag
+and coins, chests, opened doors and levers, cleared and visited rooms, pickups taken and items
+lying loose, shop stock, and the scene (the Dungeon comes back with the same layout). Sound and
+map/touch choices are kept between runs on their own. A broken save file falls back to its
+backup; a file from a newer version is refused; nothing is ever overwritten that is not a good
+save.
+
+The three demos show a small **map** in the top right (rooms appear once visited, a white dot
+for you, red for enemies, gold for items); **M** or a click on it opens the whole map. The
+Playground's map is off (settings rows "Map (M)", "Map reveal").
+
+**Touch controls** appear by themselves on a phone or after a finger touches the screen (the
+Playground's "Touch" row forces them on, to try with the mouse): a move stick bottom left, an aim
+stick bottom right (pushing it fires), Fire, Dash, Use, Gun (next weapon) and a pause button.
+
 ## Screens
 
 One set, used by all four: a HUD (health bar, weapon + ammo, hotbar, a status line, a centre
 banner, a help line - each demo shows only what it has), the text box, the chest screen, the
-pause menu, the start menu, and the Playground's settings panel. Placeholder look: dark
+shop screen, the pause menu and its save/load slot list, the map, the touch controls, the start
+menu, and the Playground's settings panel. Placeholder look: dark
 Endesga 32 boxes, the default font, drawn in the game's 640x360 pixels and scaled by whole
 numbers like the game (x3 at 1920x1080, x2 at 1366x768).
 
@@ -104,7 +126,9 @@ crumbling breaks and returns on time, door ground opens by lever, key and cleare
 cost ~4 us and ~150 B against ~24 us and ~4 KB. Bots clear the Arena shooter (boss room included; enemies
 walk round walls) and finish the
 RPG room. The UI scale matches the camera at 1920x1080 and 1366x768, and a click on the
-settings panel does not shoot.
+settings panel does not shoot. Save then load gives back exactly what was saved (RPG room, Dungeon, and loading
+one demo's slot from another), and broken, cut-down or newer save files never crash or lose the
+last good save.
 
 ## What the kit has (the user's list)
 
@@ -126,12 +150,14 @@ settings panel does not shoot.
    seed), destructible crates with a drop table: **built** (phase 11). Only the Dungeon uses them.
 11. Feel additions - hit-stop per hit kind, effect slots, swappable sound slots with placeholder
    sounds and volumes, day/night tint: **built** (phase 12). All scenes.
+12. Systems - save and load (opt-in per system, slots, backups), a coin shop, a minimap, touch
+   controls: **built** (phase 13). Save, map and touch in all four demos; the shop only in the RPG room.
 
 ## What is not done
 
 - Every playtest: movement feel (Instant vs Glide, wall slide), facing (8 directions, walk
   speed), combat numbers, the RPG room (reach, facing vs closest, magnet), and now the screens
   (sizes, readability, the settings panel), and now grid step (pace, slide time) and the
-  tiles (crumble timing, how forgiving red is), and the phase 9 weapons (swing, charge, bounce, assist), and the phase 10 enemies (boss difficulty, group spacing, trail damage), and the Dungeon (room sizes, wave difficulty, how often crates drop), and the sounds, bits, hit-stop lengths and tint colours. Nobody has played or heard any of it yet.
+  tiles (crumble timing, how forgiving red is), and the phase 9 weapons (swing, charge, bounce, assist), and the phase 10 enemies (boss difficulty, group spacing, trail damage), and the Dungeon (room sizes, wave difficulty, how often crates drop), and the sounds, bits, hit-stop lengths and tint colours, and now the shop prices, the map and the touch controls (never touched with a finger). Nobody has played or heard any of it yet.
 - Real art for everything in `TO-DRAW.md` except the floor, wall, player and aim marker.
 - WebGL build (module not installed), GIFs (only PNG screenshots in `Media/`), GitHub repo and push (the user's call).

@@ -33,6 +33,8 @@ namespace TopDownKit.Playground
         public DayNight dayNight;
         [Tooltip("Master volumes the volume row cycles through.")]
         public float[] volumes = { 1f, 0.5f, 0.25f };
+        public Minimap minimap;
+        public TouchControls touch;
         public bool startOpen = true;
 
         [Tooltip("A small sprite placed along the aim, so aim is visible.")]
@@ -103,6 +105,12 @@ namespace TopDownKit.Playground
                 () => feel.master = volumes[Next(IndexOf(volumes, feel.master), volumes.Length)]);
             Add("Day/night", () => dayNight != null, () => dayNight.mode.ToString(),
                 () => dayNight.mode = (DayNightMode)(((int)dayNight.mode + 1) % 3));
+            Add("Map (M)", () => minimap != null, () => minimap.mode.ToString(),
+                () => minimap.mode = (MapMode)(((int)minimap.mode + 1) % 3));
+            Add("Map reveal", () => minimap != null, () => minimap.revealOnVisit ? "visited" : "all",
+                () => minimap.revealOnVisit = !minimap.revealOnVisit);
+            Add("Touch", () => touch != null, () => touch.mode.ToString(),
+                () => touch.mode = (TouchMode)(((int)touch.mode + 1) % 3));
             Add("Room", () => rig != null && rig.target != null, RoomText, ClearRoom);
         }
 

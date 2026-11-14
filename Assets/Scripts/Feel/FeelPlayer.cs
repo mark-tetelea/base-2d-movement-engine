@@ -70,6 +70,8 @@ namespace TopDownKit
             Lever.AnyPulled += OnLever;
             GroundMap.TileChanged += OnTile;
             KitUI.Clicked += OnClick;
+            Shop.AnyTrade += OnTrade;
+            SaveGame.AnySaved += OnSaved;
         }
 
         void OnDisable()
@@ -84,6 +86,8 @@ namespace TopDownKit
             Lever.AnyPulled -= OnLever;
             GroundMap.TileChanged -= OnTile;
             KitUI.Clicked -= OnClick;
+            Shop.AnyTrade -= OnTrade;
+            SaveGame.AnySaved -= OnSaved;
             if (Freezing) EndFreeze();
             if (current == this) current = null;
         }
@@ -127,6 +131,8 @@ namespace TopDownKit
         void OnLockedDoor(LockedDoor d) { PlayHere(FeelEvent.DoorOpen, d.transform.position); }
         void OnLever(Lever l) { PlayHere(FeelEvent.DoorOpen, l.transform.position); }
         void OnClick() { PlayHere(FeelEvent.UiClick, Vector2.zero); }
+        void OnTrade(Shop s, bool bought) { PlayHere(bought ? FeelEvent.Buy : FeelEvent.Sell, s.transform.position); }
+        void OnSaved(SaveGame g, int slot) { PlayHere(FeelEvent.Save, Vector2.zero); }
 
         void OnTile(GroundMap map, Vector3Int cell, GroundState state)
         {
