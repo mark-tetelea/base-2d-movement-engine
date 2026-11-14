@@ -1,9 +1,9 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace TopDownKit.TestArena
+namespace TopDownKit.Playground
 {
-    // Test arena only: K knocks the player away from the mouse pointer, so knockback can
+    // K knocks the player away from the mouse pointer, so knockback can
     // be tried with every feel. Stands in for a hit until enemies exist (phase 4).
     public class KnockKey : MonoBehaviour
     {
@@ -19,7 +19,7 @@ namespace TopDownKit.TestArena
         void Update()
         {
             Keyboard k = Keyboard.current;
-            if (k != null && k.kKey.wasPressedThisFrame) pressed = true;
+            if (k != null && !PauseMenu.IsPaused && k.kKey.wasPressedThisFrame) pressed = true;
         }
 
         void FixedUpdate()

@@ -1,5 +1,5 @@
 // Camera check. Not compiled by Unity (it lives outside Assets/). Run IN PLAY MODE on
-// Assets/Scenes/TestArena.unity, from the project root:
+// Assets/Scenes/Playground.unity, from the project root:
 //
 //     unity command eval_file --file Tools/measure/camera.cs
 //
@@ -16,7 +16,7 @@
 //     the current room is the one the player stands in.
 // Shake is not triggered here; it is deliberately not clamped to rooms.
 
-if (!EditorApplication.isPlaying) return "not playing - enter play mode on TestArena first";
+if (!EditorApplication.isPlaying) return "not playing - enter play mode on Playground first";
 if (System.AppDomain.CurrentDomain.GetData("cam_state") as string == "running") return "already running";
 
 var player = GameObject.Find("Player");

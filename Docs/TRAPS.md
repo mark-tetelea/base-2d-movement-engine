@@ -590,3 +590,31 @@ reported 0 B. Cause: this editor's Mono does not implement it (returns 0). Rule:
 `GC.GetTotalMemory(false) + Profiler.GetTotalAllocatedMemoryLong()` growth around the
 calls, and don't trust frame-level "GC Allocated In Frame" in the editor (~110 KB/frame of
 editor and OnGUI noise). Found 2026-11-14 (`bullet-alloc.cs`).
+
+## 81. Capture shows no UI
+
+Symptom: `capture_game_view` of the Playground showed the arena and none of the HUD or
+picker. Cause: it renders the camera ("source: camera:Main Camera"); a UI Toolkit panel
+in overlay mode is not drawn by the camera. Rule: to look at the screens, set the runtime
+panel's `targetTexture` to a RenderTexture for one frame, `ReadPixels` it to a PNG, then
+set `targetTexture` back to null. Found 2026-11-14 (phase 6).
+
+## 82. Scripted mouse position reads (0, 0) or the real mouse
+
+Symptom: `InputState.Change(mouse.position, p)` and then, a call later,
+`KitUI.PointerOverUI` was false over a button; the mouse read (0, 0). Cause: with the Game
+view unfocused the editor drops or resets device input, and the real mouse sends its own
+position events between calls. Rule: set
+`editorInputBehaviorInPlayMode = AllDeviceInputAlwaysGoesToGameView` and `IgnoreFocus`
+(put them back after), send `InputSystem.QueueStateEvent` with a `MouseState`, and judge
+"over UI" in the frame the press arrives (`PlayerShooter.PressStartedOnUI`), not by
+hovering. Found 2026-11-14 (`screens.cs`).
+
+## 83. 99 exceptions in 1.4 s right after a recompile
+
+Symptom: `TextBox.LateUpdate` IndexOutOfRange and `EnemyBrain.FixedUpdate` NullReference,
+a burst of ~99, never seen in play. Cause: `recompile` sent 3 s after asking play mode to
+stop, which was still running: the domain reload restored private fields - a null array
+came back as an empty one, a `System.Random` as null. Rule: wait until
+`EditorApplication.isPlaying` reads false before `recompile`; open-state tests read the
+data they index (`TextBox.IsOpen` checks the index). Found 2026-11-14.

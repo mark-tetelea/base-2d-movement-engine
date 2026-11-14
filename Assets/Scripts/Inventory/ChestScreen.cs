@@ -1,11 +1,12 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 
 namespace TopDownKit
 {
     // The transfer screen between the player's Bag and a chest's Bag: click a slot to move
     // its stack to the other side, T takes everything, the interact key closes it. Every
-    // move goes through the one rule (Inventory.Move). OnGUI placeholder (phase 6 screens).
+    // move goes through the one rule (Inventory.Move). Drawn on the kit's UI panel (KitUI).
     public class ChestScreen : MonoBehaviour, IUsePanel
     {
         static ChestScreen current;
@@ -16,7 +17,6 @@ namespace TopDownKit
 
         Interactor who;
         Chest chest;
-        GUIStyle title;
 
         public bool IsOpen => chest != null;
         public Chest Chest => chest;
@@ -49,39 +49,79 @@ namespace TopDownKit
         {
             if (!IsOpen) return;
             Keyboard k = Keyboard.current;
-            if (k != null && k.tKey.wasPressedThisFrame) TakeAll();
+            if (k != null && !PauseMenu.IsPaused && k.tKey.wasPressedThisFrame) TakeAll();
         }
 
-        void OnGUI()
+        VisualElement root, chestGrid, bagGrid;
+        Label chestName;
+        VisualElement[] chestSlots, bagSlots;
+
+        VisualElement Side(string name, out Label title, out VisualElement grid)
         {
-            if (!IsOpen || who == null || who.Bag == null) return;
-            int fs = Mathf.Max(14, Screen.height / 36);
-            if (title == null) title = new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold };
-            title.fontSize = fs;
-            float cell = Mathf.Floor(Screen.height / 12f);
-            float gap = Mathf.Floor(cell * 0.1f);
-            float x0 = Screen.width * 0.5f - columns * (cell + gap) - cell * 0.5f;
-            float x1 = Screen.width * 0.5f + cell * 0.5f;
-            float y = Screen.height * 0.18f;
-            Grid(chest.name, chest.Bag.Inventory, x0, y, cell, gap, true);
-            Grid("You", who.Bag.Inventory, x1, y, cell, gap, false);
-            GUI.Label(new Rect(x0, Screen.height * 0.75f, Screen.width, fs * 1.6f), "click a slot to move it   [T] take all   [E] close", title);
+            var side = KitUI.Group();
+            side.style.marginLeft = side.style.marginRight = 6;
+            title = KitUI.Label(name, 9, KitUI.Gold);
+            title.style.marginBottom = 2;
+            grid = KitUI.Group(FlexDirection.Row);
+            grid.style.flexWrap = Wrap.Wrap;
+            grid.style.width = columns * (KitUI.SlotSize + 2);
+            side.Add(title); side.Add(grid);
+            return side;
         }
 
-        void Grid(string label, Inventory inv, float x, float y, float cell, float gap, bool isChest)
+        void Build()
         {
-            GUI.Label(new Rect(x, y - cell * 0.7f, cell * columns, cell * 0.7f), label, title);
-            for (int i = 0; i < inv.Size; i++)
+            root = KitUI.Box(6f);
+            root.name = "ChestScreen";
+            root.style.position = Position.Absolute;
+            root.style.left = 0; root.style.right = 0; root.style.top = 60;
+            root.style.marginLeft = root.style.marginRight = StyleKeyword.Auto;
+            root.style.alignSelf = Align.Center;
+            var row = KitUI.Group(FlexDirection.Row);
+            row.Add(Side("", out chestName, out chestGrid));
+            row.Add(Side("You", out _, out bagGrid));
+            root.Add(row);
+            var hint = KitUI.Label("click a slot to move it   [T] take all   [E] close", 8, KitUI.Dim);
+            hint.style.marginTop = 4;
+            root.Add(hint);
+            var wrap = KitUI.Group();
+            KitUI.Fill(wrap);
+            wrap.style.alignItems = Align.Center;
+            root.style.position = Position.Relative;
+            wrap.Add(root);
+            KitUI.Root.Add(wrap);
+            chestSlots = bagSlots = null;
+        }
+
+        VisualElement[] Fill(VisualElement grid, VisualElement[] slots, Inventory inv, bool isChest)
+        {
+            if (slots == null || slots.Length != inv.Size)
             {
-                Rect r = new Rect(x + (i % columns) * (cell + gap), y + (i / columns) * (cell + gap), cell, cell);
-                bool hot = !isChest && i < inv.settings.hotbarSlots;
-                InventoryGui.Slot(r, inv.slots[i], false);
-                if (hot) GUI.Label(new Rect(r.x + 3f, r.y, cell, cell * 0.4f), (i + 1).ToString());
-                if (GUI.Button(r, GUIContent.none, GUIStyle.none))
+                grid.Clear();
+                slots = new VisualElement[inv.Size];
+                for (int i = 0; i < inv.Size; i++)
                 {
-                    if (isChest) Take(i); else Put(i);
+                    int k = i;
+                    slots[i] = KitUI.Slot(() => { if (isChest) Take(k); else Put(k); });
+                    grid.Add(slots[i]);
                 }
             }
+            for (int i = 0; i < inv.Size; i++)
+                KitUI.SetSlot(slots[i], inv.slots[i], false, !isChest && i < inv.settings.hotbarSlots ? (i + 1).ToString() : "");
+            return slots;
         }
+
+        void LateUpdate()
+        {
+            if (root == null || root.panel == null) Build();   // trap 18
+            bool show = IsOpen && who != null && who.Bag != null;
+            root.parent.style.display = show ? DisplayStyle.Flex : DisplayStyle.None;
+            if (!show) return;
+            chestName.text = chest.name;
+            chestSlots = Fill(chestGrid, chestSlots, chest.Bag.Inventory, true);
+            bagSlots = Fill(bagGrid, bagSlots, who.Bag.Inventory, false);
+        }
+
+        void OnDestroy() { if (root != null && root.parent != null) root.parent.RemoveFromHierarchy(); }
     }
 }

@@ -44,7 +44,7 @@ namespace TopDownKit
 
         void Update()
         {
-            if (!readKeyboard) return;
+            if (!readKeyboard || PauseMenu.IsPaused) return;
             if (interactor == null) interactor = GetComponent<Interactor>();
             if (interactor != null && interactor.PanelOpen) return;
             Keyboard k = Keyboard.current;

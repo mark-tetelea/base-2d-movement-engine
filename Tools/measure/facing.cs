@@ -1,5 +1,5 @@
 // Facing check. Not compiled by Unity (it lives outside Assets/). Run IN PLAY MODE on
-// Assets/Scenes/TestArena.unity, from the project root:
+// Assets/Scenes/Playground.unity, from the project root:
 //
 //     unity command eval_file --file Tools/measure/facing.cs
 //
@@ -14,7 +14,7 @@
 // walking the other way, aim from walk. It puts the settings back when done.
 // eval runs this as a method body: no using lines, so names are written out in full.
 
-if (!EditorApplication.isPlaying) return "not playing - enter play mode on TestArena first";
+if (!EditorApplication.isPlaying) return "not playing - enter play mode on Playground first";
 if (System.AppDomain.CurrentDomain.GetData("fc_state") as string == "running") return "already running";
 
 var player = GameObject.Find("Player");

@@ -1976,6 +1976,8 @@ GameObject:
   - component: {fileID: 428046916}
   - component: {fileID: 428046915}
   - component: {fileID: 428046914}
+  - component: {fileID: 428046918}
+  - component: {fileID: 428046917}
   m_Layer: 0
   m_Name: UI
   m_TagString: Untagged
@@ -2010,8 +2012,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0fc0fadd70165eb42a72af1e8f373318, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TopDownKit.RpgHud
+  hud: {fileID: 428046918}
   hotbar: {fileID: 827345426}
-  interactor: {fileID: 827345425}
   coin: {fileID: 11400000, guid: ce97f8f48707b0a4c96e15f33a17f8d3, type: 2}
   goal: {fileID: 11400000, guid: 626cbc09c3027a34894514a4cce7d091, type: 2}
 --- !u!114 &428046915
@@ -2039,6 +2041,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8624cba02a43e34a825ec6de655d7c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TopDownKit.TextBox
+--- !u!114 &428046917
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 428046912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ca68ccd78d7a5a408e83b60147ba656, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TopDownKit.PauseMenu
+  menuScene: 0
+--- !u!114 &428046918
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 428046912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c37a498b9671c644682e3c858321a38a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TopDownKit.Hud
+  health: {fileID: 0}
+  gun: {fileID: 0}
+  hotbar: {fileID: 827345426}
+  interactor: {fileID: 827345425}
+  help: 'WASD move  E use  1-5 hotbar  Q drop
+
+    chest: click / T take all  Esc
+    pause'
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -2139,10 +2174,10 @@ Camera:
   m_LensShift: {x: 0, y: 0}
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0.22002327
-    y: 0.34024283
-    width: 0.55878925
-    height: 0.31981048
+    x: 0
+    y: 0
+    width: 1
+    height: 1
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 34

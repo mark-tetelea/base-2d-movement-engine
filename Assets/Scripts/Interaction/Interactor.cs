@@ -73,7 +73,7 @@ namespace TopDownKit
 
         void Update()
         {
-            if (!readKeyboard) return;
+            if (!readKeyboard || PauseMenu.IsPaused) return;
             Keyboard k = Keyboard.current;
             SetUseHeld(k != null && k.eKey.isPressed);
         }

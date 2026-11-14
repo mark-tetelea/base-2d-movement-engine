@@ -133,7 +133,7 @@ the counselor chat, ending with `/handoff` and a commit.
 | 3 | Camera and world layout: open, rooms-slide, rooms-fade, locking doors | doors lock for real once enemies exist (phase 4) |
 | 4 | Health, damage, shooting, enemies -> **Arena shooter demo** | first playable demo |
 | 5 | Interaction, pickups, inventory, chests, NPC text -> **RPG room demo** | |
-| 6 | Playground picker and the screens | |
+| 6 | Playground picker and the screens | built 2026-11-14: UI Toolkit screens, start menu |
 | 7 | GitHub polish: README, GIFs, WebGL build, licence | |
 
 ## Still not doing

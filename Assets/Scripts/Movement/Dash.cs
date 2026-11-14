@@ -45,6 +45,7 @@ namespace TopDownKit
         // Input arrives as data: Space for the keyboard player; a touch button calls Request.
         void Update()
         {
+            if (PauseMenu.IsPaused) return;
             Keyboard k = Keyboard.current;
             if (k != null && k.spaceKey.wasPressedThisFrame) requested = true;
         }

@@ -1,11 +1,12 @@
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace TopDownKit
 {
     // Add-on: a simple text box along the bottom of the screen. Shows lines one at a
     // time; the interact key goes to the next one and closes it after the last. The
     // player's walking is paused while it is open (the Interactor does that).
-    // Drawn with OnGUI as a placeholder; the real screens are phase 6.
+    // Drawn on the kit's UI panel (KitUI).
     public class TextBox : MonoBehaviour, IUsePanel
     {
         static TextBox current;
@@ -16,9 +17,8 @@ namespace TopDownKit
         string[] lines;
         int index;
         Interactor who;
-        GUIStyle style, nameStyle;
 
-        public bool IsOpen => lines != null;
+        public bool IsOpen => lines != null && index < lines.Length;   // a play-mode recompile leaves an empty array
         public string Line => IsOpen ? lines[index] : null;
         public int LineIndex => index;
 
@@ -47,21 +47,38 @@ namespace TopDownKit
             who = null;
         }
 
-        void OnGUI()
+        VisualElement root;
+        Label nameLabel, textLabel, moreLabel;
+
+        void Build()
         {
-            if (!IsOpen) return;
-            int fs = Mathf.Max(14, Screen.height / 30);
-            if (style == null)
-            {
-                style = new GUIStyle(GUI.skin.box) { alignment = TextAnchor.UpperLeft, wordWrap = true };
-                nameStyle = new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold };
-            }
-            style.fontSize = fs;
-            nameStyle.fontSize = fs;
-            float w = Screen.width * 0.8f, h = fs * 5f;
-            Rect r = new Rect((Screen.width - w) * 0.5f, Screen.height - h - fs, w, h);
-            GUI.Box(r, "\n" + lines[index] + "\n\n" + (index < lines.Length - 1 ? "[E] next" : "[E] close"), style);
-            if (!string.IsNullOrEmpty(speaker)) GUI.Label(new Rect(r.x + fs * 0.5f, r.y + fs * 0.2f, w, fs * 1.6f), speaker, nameStyle);
+            root = KitUI.Box(6f);
+            root.name = "TextBox";
+            root.style.position = Position.Absolute;
+            root.style.left = 64; root.style.right = 64; root.style.bottom = 8;
+            root.style.minHeight = 64;
+            nameLabel = KitUI.Label("", 9, KitUI.Gold);
+            textLabel = KitUI.Label("", 10);
+            textLabel.style.whiteSpace = WhiteSpace.Normal;
+            textLabel.style.marginTop = 2;
+            textLabel.style.flexGrow = 1f;
+            moreLabel = KitUI.Label("", 8, KitUI.Dim);
+            moreLabel.style.unityTextAlign = TextAnchor.LowerRight;
+            root.Add(nameLabel); root.Add(textLabel); root.Add(moreLabel);
+            KitUI.Root.Add(root);
         }
+
+        void LateUpdate()
+        {
+            if (root == null || root.panel == null) Build();   // trap 18
+            root.style.display = IsOpen ? DisplayStyle.Flex : DisplayStyle.None;
+            if (!IsOpen) return;
+            nameLabel.text = speaker ?? "";
+            nameLabel.style.display = string.IsNullOrEmpty(speaker) ? DisplayStyle.None : DisplayStyle.Flex;
+            textLabel.text = lines[index];
+            moreLabel.text = index < lines.Length - 1 ? "[E] next" : "[E] close";
+        }
+
+        void OnDestroy() { if (root != null) root.RemoveFromHierarchy(); }
     }
 }

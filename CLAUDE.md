@@ -81,40 +81,46 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
   `MoveSettings.knockbackStopRate`), `Dash` (add-on component, `DashSettings`, exact distance
   in whole steps), `SpeedZone` (trigger; scales speed or swaps the feel).
 - `Assets/Data/Movement/` - `Instant`, `Glide`, `Ice`, `Heavy` feels, `NoFriction` (player collider).
-- `Assets/Scenes/TestArena.unity` - Pixel Perfect Camera 640x360 / 16 PPU, Pixel Snapping,
-  Windowbox; floor and wall tilemaps (walls: one merged collider, trap 74); the player.
-  Keys 1-9 swap the feel (`Assets/Scripts/TestArena/FeelKeys.cs`), Space dashes, K knocks
-  the player from the mouse (`KnockKey.cs`); speed pad, mud and ice patch under `Zones`.
+- `Assets/Scenes/Playground.unity` (was TestArena) - Pixel Perfect Camera 640x360 / 16 PPU,
+  Pixel Snapping, Windowbox; floor and wall tilemaps (walls: one merged collider, trap 74);
+  the player with every system. `Assets/Scripts/Playground/Picker.cs` (Tab) switches every
+  setting live and places the aim marker; K knocks the player from the mouse (`KnockKey.cs`);
+  speed pad, mud and ice patch under `Zones`; a chest, the Guide, coins in A; wanderers in D.
 - `Assets/Scripts/Facing/` - `Facing` (the one facing rule: index 0-7 counter-clockwise
   from right, `Step`/`Snap`, zero direction keeps the facing; `FacingSettings`: 4 or 8,
   face walk or aim), `PlayerAim` (mouse or walk -> `Direction`, data), `PlayerFacing`
   (rule on the fixed step), `DirectionalSprites` (sprite swap idle / 2-step walk, flips the
-  left side; no Animator). Test arena: `FacingKeys` (F 4/8, G walk/aim, H aim source, aim
-  marker). Player sprites are 48x24 sheets of 3 frames sliced by `Tools/pxkit/slice-sheet.cs`.
+  left side; no Animator). Player sprites are 48x24 sheets of 3 frames sliced by `Tools/pxkit/slice-sheet.cs`.
 - `Assets/Scripts/Camera/` - `CameraFollow` (the one camera rule), `CameraRig` (on the camera;
   layout Open / RoomsSlide / RoomsFade is a setting; whole pixels; slide, fade, `Shake`),
   `Room` (marked rectangle), add-ons `RoomLock` (doors until `Clear()`) and `Warp`. Arena:
-  rooms A, B (locks), C (big), area D; L cycles layout, C clears (`CameraKeys.cs`).
+  rooms A, B (locks), C (big), area D.
   `Tools/measure/camera.cs` checks pixels and room bounds in all layouts.
 - `Assets/Scripts/Combat/` - `Damage` (the one damage rule), `Health` (teams, invulnerable
   time, flash, knockback on the target, dash protects), `Weapon` (asset, settings only),
   `Gun` (input as data: aim, trigger, reload, select), `Bullet` (fixed step, circle sweep,
   `ObjectPool`), `PlayerShooter` (mouse/keys -> Gun), `EnemyBrain` (Chase / KeepDistanceAndShoot
   / Wander on a `PlayerMover` with `readKeyboard` off), add-ons `RoomWaves` (clears a
-  `RoomLock`), `RestartOnDeath`; `ShooterHud` (demo label). Weapons in `Assets/Data/Weapons/`,
+  `RoomLock`), `RestartOnDeath`; `ArenaGoal` (the demo's win/wave text into the `Hud`). Weapons in `Assets/Data/Weapons/`,
   enemies in `Assets/Prefabs/Enemies/`. Enemies walk straight: no pathfinding.
 - `Assets/Scripts/Interaction/` - `Interaction.Pick` (the one best-target rule, plain points),
   `Interactable` base + targets `Talker`, `LockedDoor`, `Lever` (and `Chest`, `Pickup`),
   `Interactor` (E as data; open panels pause walking), `InteractPrompt`, `TextBox` +
   `DialogueLines`. `Assets/Scripts/Inventory/` - `Inventory` (the one rule, plain C#, used by
   bag and chests), `Bag`, `Item`, `Pickup` (auto/manual, heal, ammo), `Collector` (magnet),
-  `Hotbar`, `ChestScreen`, `RpgHud`. Screens are OnGUI placeholders until phase 6.
-- `Assets/Scenes/LittleRpg.unity` - the Little RPG room demo (build index 1).
-- `Assets/Scenes/ArenaShooter.unity` - the Arena shooter demo (first in the build list;
-  death reloads by build index). `Warp` moves only the camera's target.
+  `Hotbar`, `ChestScreen`, `RpgGoal` (coins and win text into the `Hud`).
+- `Assets/Scripts/Screens/` - UI Toolkit built in code: `KitUI` (the one panel, 640x360 scaled
+  by the camera's `pixelRatio`; EventSystem; `PointerOverUI`; shared box/button/slot looks),
+  `Hud` (health, ammo, hotbar, status, banner, help - all optional), `PauseMenu` (Esc,
+  `IsPaused`; Resume / Restart / Main menu), `StartMenu`. `TextBox` and `ChestScreen` draw on
+  the same panel. Panel asset: `Assets/Resources/KitPanel.asset` + `Assets/UI/KitTheme.tss`.
+  Keyboard readers ignore keys while paused; a press that starts on a screen never shoots.
+- Build list: `StartMenu` (0, buttons to the three demos), `ArenaShooter` (1), `LittleRpg` (2,
+  the Little RPG room demo), `Playground` (3). Pause -> Main menu loads index 0.
+- `Assets/Scenes/ArenaShooter.unity` - the Arena shooter demo (death reloads by build index). `Warp` moves only the camera's target.
 - `Tools/measure/` - measuring harness: `movement.cs` (run with `eval_file` in play mode;
   drives the real key path through a virtual keyboard, logs every fixed step) and
-  `analyse-movement.js`; it also checks dash distance and knockback decay at 30 vs 144 fps. Re-run it after any change to movement. `combat.cs` (30 vs 144 fps), `bullet-alloc.cs`, `playthrough.cs` on ArenaShooter; `inventory.cs` (edit mode), `rpg-playthrough.cs` on LittleRpg.
+  `analyse-movement.js`; it also checks dash distance and knockback decay at 30 vs 144 fps. Re-run it after any change to movement. `combat.cs` (30 vs 144 fps), `bullet-alloc.cs`, `playthrough.cs` on ArenaShooter; `inventory.cs` (edit mode), `rpg-playthrough.cs` on LittleRpg; `screens.cs` on Playground (UI scale, click guard, picker, pause; run at 1920x1080 and WXGA). The movement/facing/camera checks run on Playground.
 - `Assets/Art/Palette/endesga-32.gpl` - the one palette; pxkit and Aseprite both load it.
   Never written by a script that also reads it (trap 70).
 - `Assets/Art/PixelSprite16.preset` - import default for PNGs under `Assets/Art/**`.
@@ -136,7 +142,7 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
 ## Traps
 
 > One line each: symptom -> rule. The full story is in `Docs/TRAPS.md` under the same
-> number. Add the day a trap is found; next free number is **81**.
+> number. Add the day a trap is found; next free number is **84**.
 
 **The editor lies about your own edits**
 1. Code right, game wrong -> a changed `[SerializeField]` default does not change a scene that already saved it; edit the scene in edit mode and save.
@@ -241,6 +247,9 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
 78. Play-mode check times out early -> the editor runs ~300 fps; time steps by `Time.time`, never frame counts.
 79. 1 s timer lasts 61 steps -> 60 float steps of 1/60 never sum to 1; end timers below a small epsilon or count steps.
 80. Allocation reads 0 bytes -> `GC.GetAllocatedBytesForCurrentThread` returns 0 in this editor; use heap + `Profiler.GetTotalAllocatedMemoryLong` growth.
+81. `capture_game_view` shows no UI -> it renders the camera only; render the panel to a RenderTexture (`targetTexture`) to look at screens.
+82. Scripted mouse reads (0,0) or the real mouse -> route all input to the Game view, `QueueStateEvent` a `MouseState`, judge "over UI" at the press, not by hovering.
+83. Burst of exceptions after a recompile -> play mode was still stopping; wait for `isPlaying` false before `recompile`.
 
 ## Environment
 

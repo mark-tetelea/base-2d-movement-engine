@@ -480,3 +480,31 @@ Brief: `Docs/prompt-phase4-combat.md`.
 - `rpg-playthrough.cs`: 24/24 pass, one run (after fixing a test bug: Health maxHealth set after it started). Guide talk pauses walking, coins, locked door message, key chest take all, door opens and uses key, crown won, drop + take back, Hold lever at 31 steps, heart heals, ammo refills, full-health heart stays.
 - Movement (all OK), facing 18/18, camera ALL PASS, combat identical 30/144, playthrough ALL PASS. Console 0 errors.
 - Not verified: the mouse path in the chest screen (trap 39), OnGUI look (not in `capture_game_view`), feel of any number (playtest).
+
+## 2026-11-14 - Phase 6: Playground picker, shared screens (UI Toolkit), start menu
+
+Brief: `Docs/prompt-phase6-playground.md`.
+
+**Decided:**
+- **All screens are UI Toolkit built in code, hanging from one panel (`KitUI`)** in the game's own 640x360 pixels, scaled by the Pixel Perfect Camera's whole-number ratio. **Why:** one look and one scale for every demo; no UXML/USS files to keep in step. The panel's settings + theme are `Assets/Resources/KitPanel.asset` + `Assets/UI/KitTheme.tss` (a runtime copy is used, so play mode never writes the asset). `KitUI` is a shared helper, not a manager: its callers are `Hud`, `PauseMenu`, `TextBox`, `ChestScreen`, `StartMenu`, `Picker`.
+- **One `Hud` for every demo; every part optional** (health bar, weapon + ammo, hotbar with clickable slots, status line, centre banner, help line). Demo rules feed it: `ShooterHud` -> `ArenaGoal`, `RpgHud` -> `RpgGoal` (renamed, same GUIDs), which only set `Hud.Status` / `Hud.Banner`. **Why:** "unify, don't keep copies".
+- **The test arena became the Playground** (`TestArena.unity` moved to `Playground.unity`, same GUID; `Assets/Scripts/TestArena/` -> `Assets/Scripts/Playground/`, namespace `TopDownKit.Playground`). `FeelKeys`, `FacingKeys`, `CameraKeys` are **deleted**; the `Picker` (Tab) replaces them and places the aim marker. `KnockKey` (K) stays: it needs the mouse position, which a button click would always put on the panel.
+- **Pause = `PauseMenu.IsPaused`** (Esc; `Time.timeScale = 0`). Keyboard readers (`Dash`, `Interactor`, `Hotbar`, `PlayerShooter`, `ChestScreen` T, `KnockKey`, `Picker` Tab) ignore keys while paused, so a key pressed in the menu is not kept for later.
+- **A mouse press that starts on a screen never shoots, even while held after the screen closes** (`PlayerShooter.PressStartedOnUI`, read from `KitUI.PointerOverUI` in the frame of the press). Trap 21.
+- **Build list: StartMenu (0), ArenaShooter (1), LittleRpg (2), Playground (3).** The pause menu's "Main menu" loads index 0. Death still reloads by the scene's own build index.
+- In the Playground the number keys pick weapons, so its `Hotbar.readKeyboard` is off (slots are clicked). Its two wanderers live in area D: in room C they wandered into the measuring lanes and hit the player mid-run.
+
+**Built:**
+- `Assets/Scripts/Screens/`: `KitUI` (panel, scale, EventSystem, `PointerOverUI`, box/button/label/slot looks in Endesga colours), `Hud`, `PauseMenu`, `StartMenu`.
+- `TextBox` and `ChestScreen` drawn with UI Toolkit; `InventoryGui` (OnGUI slot) deleted.
+- `Assets/Scripts/Playground/Picker.cs`: rows Feel, Dash, Facings, Face towards, Aim from, Camera, Weapon, Best target, Use (press/hold), Reach, Magnet, Room (click clears a locked room). `Click(row)` is the entry point.
+- `Assets/Scenes/StartMenu.unity`, `Playground.unity` (player now has gun, health, bag, hotbar, interactor, magnet; a chest, the Guide and coins in room A). Scene setup: `Tools/measure/setup-phase6.cs`.
+- Check `Tools/measure/screens.cs` (play mode, Playground).
+
+**Measured / verified (one run each):**
+- Compiles, 0 errors (one old warning: `Pickup.All` hides `Interactable.All`).
+- `screens.cs` at 1920x1080 AND WXGA 1366x768: UI scale = camera `pixelRatio` (3 and 2); a mouse press on a picker button does not shoot and is seen as "on UI"; a press on the floor shoots; picker click changes the feel and 4 clicks cycle back; pause/resume set timeScale 0/1. 7/7 at each size.
+- Start menu has 3 buttons; it opens the Playground; pause shows Resume / Restart / Main menu; Main menu returns with timeScale 1.
+- Looked at (UI rendered to a texture): picker + HUD at 1920x1080, text box, chest screen with icons. Not looked at over the game picture together.
+- Earlier checks all pass on the new scenes: movement (all OK, 30 = 144 fps), facing 18/18, camera ALL PASS, combat identical 30/144, bullet pool 150 B / 3.7 us vs Instantiate 3,980 B / 24 us, Arena playthrough ALL PASS (win banner through the new Hud), RPG playthrough 24/24, inventory 21/21.
+- Not verified: the real mouse clicking real buttons (trap 39 - checks call the entry points or queue mouse events); the look in a build; feel (playtest).

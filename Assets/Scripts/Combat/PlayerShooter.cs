@@ -15,14 +15,21 @@ namespace TopDownKit
         Gun gun;
         PlayerAim aim;
         PlayerMover mover;
+        bool pressStartedOnUI;
+
+        public bool PressStartedOnUI => pressStartedOnUI;
 
         void Update()
         {
             if (gun == null) { gun = GetComponent<Gun>(); aim = GetComponent<PlayerAim>(); mover = GetComponent<PlayerMover>(); }
             if (aim != null) gun.SetAim(aim.Direction);
+            if (PauseMenu.IsPaused) { gun.SetTrigger(false); return; }
             bool paused = mover != null && mover.inputPaused;
             Mouse m = Mouse.current;
-            gun.SetTrigger(!paused && m != null && m.leftButton.isPressed);
+            // A press that starts on a screen (button, slot, picker) never shoots, even
+            // while held after the screen closes (trap 21).
+            if (m != null && m.leftButton.wasPressedThisFrame) pressStartedOnUI = KitUI.PointerOverUI;
+            gun.SetTrigger(!paused && !pressStartedOnUI && m != null && m.leftButton.isPressed);
 
             Keyboard k = Keyboard.current;
             if (k != null)

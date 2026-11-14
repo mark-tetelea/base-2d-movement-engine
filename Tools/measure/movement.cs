@@ -1,5 +1,5 @@
 // Movement measuring harness. Not compiled by Unity (it lives outside Assets/).
-// Run IN PLAY MODE on Assets/Scenes/TestArena.unity, from the project root:
+// Run IN PLAY MODE on Assets/Scenes/Playground.unity, from the project root:
 //
 //     unity command eval_file --file Tools/measure/movement.cs
 //
@@ -16,7 +16,7 @@
 // eval runs this as a method body: no using lines, so names are written out in full.
 // Numbers are written with the invariant culture (this editor's locale uses decimal commas).
 
-if (!EditorApplication.isPlaying) return "not playing - enter play mode on TestArena first";
+if (!EditorApplication.isPlaying) return "not playing - enter play mode on Playground first";
 if (System.AppDomain.CurrentDomain.GetData("mv_state") as string == "running") return "already running";
 string outPath = System.IO.Path.GetFullPath(Application.dataPath + "/../Temp/measure-movement.csv");
 var inv = System.Globalization.CultureInfo.InvariantCulture;

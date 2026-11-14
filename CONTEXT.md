@@ -1,96 +1,77 @@
 # Where the kit is now
 
-> Rewritten, never appended. True as of **2026-11-14**, end of phase 5 (interaction, inventory, Little RPG room demo).
+> Rewritten, never appended. True as of **2026-11-14**, end of phase 6 (Playground picker, shared screens, start menu).
 
-## How it plays
+## How it starts
 
-Open `Assets/Scenes/TestArena.unity` and press Play. A blue placeholder player walks in 8
-directions (WASD or the arrows) in a stone arena that fills the 640x360 view: a wall ring
-at the screen edge, a pillar, a bar, a single block, diagonal steps and a one-tile
-corridor. Walls stop the player; pushing diagonally into a wall slides along it.
+Press Play on `Assets/Scenes/StartMenu.unity` (first in the build list): a title and three
+buttons - **Playground**, **Arena shooter**, **Little RPG room**. In every demo **Esc**
+pauses (the game stops; Resume, Restart, Main menu).
 
-Four feels, swapped with keys **1**-**4** (the top-left label names the one in use and the speed in force now):
+## The Playground
 
-- **Instant** (like Deltarune): 6 tiles/s, full speed at once, stops at once.
-- **Glide** (like Diep.io): 6 tiles/s, 0.4 s to full speed, 0.8 s to stop.
-- **Ice**: 6 tiles/s, 1.0 s to full speed, 2.0 s to stop; pushes slide far.
-- **Heavy**: 4 tiles/s, 0.5 s to full speed, 0.15 s to stop; shrugs pushes off.
+`Assets/Scenes/Playground.unity` (the old test arena). A blue placeholder player in a stone
+arena of four rooms: A (start), B to the right (its doors lock once you are inside), big
+room C above, and area D reached by a brown warp pad in C. Along the top of A: a yellow
+speed pad (x1.6), brown mud (x0.5) and a cyan ice patch. In A: a chest (a key and 10 coins),
+the green Guide to talk to, a row of coins. In D: two green wanderers to shoot.
 
-The player faces where it walks (8 directions, idle + a 2-step walk; the left side is the
-right side flipped) and a yellow diamond shows the aim, towards the mouse. **F** switches
-4 / 8 facings, **G** face walk / aim, **H** aim from mouse / walk; the second label line
-names them. Standing still keeps the facing.
+A **settings panel** on the left (Tab hides it) shows every choice the kit has, each as a
+button; a click moves to the next value, live:
 
-**Space** dashes 3 tiles in 0.2 s (0.4 s cooldown; hits do not land during it). **K** knocks the player away from the mouse. Along the top of the arena: a yellow
-speed pad (x1.6), brown mud (x0.5) and a cyan ice patch (Ice feel while on it).
+- Feel: Instant (like Deltarune) / Glide (like Diep.io) / Ice / Heavy
+- Dash (Space): on / off - Facings: 4 / 8 - Face towards: walk / aim - Aim from: mouse / walk
+- Camera: Open / Rooms slide / Rooms fade - Weapon: Pistol / Shotgun / Rapid
+- Best target: facing / closest - Use: press / hold - Reach: 1 / 1.5 / 2.5 tiles
+- Magnet: off / 2.5 / 5 tiles - Room: shows the room; click clears a locked one
 
-**Camera and rooms (phase 3):** the arena is now room A of a small level: room B to the
-right (its doors lock once you are inside; **C** clears it), room C above (80x30, bigger
-than the screen), and area D reached by a brown warp pad in C. **L** switches the camera:
-Open (follows with a small dead zone, leans 1.5 tiles toward the aim), Rooms slide (stays
-in the room, slides 0.5 s to the next), Rooms fade (fade out/in 0.25 s each). Keys pause
-during slides and fades. **K** also shakes the screen. The camera is always on whole pixels.
-
-All of it is starting guesses - nobody has judged it by playing yet. Each feel is an asset
-in `Assets/Data/Movement/`; tuning during play is kept.
-
-Measured: the same keys give the same movement step for step at 30 and 144 fps (LOG,
-2026-10-18). Ready to use besides: the `unity` command line (port 7801), the 60 Hz fixed
-step, the Endesga 32 palette, pxkit, the PNG import preset, and the movement measuring
-harness in `Tools/measure/`.
+WASD move, mouse aims, left click shoots (not when the click lands on a screen), R reloads,
+1-3 pick a weapon, E uses, K knocks the player away from the mouse. The HUD shows health,
+weapon and ammo, the hotbar (click a slot) and the controls.
 
 ## The Arena shooter demo (phase 4)
 
-Open `Assets/Scenes/ArenaShooter.unity` and press Play. Glide feel, the player faces the
-mouse, rooms slide. WASD move, mouse aims, left click shoots, R reloads, 1-3 or the wheel
-pick Pistol (12 shots, semi), Shotgun (6 pellets, 4 shells, strong recoil) or Rapid (auto,
-30), Space dashes (invulnerable). Player 6 health, 1 s invulnerable after a hit (blinks),
-the screen shakes. Room A has two green wanderers to warm up on; walking into B, C or the
-warp area D shuts the doors and sends waves: red chasers (touch damage), purple shooters
-(keep 6 tiles away and fire), green wanderers. The last wave dead opens the doors. All
-rooms cleared shows "Arena cleared - you win"; dying reloads the scene after 1.5 s. A
-top-left label shows health, weapon, ammo and the wave. Every number is a starting guess.
-
-Measured: combat behaves step for step the same at 30 and 144 fps; reused bullets
-(Unity's `ObjectPool`) cost ~4 us and ~150 B against ~25 us and ~4 KB with Instantiate; a
-bot clears every room and the death restart works. Enemies walk straight at you - they
-can get stuck behind a pillar (no pathfinding).
+`Assets/Scenes/ArenaShooter.unity`. Glide feel, faces the mouse, rooms slide. WASD, mouse aim,
+left click shoots, R reloads, 1-3 or the wheel pick Pistol / Shotgun / Rapid, Space dashes
+(invulnerable). Walking into B, C or D shuts the doors and sends waves (red chasers, purple
+shooters, green wanderers); the last wave opens them. HUD: health bar, weapon and ammo,
+"wave 2/3", "Arena cleared - you win", "You died" (the scene restarts after 1.5 s).
 
 ## The Little RPG room demo (phase 5)
 
-Open `Assets/Scenes/LittleRpg.unity` and press Play. Instant feel, 4 facings, rooms fade.
-WASD move, E uses the best target in front (an "E" shows over it), 1-5 pick a hotbar slot,
-Q drops one. The green Guide in A explains; coins are picked up by walking near (magnet
-2.5 tiles); the pink door east is locked; the key is in a chest in big room C; the door
-opens with it (key used up); room B has the Keeper and the crown chest - taking the crown
-wins. In C a lever opens the gate over the warp to D (Hermit, a coin chest, a heart).
-Chests open a transfer screen (click a slot, T take all, E close). A storage chest sits
-in A. Measured: a bot plays it start to finish (24 checks pass). All numbers are guesses.
-
-## What the kit will have (the user's list, in the order to build it)
-
-1. **Movement** - 8 directions and instant-to-glide feel: **built**. Ice/Heavy presets, dash,
-   knockback and speed zones: **built** (phase 1, 2026-11-14).
-2. **Facing and animation** - 4 or 8 directions, aim separate from walking: **built**
-   (phase 2, 2026-11-14). 5 drawings + mirroring by default, true 8 as a setting.
-   **Camera and world layout** (roadmap 3): **built** (phase 3, 2026-11-14).
-3. **Interaction** - one key, best nearby target: **built** (phase 5).
-4. **Pickups and inventory** - auto (coins, ammo) and manual (weapons, key items),
-   inventory with a hotbar, chests as inventories: **built** (phase 5).
-5. **Shooting** - weapon settings, reused bullets, health, damage, recoil: **built**, with
-   tiny enemies and rooms that lock until cleared (phase 4, 2026-11-14).
-
-The order is a suggestion, not a decision.
+`Assets/Scenes/LittleRpg.unity`. Instant feel, 4 facings, rooms fade. E uses the best target
+in front (an "E" shows over it), 1-5 pick a hotbar slot, Q drops one. Talk to the Guide,
+pick up coins (magnet 2.5 tiles), find the key in a chest in C, open the pink door, take the
+crown in B to win. Chests open a transfer screen (click a slot, T takes all, E closes).
 
 ## Screens
 
-None. The test arena has a one-line developer label (which feel is in use, and the facing settings), not kit UI.
+One set, used by all three: a HUD (health bar, weapon + ammo, hotbar, a status line, a centre
+banner, a help line - each demo shows only what it has), the text box, the chest screen, the
+pause menu, the start menu, and the Playground's settings panel. Placeholder look: dark
+Endesga 32 boxes, the default font, drawn in the game's 640x360 pixels and scaled by whole
+numbers like the game (x3 at 1920x1080, x2 at 1366x768).
+
+## What is measured
+
+Same keys give the same movement step for step at 30 and 144 fps; combat too. Reused bullets
+cost ~4 us and ~150 B against ~24 us and ~4 KB. Bots clear the Arena shooter and finish the
+RPG room. The UI scale matches the camera at 1920x1080 and 1366x768, and a click on the
+settings panel does not shoot.
+
+## What the kit has (the user's list)
+
+1. Movement - 8 directions, instant-to-glide, Ice/Heavy, dash, knockback, speed zones: **built**.
+2. Facing and animation - 4 or 8, aim separate from walking: **built**. Camera and rooms: **built**.
+3. Interaction - one key, best nearby target: **built**.
+4. Pickups and inventory - auto and manual, hotbar, chests as inventories: **built**.
+5. Shooting - weapons, reused bullets, health, damage, recoil, tiny enemies: **built**.
+6. Screens and the Playground picker: **built** (phase 6).
 
 ## What is not done
 
-- The feel playtest (Instant vs Glide, and whether a wall slide should keep full speed).
-- Everything after movement in the list above, and every placeholder in `TO-DRAW.md`
-  except the floor, wall, the player and the aim marker. The facing playtest (does 8 feel
-  right, walk-cycle speed 8 fps).
-- The RPG demo playtest: reach 1.5, facing vs closest, magnet, text box.
-- The combat playtest: weapon numbers, enemy speed and health, wave sizes, damage feel.
+- Every playtest: movement feel (Instant vs Glide, wall slide), facing (8 directions, walk
+  speed), combat numbers, the RPG room (reach, facing vs closest, magnet), and now the screens
+  (sizes, readability, the settings panel). Nobody has played any of it yet.
+- Real art for everything in `TO-DRAW.md` except the floor, wall, player and aim marker.
+- Phase 7: README, GIFs, WebGL build, licence.
