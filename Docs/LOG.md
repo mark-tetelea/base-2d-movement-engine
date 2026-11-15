@@ -751,3 +751,78 @@ Brief: `Docs/prompt-phase14-swappable.md`. The last building pass before the pha
   (trap 55).
 - `Assets/Art/PixelSprite16.preset` - import default for PNGs under `Assets/Art/**`.
   Not a place for per-sprite settings (pivots are set per file).
+
+## 2026-11-15 - Phase 15: full test pass (made lighter mid-way), pixel font on
+
+Brief: `Docs/prompt-phase15-tests.md`. Mid-way the user made it lighter (via the counselor): re-run
+every check and bot, fix what broke, no more new checks (the finished ones are kept), the NEXT
+"unsure" notes stay listed unless a re-run turned them up. Font answer: the pixel font.
+
+**Decided:**
+- **The kit's default theme uses the pixel font** (`Resources/KitTheme`: fontAsset KitPixel, pixelFontSize 8 - the
+  only two fields that differed from `Assets/UI/KitThemePixel`). **Why:** the user's choice. **Consequence:**
+  `KitThemePixel` is now an identical copy (only its name differs) - keep or delete, nothing points at it.
+- **Walking is paused by owners: `PlayerMover.PauseInput(who, on)`; `inputPaused` is the result (read it, don't set
+  it).** Callers: Interactor (panels), CameraRig (fades/slides), RestartOnDeath. **Why:** one bool had two owners -
+  a camera fade that ended while a panel was open switched walking back on under the shop screen.
+- **A hit-stop counts down from the frame after the hit.** **Why:** counting the hit's own frame charged it for
+  time spent before the hit (0.08 s became 0.047 s at 30 fps; skipped below ~12 fps).
+
+**Built:**
+- `Tools/measure/run-check.sh` (one play check end to end: open scene, Play, run, poll, Stop; key "-" for
+  self-polling checks, "=" for one-shot; afterwards turns every keyboard/mouse back on and clears
+  `SaveFiles.FolderOverride`). `Tools/measure/game-view-size.cs` (Game view to "Full HD" / "WXGA" by reflection).
+- New checks (finished before the "no new checks" call, all ALL PASS): `combat2.cs` (sword, charge, bounce, aim
+  assist, hit-stop vs the fixed step; 12), `enemies2.cs` (paths round a wall for free and grid walkers, groups,
+  trail; 9), `pickups.cs` (four pickup modes, not-droppable, dropping, bag screen; 14), `controls.cs` (rebind
+  by virtual key and mouse through the real rebind screen, Esc cancels, Reset all; touch sticks/pads as data; 16),
+  `shop-map.cs` (shop trade results, shop screen, minimap reveal, the pause bug; 13).
+- Check fixes: virtual-keyboard/mouse checks switch the real devices off while they run (trap 90); combat.cs
+  releases the trigger before each run and compares 30 vs 144 fps itself; rpg-playthrough.cs step 7 follows the
+  13b pickup rules (coins come back by magnet after walking away, a key by E); dungeon-play.cs accepts the boss
+  bar by `Hud.Current` (phase 14 moved that wiring into BossPhases); camera.cs says why a walk stopped;
+  screens.cs sets runInBackground.
+- Code: `PlayerMover.PauseInput`, `CameraRig`/`Interactor`/`RestartOnDeath` use it; `FeelPlayer` freeze frame.
+
+**Measured / verified (one run each unless said):**
+- Compile 0 errors. Removal check ALL PASS 17. save.cs ALL PASS 47 (twice). missing-scripts 0 (5 scenes, 25 prefabs).
+- movement.cs: same numbers as phase 1 (dash 3.0000, knockback 2.5667 / 2.5910, 30 = 144 fps) - twice, the second
+  after the PauseInput change (that run's editor only reached 21-32 fps; still 0 difference). facing 18/18 (twice).
+  camera 11/11 (3 runs). tiles 16/16 (twice). inventory 21/21. dungeon-layouts ALL PASS. dungeon-play ALL PASS on
+  3 seeds. combat.cs PASS 561 steps 0 differing. Bullets: pool 150 B / 4.9 us vs Instantiate 4,185 B / 34 us.
+- Bots: Arena ALL PASS (twice, boss 3 phases, death restarts); RPG ALL PASS 25 (twice).
+- screens.cs before the font switch: 8/8 at 1920x1080 and at WXGA. After the font switch (and an editor restart):
+  WXGA 8/8; 1920x1080 UI scale passes but the virtual mouse presses never arrive (3 runs: no shot even on the
+  floor) - not the font (the font cannot stop a floor press); not solved. Nobody has looked at the screens in the
+  pixel font at both sizes (no panel capture this session).
+- The camera check flake (phase 8): a key event from any other keyboard makes it `Keyboard.current`, and the held
+  virtual W stops counting - shown in play (VirtA held W, VirtB pressed K -> current VirtB, player velocity 0).
+  The stop at x 39.5 / y 17.5 is consistent with someone typing during the run; not provable after the fact.
+- combat.cs once showed 30 vs 144 fps differing: the editor's mouse read as held at Play (trap 84), so the
+  trigger was already down and the step-10 press had no edge. Check fix only; the game was right.
+- Found by the new checks: the pause bug above (fails before, passes after, 2 runs); the hit-stop bug (2 of 4
+  runs missed the freeze before, 4 of 4 pass after).
+
+**Overturned:** LOG 2026-11-14 phase 8 "camera check flake - nothing solid there": the cause is input, not the
+level (above). NEXT's "aim assist bends toward crates" is true by design of the rule (any Health of another team;
+crates are team 2) - a choice for the user, not a bug.
+
+**Art traps moved from CLAUDE.md (size, 2026-11-15)** - word for word:
+
+**Art**
+56. Drawing guide shows in game -> guides on a hidden Aseprite layer, never in the export.
+57. `.aseprite` at the wrong size -> importer defaults to 100 PPU; set `spritePixelsPerUnit = 16` etc. via public properties.
+58. Drawn item floats off its placeholder spot -> importer trims and centres; use canvas pivot.
+59. Swapped sprite drops half a cell -> PNG pivots centre, `.aseprite` bottom-centre; match pivots.
+60. Drawing entirely off-palette -> load the project palette; check colours on arrival.
+61. Indexed conversion scrambles colours -> RGB, load `.gpl`, confirm, then Indexed, no dither.
+62. A colour paints as an eraser -> palette slot 0 is reserved transparent.
+63. Same wrong colour twice -> near-identical dark swatches; read indices from the file.
+64. Drawings land in the palette folder -> check where every save landed.
+65. Lua export all black -> pass `palette = spr.palettes[1]` to `saveAs`.
+66. Half a sprite missing in game -> the background colour is not a paint (`lint.js` checks).
+67. One ramp change moves unrelated objects -> a ramp must not do two jobs.
+68. Grade destroys shadows -> measure deltaE between slots after any wholesale colour change.
+69. Nearest-colour remap flattens art -> pin big areas by role first.
+70. Migration does a third of the job -> never read from the path you write; a substitution table is not a pipeline.
+

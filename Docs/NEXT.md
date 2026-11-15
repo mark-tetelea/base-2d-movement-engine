@@ -1,51 +1,41 @@
 # Next
 
-> Overwritten at every `/handoff`. Written 2026-11-15, end of phase 14 (make everything swappable).
+> Overwritten at every `/handoff`. Written 2026-11-15, end of phase 15 (full test pass, made lighter by the user).
 
 ## Do first
 
-1. **Phase 15 of `Docs/ROADMAP.md` (the full test pass)** - when the counselor starts it. Start with
-   `sh Tools/measure/compile.sh`, `sh Tools/measure/removal-check.sh` (ALL PASS, 17) and `save.cs` (ALL PASS, 47),
-   then re-run every other check in `Tools/measure/` - none was re-run in phase 14 (notes below).
-2. The playtests from `CONTEXT.md`, "What is not done" - now including the rebind screen (Esc > Controls) and
-   the pixel theme (point `Resources/KitTheme` at the font, or swap in `Assets/UI/KitThemePixel`).
+1. **The screens check at 1920x1080:** after an editor restart its virtual mouse presses never arrive (no shot even
+   on the floor; 3 runs), while WXGA passes 8/8 and both passed before the restart. Run
+   `sh Tools/measure/run-check.sh Playground Tools/measure/screens.cs - 120` at Full HD (`game-view-size.cs`) and
+   find out why (Game view scaled to fit a smaller window? input routing after restart?). Not the font.
+2. Look at the screens in the pixel font at both sizes (render the panel to a RenderTexture, trap 81) - nobody has
+   since it became the default.
+3. Any check: `sh Tools/measure/run-check.sh <Scene> <file> <state key>`; one-shot checks key "=", self-polling "-".
 
-## Half-done (for the phase 15 test pass)
+## Half-done / not checked
 
-- **Phase 14 input path:** every key now goes through `Controls` (same `Keyboard.current` reads as before, so
-  the virtual-keyboard checks should still drive it). Re-run `movement.cs` (CLAUDE.md: after any movement change),
-  `combat.cs`, `tiles.cs` (fixed for `GetBag`, not run), `screens.cs`, `playthrough.cs`, `rpg-playthrough.cs`.
-  Add a check that drives the rebind screen with real key presses and a mouse button (trap 84 for the mouse), and
-  that touch buttons still fire/dash/use (they now go through `Controls.SetHeld/Tap`; only entry points were run).
-- **Not tried:** deleting a folder for real in the editor (the check compiles without it; scenes then show
-  "Missing script" - harmless, expected). Enemies with a `SpriteAnimSet` (the component supports it; no enemy has
-  one). `Item.floorPrefab` (no item uses one). Theme sprites (box/button/slot art) - all empty, flat boxes as before.
-- `Tools/measure/setup-phase14.cs`: its player-art part read fields that are now removed, so it no longer compiles
-  as is (kept as the record); `setup-phase13.cs` sets `TouchControls` fields that are gone.
-- The default-font theme `KitTheme` and `KitThemePixel` are separate copies: a colour changed in one is not in the
-  other.
-- From 13b / 13 / earlier (unchanged): pickup check by real keys, bag screen by clicks; `save.cs` once failed on
-  Dungeon seed 1931867546 (spawn overlap, phase 11, not fixed); multi-touch; crates not saved; enemies outside
-  waves come back on load; no "Continue"; potions and gems do nothing; WebGL module, GIFs, push; `Assets/_Recovery/`
-  to delete; aim assist bends toward crates; crumbling in "blocks" mode; camera check flake.
+- Left on purpose by the lighter pass (still unsure, from earlier phases): deleting a folder for real in the
+  editor; an enemy with a `SpriteAnimSet`; `Item.floorPrefab` (no item uses one); theme sprites (all empty);
+  crumbling in "blocks" mode and a tile/door closing on someone (push-out); the Dungeon spawn overlap
+  (save.cs once failed on seed 1931867546, phase 11); multi-touch / a real finger; bag screen by real clicks.
+- `Assets/UI/KitThemePixel` is now identical to `Resources/KitTheme` (name only differs) - keep or delete.
+- `setup-phase14.cs` and `setup-phase13.cs` no longer compile as is (fields removed); kept as records.
+- Known gaps, not bugs: crates not saved; enemies outside waves come back on load; no "Continue"; potions and gems
+  do nothing; `Assets/_Recovery/` to delete; group followers can trail up to ~7.7 tiles behind their place while
+  the leader turns (enemies2.cs, feel).
 
 ## Waiting on the user
 
-- Playtests (everything so far, now also rebinding and the pixel font). Which font the kit's default theme
-  should use (default font kept for now). WebGL module install, repo push.
+- **Aim assist and crates:** the rule bends shots toward any living Health of another team, so a crate (team 2)
+  in the cone and nearer than an enemy wins. Keep, or skip crates (a setting)? Recommendation: skip team 2.
+- Playtests (everything; nobody has played any of it). WebGL module, GIFs, repo push.
 
 ## Don't
 
-- Don't add a reference between system asmdefs without checking the removal check still passes and the README's
-  table still says what goes with what; Core (`Core`, `Movement`, `Facing`, `Camera`, `Screens`) references no
-  other kit folder.
-- Don't read keys or the mouse buttons directly (`Keyboard.current`) in kit code - use `Controls` (pointer position
-  is fine). Don't play sounds outside Feel - raise `Cues`. Don't hard-code UI colours - use `KitUI` / the theme.
-- Don't make Feel, Save, Map or Touch reference Combat / Inventory / Shop / World types again - use the promises in
-  `Core/Contracts.cs` (or `IItemStock`).
-- Don't change `SaveData` (or any saved struct) without raising `SaveGame.Version` (now 2) and an upgrade step by
-  meaning. The settings file's "Controls" entry is a value, not a shape change.
-- Don't reorder `FeelEvent` (now in `Core/Cues.cs`). Don't put items on the floor except through `Pickup.Spawn`.
-- Don't run play checks against the real save folder (`SaveFiles.FolderOverride`, trap 50). New statics need a
-  reset - domain reload is off (trap 88).
+- Don't set `PlayerMover.inputPaused` directly - call `PauseInput(owner, on)` (trap 91).
+- Don't drive a virtual keyboard/mouse in a check without switching the real ones off (trap 90).
+- Don't run play checks against the real save folder (`SaveFiles.FolderOverride`; run-check.sh clears it after).
+- Don't read keys directly in kit code (`Controls`), don't play sounds outside Feel (`Cues`), don't hard-code UI
+  colours (theme). Don't change a saved struct without raising `SaveGame.Version` + an upgrade step.
+- Don't add a reference between system asmdefs without re-running `removal-check.sh` (ALL PASS, 17).
 - From before: no gamepad, no Android/iOS targets, no navmesh, no second door system, don't push.

@@ -69,7 +69,7 @@ namespace TopDownKit
         void Pause(bool on)
         {
             if (mover == null) mover = GetComponent<PlayerMover>();
-            if (mover != null) mover.inputPaused = on;
+            if (mover != null) mover.PauseInput(this, on);
         }
 
         void Update()

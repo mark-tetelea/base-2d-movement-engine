@@ -7,6 +7,7 @@
 // Polls itself: call again until it says done.
 if (!EditorApplication.isPlaying) return "not playing - enter play mode on Playground first";
 var D = System.AppDomain.CurrentDomain;
+Application.runInBackground = true;   // phase 15: an unfocused editor stops the game clock (trap 6)
 var results = new System.Collections.Generic.List<string>();
 void Check(string n, bool ok, string d) { results.Add((ok ? "PASS " : "FAIL ") + n + " (" + d + ")"); }
 var doc = UnityEngine.Object.FindFirstObjectByType<UnityEngine.UIElements.UIDocument>();
@@ -22,6 +23,23 @@ var shooter = player.GetComponent<TopDownKit.PlayerShooter>();
 var mouse = UnityEngine.InputSystem.InputSystem.GetDevice("ScreensMouse") as UnityEngine.InputSystem.Mouse;
 if (mouse == null) mouse = UnityEngine.InputSystem.InputSystem.AddDevice<UnityEngine.InputSystem.Mouse>("ScreensMouse");
 mouse.MakeCurrent();
+// Phase 15: the real keyboard / mouse are switched off while this runs and back on at the end.
+// A real key press makes that device "current", and the virtual hold stops counting - the
+// phase 8 camera flake (the player stopped mid-walk). sh Tools/measure/run-check.sh also
+// switches every device back on after play mode, in case a run dies half way.
+void RealDevices(bool on, params UnityEngine.InputSystem.InputDevice[] mine)
+{
+    foreach (var d in UnityEngine.InputSystem.InputSystem.devices)
+    {
+        if (System.Array.IndexOf(mine, d) >= 0) continue;
+        bool same = false;
+        foreach (var m in mine) if ((m is UnityEngine.InputSystem.Keyboard && d is UnityEngine.InputSystem.Keyboard) || (m is UnityEngine.InputSystem.Mouse && d is UnityEngine.InputSystem.Mouse)) same = true;
+        if (!same) continue;
+        if (on && !d.enabled) UnityEngine.InputSystem.InputSystem.EnableDevice(d);
+        if (!on && d.enabled) UnityEngine.InputSystem.InputSystem.DisableDevice(d);
+    }
+}
+RealDevices(false, mouse);
 if (!picker.IsOpen) picker.Toggle();
 
 // Where is the first picker button on screen? Panel coords * scale, Y flipped.
@@ -97,6 +115,7 @@ if (state == "pressFloor")
     pm.Resume();
     string rz = (Time.timeScale == 1f && !TopDownKit.PauseMenu.IsPaused ? "PASS" : "FAIL") + " resume sets timeScale 1";
     D.SetData("sc_state", null);
+    RealDevices(true, mouse);
     UnityEngine.InputSystem.InputSystem.RemoveDevice(mouse);
     ins.editorInputBehaviorInPlayMode = (UnityEngine.InputSystem.InputSettings.EditorInputBehaviorInPlayMode)D.GetData("sc_eb");
     ins.backgroundBehavior = (UnityEngine.InputSystem.InputSettings.BackgroundBehavior)D.GetData("sc_bb");

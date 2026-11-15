@@ -66,6 +66,18 @@ void Finish()
     QualitySettings.vSyncCount = oldVsync;
     Application.targetFrameRate = oldTarget;
     if (dummy != null) UnityEngine.Object.Destroy(dummy);
+    // Phase 15: the check compares the two frame rates itself, row by row (was by hand).
+    var byRate = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.List<string>>();
+    for (int i = 1; i < lines.Count; i++) { int c = lines[i].IndexOf(','); string k = lines[i].Substring(0, c); if (!byRate.ContainsKey(k)) byRate[k] = new System.Collections.Generic.List<string>(); byRate[k].Add(lines[i].Substring(c + 1)); }
+    string verdict = "FAIL 30 vs 144 fps: a run is missing";
+    if (byRate.ContainsKey("30") && byRate.ContainsKey("144"))
+    {
+        var r30 = byRate["30"]; var r144 = byRate["144"]; int differ = 0, first = -1;
+        for (int i = 0; i < Mathf.Min(r30.Count, r144.Count); i++) if (r30[i] != r144[i]) { differ++; if (first < 0) first = i; }
+        bool same = differ == 0 && r30.Count == r144.Count && r30.Count > 500;
+        verdict = (same ? "PASS" : "FAIL") + " 30 vs 144 fps: " + r30.Count + " / " + r144.Count + " steps, " + differ + " differing" + (first >= 0 ? " (first at step " + first + ")" : "");
+    }
+    results.Insert(0, verdict);
     System.AppDomain.CurrentDomain.SetData("cb_state", error == null ? "done\n" + string.Join("\n", results) + "\n-> " + outPath : "error: " + error);
 }
 
@@ -80,6 +92,9 @@ void OnFixed()
         int s = step++;
         if (s == 0)
         {
+            // Phase 15: the editor's mouse can read as held at Play (trap 84), leaving the trigger
+            // down before PlayerShooter was switched off - then step 10's press had no edge.
+            gun.SetTrigger(false);
             hp.Restore(); gun.Select(0); gun.Refill(); Place(-15f, 0f);
             dummy = UnityEngine.Object.Instantiate(chaser, new Vector3(-8f, 0f, 0f), Quaternion.identity);
             UnityEngine.Object.DestroyImmediate(dummy.GetComponent<TopDownKit.EnemyBrain>());

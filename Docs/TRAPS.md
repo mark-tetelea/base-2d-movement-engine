@@ -667,3 +667,18 @@ reference `Library/ScriptAssemblies/TopDownKit.*.dll`, so the removed types stil
 every removal "passes". Rule: put the kit's own dlls and `Assembly-CSharp*` in
 `excludeReferences`, add only package dlls the asmdefs name, and keep a self-test that must
 FAIL (Combat removed, its users kept). Found 2026-11-15 (phase 14).
+
+## 90. A virtual keyboard's held key stops counting in the middle of a check
+Symptom: a walk driven by a virtual keyboard stops at a random place; nothing solid there (the phase 8 camera
+check, "stopped at y 17.5"). Cause: any key event from another keyboard (the user typing anywhere, with input
+routed to the Game view) makes that device `Keyboard.current`; `Controls` reads `Keyboard.current`, so the
+virtual hold is no longer seen. Rule: a check that drives a virtual keyboard or mouse disables the other
+keyboards/mice while it runs and enables them at the end (`RealDevices` in the checks; `run-check.sh` turns all
+back on). Found 2026-11-15 (phase 15).
+
+## 91. One pause switch, two owners
+Symptom: a shop screen opened during a camera room fade; when the fade ended the player could walk with the
+screen open. Cause: `PlayerMover.inputPaused` was one bool set true/false by both the Interactor (panels) and
+the CameraRig (fades/slides); whoever finished last won. Rule: anything that stops walking calls
+`PlayerMover.PauseInput(itself, on)`; walking stays stopped while any owner holds it. Same for any future
+shared flag. Found 2026-11-15 (phase 15).

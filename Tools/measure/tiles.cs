@@ -51,6 +51,23 @@ QualitySettings.vSyncCount = 0;
 Application.runInBackground = true;
 var kb = UnityEngine.InputSystem.InputSystem.AddDevice<UnityEngine.InputSystem.Keyboard>("TilesKeyboard");
 kb.MakeCurrent();
+// Phase 15: the real keyboard / mouse are switched off while this runs and back on at the end.
+// A real key press makes that device "current", and the virtual hold stops counting - the
+// phase 8 camera flake (the player stopped mid-walk). sh Tools/measure/run-check.sh also
+// switches every device back on after play mode, in case a run dies half way.
+void RealDevices(bool on, params UnityEngine.InputSystem.InputDevice[] mine)
+{
+    foreach (var d in UnityEngine.InputSystem.InputSystem.devices)
+    {
+        if (System.Array.IndexOf(mine, d) >= 0) continue;
+        bool same = false;
+        foreach (var m in mine) if ((m is UnityEngine.InputSystem.Keyboard && d is UnityEngine.InputSystem.Keyboard) || (m is UnityEngine.InputSystem.Mouse && d is UnityEngine.InputSystem.Mouse)) same = true;
+        if (!same) continue;
+        if (on && !d.enabled) UnityEngine.InputSystem.InputSystem.EnableDevice(d);
+        if (!on && d.enabled) UnityEngine.InputSystem.InputSystem.DisableDevice(d);
+    }
+}
+RealDevices(false, kb);
 void Keys(params UnityEngine.InputSystem.Key[] keys) { UnityEngine.InputSystem.InputSystem.QueueStateEvent(kb, new UnityEngine.InputSystem.LowLevel.KeyboardState(keys)); }
 
 var results = new System.Collections.Generic.List<string>();
@@ -263,6 +280,7 @@ void Finish()
     }
     catch (System.Exception e) { error = (error ?? "") + " " + e.Message; }
     UnityEngine.LowLevel.PlayerLoop.SetPlayerLoop(original);
+    RealDevices(true, kb);
     UnityEngine.InputSystem.InputSystem.RemoveDevice(kb);
     settings.editorInputBehaviorInPlayMode = oldEditorBehaviour;
     settings.backgroundBehavior = oldBackground;

@@ -34,6 +34,23 @@ settings.backgroundBehavior = UnityEngine.InputSystem.InputSettings.BackgroundBe
 Application.runInBackground = true;
 var kb = UnityEngine.InputSystem.InputSystem.AddDevice<UnityEngine.InputSystem.Keyboard>("CameraKeyboard");
 kb.MakeCurrent();
+// Phase 15: the real keyboard / mouse are switched off while this runs and back on at the end.
+// A real key press makes that device "current", and the virtual hold stops counting - the
+// phase 8 camera flake (the player stopped mid-walk). sh Tools/measure/run-check.sh also
+// switches every device back on after play mode, in case a run dies half way.
+void RealDevices(bool on, params UnityEngine.InputSystem.InputDevice[] mine)
+{
+    foreach (var d in UnityEngine.InputSystem.InputSystem.devices)
+    {
+        if (System.Array.IndexOf(mine, d) >= 0) continue;
+        bool same = false;
+        foreach (var m in mine) if ((m is UnityEngine.InputSystem.Keyboard && d is UnityEngine.InputSystem.Keyboard) || (m is UnityEngine.InputSystem.Mouse && d is UnityEngine.InputSystem.Mouse)) same = true;
+        if (!same) continue;
+        if (on && !d.enabled) UnityEngine.InputSystem.InputSystem.EnableDevice(d);
+        if (!on && d.enabled) UnityEngine.InputSystem.InputSystem.DisableDevice(d);
+    }
+}
+RealDevices(false, kb);
 var W = UnityEngine.InputSystem.Key.W; var A = UnityEngine.InputSystem.Key.A; var D = UnityEngine.InputSystem.Key.D;
 
 var results = new System.Collections.Generic.List<string>();
@@ -58,6 +75,15 @@ void Check(string name, bool ok, string detail)
     results.Add((ok ? "PASS " : "FAIL ") + rig.layout + ": " + name + " (" + detail + ")");
 }
 string Room() { return rig.CurrentRoom != null ? rig.CurrentRoom.name : "none"; }
+// Phase 15: on a failed walk, say why the player stopped (the phase 8 flake left no clue).
+var mover = player.GetComponent<TopDownKit.PlayerMover>();
+string Why()
+{
+    string s = " | feel " + (mover.feel != null ? mover.feel.name : "none") + ", v " + rb.linearVelocity.ToString("F2") + ", keys W " + kb.wKey.isPressed + " A " + kb.aKey.isPressed + " D " + kb.dKey.isPressed
+        + ", current kb " + (UnityEngine.InputSystem.Keyboard.current == kb) + ", timeScale " + Time.timeScale + ", solid near:";
+    foreach (var c in Physics2D.OverlapCircleAll(rb.position, 1.2f)) if (!c.isTrigger && c.attachedRigidbody != rb) s += " " + c.name;
+    return s;
+}
 
 int stepIndex = 0, stepFrame = 0, lastFrame = -1;
 float stepStart = 0f;
@@ -69,7 +95,7 @@ void Leg(TopDownKit.CameraLayout layout, bool lockTest)
     steps.Add(f => { if (f == 0) { Keys(); rig.SetLayout(TopDownKit.CameraLayout.Open); Teleport(16f, 7.5f); transitions = 0; } if (f < 4) return false; rig.SetLayout(layout); return true; });
     steps.Add(f => { if (f == 0) Keys(D);
         bool done = rb.position.x > 25f && !rig.InTransition;
-        if (done || T() > 10f) { Keys(); Check("walk A -> B", done && Room() == "Room B" && (layout == TopDownKit.CameraLayout.Open || transitions >= 1), "x " + rb.position.x.ToString("F2") + ", room " + Room() + ", transitions " + transitions); return true; }
+        if (done || T() > 10f) { Keys(); Check("walk A -> B", done && Room() == "Room B" && (layout == TopDownKit.CameraLayout.Open || transitions >= 1), "x " + rb.position.x.ToString("F2") + ", room " + Room() + ", transitions " + transitions + (done ? "" : Why())); return true; }
         return false; });
     if (lockTest)
     {
@@ -82,12 +108,12 @@ void Leg(TopDownKit.CameraLayout layout, bool lockTest)
     steps.Add(f => { if (f == 0) { Keys(); rig.SetLayout(TopDownKit.CameraLayout.Open); Teleport(39.5f, 5f); } if (f < 4) return false; rig.SetLayout(layout); return true; });
     steps.Add(f => { if (f == 0) { Keys(W); transitions = 0; }
         bool done = rb.position.y > 32f && !rig.InTransition;
-        if (done || T() > 15f) { Keys(); Check("walk B -> C and up the big room", done && Room() == "Room C", "y " + rb.position.y.ToString("F2") + ", room " + Room() + ", cam y " + cam.transform.position.y.ToString("F3")); return true; }
+        if (done || T() > 15f) { Keys(); Check("walk B -> C and up the big room", done && Room() == "Room C", "y " + rb.position.y.ToString("F2") + ", room " + Room() + ", cam y " + cam.transform.position.y.ToString("F3") + (done ? "" : Why())); return true; }
         return false; });
     steps.Add(f => { if (f == 0) { Keys(); rig.SetLayout(TopDownKit.CameraLayout.Open); Teleport(46f, 35f); } if (f < 4) return false; rig.SetLayout(layout); return true; });
     steps.Add(f => { if (f == 0) Keys(D);
         bool done = Room() == "Area D" && !rig.InTransition && T() > 0.5f;
-        if (done || T() > 10f) { Keys(); Check("warp C -> D fades and cuts", done && rb.position.x > 100f, "x " + rb.position.x.ToString("F2") + ", room " + Room()); return true; }
+        if (done || T() > 10f) { Keys(); Check("warp C -> D fades and cuts", done && rb.position.x > 100f, "x " + rb.position.x.ToString("F2") + ", room " + Room() + (done ? "" : Why())); return true; }
         return false; });
 }
 Leg(TopDownKit.CameraLayout.RoomsSlide, true);
@@ -99,6 +125,7 @@ Leg(TopDownKit.CameraLayout.Open, false);
 void Finish(string error)
 {
     EditorApplication.update -= Tick;
+    RealDevices(true, kb);
     UnityEngine.InputSystem.InputSystem.RemoveDevice(kb);
     settings.editorInputBehaviorInPlayMode = oldEditorBehaviour;
     settings.backgroundBehavior = oldBackground;

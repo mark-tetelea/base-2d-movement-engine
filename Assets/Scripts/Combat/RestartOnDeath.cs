@@ -28,7 +28,7 @@ namespace TopDownKit
         {
             left = delay;
             PlayerMover mover = GetComponent<PlayerMover>();
-            if (mover != null) mover.inputPaused = true;
+            if (mover != null) mover.PauseInput(this, true);
             Gun gun = GetComponent<Gun>();
             if (gun != null) gun.enabled = false;
         }

@@ -27,9 +27,9 @@ MonoBehaviour:
   touchBack: {r: 0.1, g: 0.1, b: 0.15, a: 0.55}
   touchKnob: {r: 0.55, g: 0.6, b: 0.7, a: 0.8}
   touchDown: {r: 0.35, g: 0.4, b: 0.55, a: 0.75}
-  fontAsset: {fileID: 0}
+  fontAsset: {fileID: 11400000, guid: 4b1057d9118327c498aa88bc270a20c2, type: 2}
   font: {fileID: 0}
-  pixelFontSize: 0
+  pixelFontSize: 8
   textScale: 1
   textShadow: 1
   box: {fileID: 0}

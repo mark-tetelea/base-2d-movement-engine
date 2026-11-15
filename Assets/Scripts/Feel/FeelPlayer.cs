@@ -48,6 +48,7 @@ namespace TopDownKit
         int nextSource;
         float[] lastPlayed;
         float freezeLeft, scaleBefore = 1f;
+        int freezeFrame = -1;   // the frame a freeze started: its time was spent before the hit
         readonly Dictionary<GameObject, List<GameObject>> pool = new Dictionary<GameObject, List<GameObject>>();
         readonly List<(GameObject go, float left)> timed = new List<(GameObject, float)>();
 
@@ -181,6 +182,7 @@ namespace TopDownKit
                 Time.timeScale = 0f;
             }
             freezeLeft = Mathf.Max(freezeLeft, seconds);
+            freezeFrame = Time.frameCount;
         }
 
         void EndFreeze()
@@ -194,7 +196,10 @@ namespace TopDownKit
         {
             if (Freezing)
             {
-                freezeLeft -= Time.unscaledDeltaTime;
+                // Counted from the next frame. Phase 15: counting the frame the hit happened in
+                // charged the freeze for time spent before it (0.08 s became 0.047 s at 30 fps,
+                // nothing below ~12 fps).
+                if (Time.frameCount != freezeFrame) freezeLeft -= Time.unscaledDeltaTime;
                 if (freezeLeft <= 0f) EndFreeze();
             }
             for (int i = timed.Count - 1; i >= 0; i--)

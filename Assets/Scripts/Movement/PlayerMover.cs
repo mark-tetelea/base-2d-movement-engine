@@ -16,8 +16,19 @@ namespace TopDownKit
     {
         [Tooltip("How moving feels. Read every step, so swapping or tuning it shows at once.")]
         public MoveFeel feel;
-        [Tooltip("While on, keys are ignored (walking eases to a stop by the feel). Set by camera fades and slides.")]
+        [Tooltip("While on, keys are ignored (walking eases to a stop by the feel). Read it; to set it, call PauseInput.")]
         public bool inputPaused;
+
+        // Several things stop walking for their own time (an open panel, a camera fade or
+        // slide, death); each says so with PauseInput(itself, on) and walking stays stopped
+        // while any of them does. Phase 15: a fade that ended while a shop screen was open
+        // used to switch walking back on under the screen.
+        readonly HashSet<object> pausedBy = new HashSet<object>();
+        public void PauseInput(object by, bool on)
+        {
+            if (on) pausedBy.Add(by); else pausedBy.Remove(by);
+            inputPaused = pausedBy.Count > 0;
+        }
         [Tooltip("On: the walk controls steer it (the player). Off: something else calls SetMoveDirection (an enemy brain, a touch stick).")]
         public bool readKeyboard = true;
 

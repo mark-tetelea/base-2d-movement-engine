@@ -62,7 +62,8 @@ log += (wallHit ? "ok   " : "FAIL ") + "stamped walls have colliders\n"; if (!wa
 bool inStart = TopDownKit.Room.At(player.position) == gen.Rooms[0].GetComponent<TopDownKit.Room>();
 log += (inStart ? "ok   " : "FAIL ") + "player in the start room\n"; if (!inStart) fails++;
 var bp = gen.EndRoom.GetComponentInChildren<TopDownKit.BossPhases>(true);
-bool bar = bp == null || bp.hud != null;
+// Phase 14: the generator no longer sets BossPhases.hud; the boss takes the level's HUD (Hud.Current) on its first step.
+bool bar = bp == null || bp.hud != null || TopDownKit.Hud.Current != null;
 log += (bar ? "ok   " : "FAIL ") + "boss bar wired (" + (bp != null ? "boss present" : "no boss") + ")\n"; if (!bar) fails++;
 int doors = 0; foreach (var r in gen.Rooms) { var l = r.GetComponent<TopDownKit.RoomLock>(); if (l != null) doors += l.doors.Length; }
 log += "door ground objects on locks: " + doors + "\n";

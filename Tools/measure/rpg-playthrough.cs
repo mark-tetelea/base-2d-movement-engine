@@ -113,12 +113,28 @@ Do("drop", () =>
     dropped = hotbar.Drop(1);
     Check("drop puts one on the floor", dropped != null && inv.Count(coin) == 23 && hotbar.Selected == slot, "slot " + slot + ", coins " + inv.Count(coin));
 });
-Wait(0.1f);
-Do("not yet", () => Check("not takeable straight away", it.Target != dropped, Name(it.Target)));
-Wait(0.6f);
-Do("dropped targeted", () => Check("dropped coin is the target (in front, closer than the chest)", it.Target == dropped, Name(it.Target)));
+// Phase 15: the phase 13b rules. A coin is a Magnet item: never an E target, and not pulled
+// back to its dropper until the dropper has been out of its reach once. A key is an Interact
+// item: E takes it back at once.
+Vector2 dropSpot = Vector2.zero;
+Wait(0.8f);
+Do("not yet", () => { dropSpot = rb.position; Check("a dropped coin stays down while its dropper stands by, and is no E target", dropped != null && inv.Count(coin) == 23 && it.Target != dropped, "coins " + inv.Count(coin) + ", target " + Name(it.Target)); });
+Do("walk away", () => Place(dropSpot + new Vector2(-8f, 0f)));
+Wait(0.3f);
+Do("come back", () => Place(dropSpot));
+Wait(1f);
+Do("taken back", () => Check("after walking away and back, the magnet takes it", dropped == null && inv.Count(coin) == 24, "coins " + inv.Count(coin)));
+TopDownKit.Pickup droppedKey = null;
+Do("drop key", () =>
+{
+    inv.Add(key, 1);
+    hotbar.Select(System.Array.FindIndex(inv.slots, s => s.item == key));
+    droppedKey = hotbar.Drop(1);
+});
+Wait(0.6f);   // the hotbar's drop wait (0.5 s) applies to everyone
+Do("key targeted", () => Check("a dropped key (Interact item) is the E target at once", droppedKey != null && it.Target == droppedKey, Name(it.Target)));
 Press(); Wait(0.1f);
-Do("taken back", () => Check("taken back with E", dropped == null && inv.Count(coin) == 24, "coins " + inv.Count(coin)));
+Do("key back", () => { Check("E takes the key back", droppedKey == null && inv.Has(key), "key " + inv.Has(key)); inv.Remove(key, 1); });
 
 // 8. Hold mode on the lever in C (placed there, as walking needs the warp side).
 int holdSteps = 0;

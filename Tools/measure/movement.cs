@@ -42,6 +42,23 @@ QualitySettings.vSyncCount = 0;
 Application.runInBackground = true;
 var kb = UnityEngine.InputSystem.InputSystem.AddDevice<UnityEngine.InputSystem.Keyboard>("MeasureKeyboard");
 kb.MakeCurrent();
+// Phase 15: the real keyboard / mouse are switched off while this runs and back on at the end.
+// A real key press makes that device "current", and the virtual hold stops counting - the
+// phase 8 camera flake (the player stopped mid-walk). sh Tools/measure/run-check.sh also
+// switches every device back on after play mode, in case a run dies half way.
+void RealDevices(bool on, params UnityEngine.InputSystem.InputDevice[] mine)
+{
+    foreach (var d in UnityEngine.InputSystem.InputSystem.devices)
+    {
+        if (System.Array.IndexOf(mine, d) >= 0) continue;
+        bool same = false;
+        foreach (var m in mine) if ((m is UnityEngine.InputSystem.Keyboard && d is UnityEngine.InputSystem.Keyboard) || (m is UnityEngine.InputSystem.Mouse && d is UnityEngine.InputSystem.Mouse)) same = true;
+        if (!same) continue;
+        if (on && !d.enabled) UnityEngine.InputSystem.InputSystem.EnableDevice(d);
+        if (!on && d.enabled) UnityEngine.InputSystem.InputSystem.DisableDevice(d);
+    }
+}
+RealDevices(false, kb);
 
 // Segments, run one after another by the per-frame hook:
 //   lane  - from (-15, 0): settle 0.6 s, hold D 2.0 s, release, wait 1.5 s
@@ -79,6 +96,7 @@ void Finish()
 {
     try { System.IO.File.WriteAllLines(outPath, lines); } catch (System.Exception e) { error = (error ?? "") + " write: " + e.Message; }
     UnityEngine.LowLevel.PlayerLoop.SetPlayerLoop(original);
+    RealDevices(true, kb);
     UnityEngine.InputSystem.InputSystem.RemoveDevice(kb);
     settings.editorInputBehaviorInPlayMode = oldEditorBehaviour;
     settings.backgroundBehavior = oldBackground;

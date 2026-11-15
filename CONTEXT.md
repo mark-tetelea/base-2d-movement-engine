@@ -1,6 +1,6 @@
 # Where the kit is now
 
-> Rewritten, never appended. True as of **2026-11-15**, end of phase 14 (make everything swappable).
+> Rewritten, never appended. True as of **2026-11-15**, end of phase 15 (the full test pass).
 
 ## How it starts
 
@@ -121,11 +121,11 @@ stick bottom right (pushing it fires), Fire, Dash, Use, Gun (next weapon) and a 
 Every key is a setting (`Assets/Resources/KitControls`) and the player can change them in the pause menu;
 the change is kept with the other settings. The look of every screen comes from one theme asset
 (`Assets/Resources/KitTheme`: colours, font, box / button / slot / bar art, where each HUD part sits); a
-pixel font drawn for the kit is ready in `Assets/UI/KitThemePixel` (not switched on). A character's art is
+pixel font drawn for the kit is the default (phase 15, the user's choice; `Assets/UI/KitThemePixel` is now an identical copy). A character's art is
 one animations asset (the player: `Assets/Data/Art/PlayerAnims`, idle and a 4-frame walk; any action, any
 number of frames, any speed). Dropped items can have their own floor prefab. Each system is its own folder
 that can be deleted (the README's table says what goes with what); the menu **TopDownKit > Check removable
-systems** proves the rest still compiles. Nothing looks or plays differently from phase 13b in the demos.
+systems** proves the rest still compiles. Phase 15 changed two things in play: a screen opened during a camera fade now keeps walking paused, and a hit-stop now lasts its full length at any frame rate.
 
 ## Screens
 
@@ -133,7 +133,7 @@ One set, used by all four: a HUD (health bar, weapon + ammo, hotbar, a status li
 banner, a help line - each demo shows only what it has), the text box, the chest screen, the
 bag screen, the shop screen, the pause menu and its save/load slot list, the map, the touch controls, the start
 menu, and the Playground's settings panel. Placeholder look: dark
-Endesga 32 boxes, the default font, drawn in the game's 640x360 pixels and scaled by whole
+Endesga 32 boxes, the kit's pixel font, drawn in the game's 640x360 pixels and scaled by whole
 numbers like the game (x3 at 1920x1080, x2 at 1366x768).
 
 ## What is measured
@@ -177,6 +177,12 @@ last good save.
    controls: **built** (phase 13). Save, map and touch in all four demos; the shop only in the RPG room.
 13. Swappable everything - keys (with a rebind screen), UI theme and a pixel font, animations per action,
    item floor art, sounds only through slots; every optional system deletable, checked: **built** (phase 14).
+
+## What is measured (phase 15)
+
+Every check and bot was re-run and passes (LOG 2026-11-15), plus new checks for the sword, charge, bounce, aim
+assist, hit-stop, enemy paths, groups, trail, pickup modes, dropping, the bag and shop screens, the minimap,
+rebinding and the touch path (touch as data, not a finger). Open: the screens check's mouse presses at 1920x1080.
 
 ## What is not done
 

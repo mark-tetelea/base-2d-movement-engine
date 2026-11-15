@@ -36,6 +36,23 @@ Application.runInBackground = true;
 var kb = UnityEngine.InputSystem.InputSystem.AddDevice<UnityEngine.InputSystem.Keyboard>("FacingKeyboard");
 var mouse = UnityEngine.InputSystem.InputSystem.AddDevice<UnityEngine.InputSystem.Mouse>("FacingMouse");
 mouse.MakeCurrent(); kb.MakeCurrent();
+// Phase 15: the real keyboard / mouse are switched off while this runs and back on at the end.
+// A real key press makes that device "current", and the virtual hold stops counting - the
+// phase 8 camera flake (the player stopped mid-walk). sh Tools/measure/run-check.sh also
+// switches every device back on after play mode, in case a run dies half way.
+void RealDevices(bool on, params UnityEngine.InputSystem.InputDevice[] mine)
+{
+    foreach (var d in UnityEngine.InputSystem.InputSystem.devices)
+    {
+        if (System.Array.IndexOf(mine, d) >= 0) continue;
+        bool same = false;
+        foreach (var m in mine) if ((m is UnityEngine.InputSystem.Keyboard && d is UnityEngine.InputSystem.Keyboard) || (m is UnityEngine.InputSystem.Mouse && d is UnityEngine.InputSystem.Mouse)) same = true;
+        if (!same) continue;
+        if (on && !d.enabled) UnityEngine.InputSystem.InputSystem.EnableDevice(d);
+        if (!on && d.enabled) UnityEngine.InputSystem.InputSystem.DisableDevice(d);
+    }
+}
+RealDevices(false, kb, mouse);
 var W = UnityEngine.InputSystem.Key.W; var A = UnityEngine.InputSystem.Key.A;
 var S = UnityEngine.InputSystem.Key.S; var D = UnityEngine.InputSystem.Key.D;
 
@@ -76,6 +93,7 @@ const int HOLD = 12;   // game frames to hold each case before reading it
 void Finish(string error)
 {
     EditorApplication.update -= Tick;
+    RealDevices(true, kb, mouse);
     UnityEngine.InputSystem.InputSystem.RemoveDevice(kb);
     UnityEngine.InputSystem.InputSystem.RemoveDevice(mouse);
     facing.settings = oldSettings; aim.aimFrom = oldAimFrom; aim.view = oldView;

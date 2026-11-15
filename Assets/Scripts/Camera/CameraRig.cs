@@ -169,7 +169,7 @@ namespace TopDownKit
             if (pauseInputDuringSlide) Pause(true);
         }
 
-        void Pause(bool on) { if (mover != null) mover.inputPaused = on; }
+        void Pause(bool on) { if (mover != null) mover.PauseInput(this, on); }
 
         // A full-view quad in front of the camera, made on first use.
         void SetFade(float alpha)

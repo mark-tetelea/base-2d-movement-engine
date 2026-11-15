@@ -87,7 +87,7 @@ says what each folder needs and what goes with it.
 - `Assets/Scripts/Movement/` - `Movement.Step(velocity, moveDirection, settings, dt)` is the
   one movement rule; `MoveSettings` (speed in tiles/s, time to full speed, time to stop;
   0 = instant), `MoveFeel` (the asset), `PlayerMover` (keys -> direction in `Update`,
-  latched until a step uses it; `Step` in `FixedUpdate` on an interpolated Rigidbody2D,
+  latched until a step uses it; walking stops while any owner holds `PauseInput(who, on)`; `Step` in `FixedUpdate` on an interpolated Rigidbody2D,
   reading the body's velocity back so walls take speed away). The body gets walking
   velocity + a knockback push, kept apart. **Grid step** is a feel setting
   (`MoveSettings.gridStep`, `stepTime`, `holdToWalk`, `eightDirections`): `GridStep` is its
@@ -183,9 +183,9 @@ says what each folder needs and what goes with it.
 - Build list: `StartMenu` (0, buttons to the demos), `ArenaShooter` (1), `LittleRpg` (2,
   the Little RPG room demo), `Playground` (3), `Dungeon` (4, generated rooms). Pause -> Main menu loads index 0.
 - `Assets/Scenes/ArenaShooter.unity` - the Arena shooter demo (death reloads by build index). `Warp` moves only the camera's target.
-- `Tools/measure/` - measuring harness: `compile.sh` (recompile, print errors), `removal-check.sh` (vital),
+- `Tools/measure/` - measuring harness: `run-check.sh <Scene> <file> <state key>` runs any play check end to end; `compile.sh` (recompile, print errors), `removal-check.sh` (vital),
   `save.cs` (vital), `missing-scripts.cs`, and per-system checks (`movement.cs` - re-run after any movement
-  change - `combat.cs`, `tiles.cs`, `screens.cs`, bots...). What each checks: LOG 2026-11-15 "moved from CLAUDE.md".
+  change - `combat.cs`, `tiles.cs`, `screens.cs`, bots..., phase 15's `combat2`, `enemies2`, `pickups`, `controls`, `shop-map`). What each checks: LOG 2026-11-15.
 - `Assets/Art/Palette/endesga-32.gpl` - the one palette; pxkit and Aseprite both load it.
   Never written by a script that also reads it (trap 70).
 - `Tools/pxkit/` - code-drawn sprites (`README.md` there). Must not grow game-specific
@@ -203,7 +203,7 @@ says what each folder needs and what goes with it.
 ## Traps
 
 > One line each: symptom -> rule. The full story is in `Docs/TRAPS.md` under the same
-> number. Add the day a trap is found; next free number is **90**.
+> number. Add the day a trap is found; next free number is **92**.
 
 **The editor lies about your own edits**
 1. Code right, game wrong -> a changed `[SerializeField]` default does not change a scene that already saved it; edit the scene in edit mode and save.
@@ -281,22 +281,7 @@ says what each folder needs and what goes with it.
 54. "Unchanged" when nothing was compared -> print what was compared; fail on empty input.
 55. Node dies on `D:\package.json` -> every Node tool under `D:\` needs its own `package.json`.
 
-**Art**
-56. Drawing guide shows in game -> guides on a hidden Aseprite layer, never in the export.
-57. `.aseprite` at the wrong size -> importer defaults to 100 PPU; set `spritePixelsPerUnit = 16` etc. via public properties.
-58. Drawn item floats off its placeholder spot -> importer trims and centres; use canvas pivot.
-59. Swapped sprite drops half a cell -> PNG pivots centre, `.aseprite` bottom-centre; match pivots.
-60. Drawing entirely off-palette -> load the project palette; check colours on arrival.
-61. Indexed conversion scrambles colours -> RGB, load `.gpl`, confirm, then Indexed, no dither.
-62. A colour paints as an eraser -> palette slot 0 is reserved transparent.
-63. Same wrong colour twice -> near-identical dark swatches; read indices from the file.
-64. Drawings land in the palette folder -> check where every save landed.
-65. Lua export all black -> pass `palette = spr.palettes[1]` to `saveAs`.
-66. Half a sprite missing in game -> the background colour is not a paint (`lint.js` checks).
-67. One ramp change moves unrelated objects -> a ramp must not do two jobs.
-68. Grade destroys shadows -> measure deltaE between slots after any wholesale colour change.
-69. Nearest-colour remap flattens art -> pin big areas by role first.
-70. Migration does a third of the job -> never read from the path you write; a substitution table is not a pipeline.
+**Art** - traps 56-70 (Aseprite, pivots, palette, ramps): one line each in `Docs/LOG.md` 2026-11-15 "Art traps moved", stories in `Docs/TRAPS.md`. Read them before drawing.
 
 **Found in this project**
 71. Fixed timestep write "succeeds", changes nothing -> it is a rational in Unity 6; set `Fixed Timestep.m_Count` (2352000 = 60 Hz). Check `console_status` errors after any settings write.
@@ -317,6 +302,8 @@ says what each folder needs and what goes with it.
 87. Poll loop on `eval` never ends -> the reply echoes your code; match on `"result":"<marker>`, not a word in the code.
 88. Statics keep last Play's values -> domain reload is off on entering play mode; reset new statics in `SubsystemRegistration` or `OnDisable`.
 89. "Compile without X" passes anyway -> exclude the kit's own compiled dlls; keep a self-test that must fail.
+90. Virtual key hold stops mid-check -> any other keyboard's event becomes `Keyboard.current`; disable real keyboards/mice while a check runs.
+91. Walking unpaused under an open panel -> one flag, two owners; stop walking only through `PlayerMover.PauseInput(owner, on)`.
 
 ## Environment
 
