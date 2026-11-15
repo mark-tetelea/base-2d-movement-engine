@@ -180,7 +180,10 @@ namespace TopDownKit
             foreach (Lever l in FindObjectsByType<Lever>(all, FindObjectsSortMode.None)) Add(l);
             foreach (RoomLock l in FindObjectsByType<RoomLock>(all, FindObjectsSortMode.None)) Add(l);
             foreach (Room r in FindObjectsByType<Room>(all, FindObjectsSortMode.None)) Add(r);
-            foreach (Shop s in FindObjectsByType<Shop>(all, FindObjectsSortMode.None)) Add(s);
+            // Shops (anything with an IItemStock), found without needing the Shop folder.
+            var stocks = new List<MonoBehaviour>();
+            foreach (MonoBehaviour m in FindObjectsByType<MonoBehaviour>(all, FindObjectsSortMode.None))
+                if (m is IItemStock) { stocks.Add(m); Add(m); }
             foreach (Pickup p in FindObjectsByType<Pickup>(all, FindObjectsSortMode.None)) { Add(p); startCounts[p] = p.stack.count; }
 
             itemsByName.Clear();
@@ -190,10 +193,11 @@ namespace TopDownKit
             foreach (Bag b in FindObjectsByType<Bag>(all, FindObjectsSortMode.None))
                 if (b.inventory != null && b.inventory.slots != null) foreach (ItemStack s in b.inventory.slots) Know(s.item);
             foreach (var kv in startCounts) Know(kv.Key.stack.item);
-            foreach (Shop s in FindObjectsByType<Shop>(all, FindObjectsSortMode.None))
+            foreach (MonoBehaviour m in stocks)
             {
-                Know(s.currency);
-                for (int i = 0; i < s.LineCount; i++) Know(s.Line(i).item);
+                var s = (IItemStock)m;
+                Know(s.Currency);
+                for (int i = 0; i < s.LineCount; i++) Know(s.LineItem(i));
             }
         }
 
@@ -212,12 +216,12 @@ namespace TopDownKit
         bool Has(SaveParts p) => (parts & p) != 0;
 
         Bag PlayerBag => player != null ? player.GetComponent<Bag>() : null;
-        Health PlayerHealth => player != null ? player.GetComponent<Health>() : null;
+        IHealth PlayerHealth => player != null ? player.GetComponent<IHealth>() : null;
 
         // Why saving is not allowed right now ("" = it is).
         public string CannotSave()
         {
-            Health h = PlayerHealth;
+            IHealth h = PlayerHealth;
             if (h != null && h.Dead) return "Cannot save while dead";
             return "";
         }
@@ -240,8 +244,7 @@ namespace TopDownKit
             if (Has(SaveParts.Scene))
             {
                 d.scene = SceneManager.GetActiveScene().name;
-                RoomGenerator g = FindFirstObjectByType<RoomGenerator>();
-                d.seed = g != null && g.Built ? g.UsedSeed : 0;
+                d.seed = LevelSeed.Used;   // set by World's RoomGenerator while a generated level runs
             }
             if (Has(SaveParts.Player) && player != null)
             {
@@ -270,10 +273,10 @@ namespace TopDownKit
                 else if (Has(SaveParts.Doors) && o is Lever lv && lv != null && lv.on) levers.Add(id);
                 else if (Has(SaveParts.Rooms) && o is RoomLock rl && rl != null && rl.Cleared) cleared.Add(id);
                 else if (Has(SaveParts.Rooms) && o is Room r && r != null && r.Visited) visited.Add(id);
-                else if (Has(SaveParts.Shops) && o is Shop s && s != null)
+                else if (Has(SaveParts.Shops) && o is IItemStock s && o != null)
                 {
                     var lines = new ShopLineSave[s.LineCount];
-                    for (int i = 0; i < lines.Length; i++) lines[i] = new ShopLineSave { item = ItemName(s.Line(i).item), left = s.Left(i) };
+                    for (int i = 0; i < lines.Length; i++) lines[i] = new ShopLineSave { item = ItemName(s.LineItem(i)), left = s.Left(i) };
                     shops.Add(new ShopSave { id = id, lines = lines });
                 }
             }
@@ -384,7 +387,7 @@ namespace TopDownKit
             if (In(d, SaveParts.Shops))
                 foreach (ShopSave s in d.shops)
                 {
-                    Shop shop = Find<Shop>(s.id);
+                    IItemStock shop = Find<MonoBehaviour>(s.id) as IItemStock;
                     if (shop == null) { Missing(s.id); continue; }
                     // By item, not by line number: a stock list reordered later still loads (trap 47).
                     foreach (ShopLineSave l in s.lines)
@@ -457,6 +460,7 @@ namespace TopDownKit
             if (saveSettings) { LookAtSettings(); WriteSettings(lastSettings); }
             LastNote = "Saved to slot " + (slot + 1);
             AnySaved?.Invoke(this, slot);
+            Cues.Raise(FeelEvent.Save, Vector2.zero);
             return "";
         }
 
@@ -475,7 +479,7 @@ namespace TopDownKit
             pending = d;
             pendingScene = other ? d.scene : scene;
             pendingNote = st == SaveFiles.State.FromBackup ? "Loaded slot " + (slot + 1) + " (" + note + ")" : "Loaded slot " + (slot + 1);
-            if (In(d, SaveParts.Scene) && d.seed != 0) RoomGenerator.NextSeed = d.seed;
+            if (In(d, SaveParts.Scene) && d.seed != 0) LevelSeed.Next = d.seed;
             if (PauseMenu.Current != null) PauseMenu.Current.Resume();
             Time.timeScale = 1f;
             SceneManager.LoadScene(other ? d.scene : scene);
@@ -501,9 +505,13 @@ namespace TopDownKit
             return f;
         }
 
+        const string ControlsKey = "Controls";
+
         SettingSave[] CaptureSettings()
         {
             var list = new List<SettingSave>();
+            // The player's key changes (the rebind screen), kept with the other settings.
+            list.Add(new SettingSave { key = ControlsKey, value = Controls.Export() });
             if (settings == null) return list.ToArray();
             foreach (SavedSetting s in settings)
             {
@@ -522,6 +530,8 @@ namespace TopDownKit
             if (!File.Exists(SettingsPath) && !File.Exists(SaveFiles.BackupOf(SettingsPath))) return;
             SaveFiles.State st = SaveFiles.Read(SettingsPath, Version, null, out SettingsData d, out string note);
             if (st != SaveFiles.State.Ok && st != SaveFiles.State.FromBackup) { Debug.LogWarning("SaveGame: settings file not used: " + note, this); return; }
+            foreach (SettingSave v in d.values) if (v.key == ControlsKey) Controls.Import(v.value);
+            if (settings == null) return;
             foreach (SavedSetting s in settings)
             {
                 FieldInfo f = FieldOf(s);

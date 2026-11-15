@@ -12,4 +12,11 @@ namespace TopDownKit
 
         void OnValidate() { if (inventory != null) inventory.Fit(); }
     }
+
+    public static class BagLookup
+    {
+        // The bag of whoever is interacting (null: none). The Interaction folder does not
+        // know bags; this is how inventory targets (chests, shops, key doors) find one.
+        public static Bag GetBag(this Interactor who) => who != null ? who.GetComponent<Bag>() : null;
+    }
 }

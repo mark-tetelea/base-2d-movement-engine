@@ -1,0 +1,23 @@
+{
+    "name": "TopDownKit.World",
+    "rootNamespace": "TopDownKit",
+    "references": [
+        "TopDownKit.Core",
+        "TopDownKit.Movement",
+        "TopDownKit.Camera",
+        "TopDownKit.Screens",
+        "TopDownKit.Combat",
+        "TopDownKit.Inventory",
+        "TopDownKit.Tiles",
+        "TopDownKit.Interaction"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 namespace TopDownKit
@@ -41,15 +40,14 @@ namespace TopDownKit
         }
 
         // Data entry points (the buttons and keys call these; checks call them directly).
-        public int Take(int slot) => IsOpen ? Inventory.Move(chest.Bag.Inventory, slot, who.Bag.Inventory) : 0;
-        public int Put(int slot) => IsOpen ? Inventory.Move(who.Bag.Inventory, slot, chest.Bag.Inventory) : 0;
-        public int TakeAll() => IsOpen ? Inventory.MoveAll(chest.Bag.Inventory, who.Bag.Inventory) : 0;
+        public int Take(int slot) => IsOpen ? Inventory.Move(chest.Bag.Inventory, slot, who.GetBag().Inventory) : 0;
+        public int Put(int slot) => IsOpen ? Inventory.Move(who.GetBag().Inventory, slot, chest.Bag.Inventory) : 0;
+        public int TakeAll() => IsOpen ? Inventory.MoveAll(chest.Bag.Inventory, who.GetBag().Inventory) : 0;
 
         void Update()
         {
             if (!IsOpen) return;
-            Keyboard k = Keyboard.current;
-            if (k != null && !PauseMenu.IsPaused && k.tKey.wasPressedThisFrame) TakeAll();
+            if (Controls.Pressed(Controls.TakeAll)) TakeAll();
         }
 
         VisualElement root, chestGrid, bagGrid;
@@ -81,7 +79,7 @@ namespace TopDownKit
             row.Add(Side("", out chestName, out chestGrid));
             row.Add(Side("You", out _, out bagGrid));
             root.Add(row);
-            var hint = KitUI.Label("click a slot to move it   [T] take all   [E] close", 8, KitUI.Dim);
+            var hint = KitUI.Label("click a slot to move it   [" + Controls.Describe(Controls.TakeAll) + "] take all   [" + Controls.Describe(Controls.Use) + "] close", 8, KitUI.Dim);
             hint.style.marginTop = 4;
             root.Add(hint);
             var wrap = KitUI.Group();
@@ -107,19 +105,19 @@ namespace TopDownKit
                 }
             }
             for (int i = 0; i < inv.Size; i++)
-                KitUI.SetSlot(slots[i], inv.slots[i], false, !isChest && i < inv.settings.hotbarSlots ? (i + 1).ToString() : "");
+                ItemSlots.Show(slots[i], inv.slots[i], false, !isChest && i < inv.settings.hotbarSlots ? (i + 1).ToString() : "");
             return slots;
         }
 
         void LateUpdate()
         {
             if (root == null || root.panel == null) Build();   // trap 18
-            bool show = IsOpen && who != null && who.Bag != null;
+            bool show = IsOpen && who != null && who.GetBag() != null;
             root.parent.style.display = show ? DisplayStyle.Flex : DisplayStyle.None;
             if (!show) return;
             chestName.text = chest.name;
             chestSlots = Fill(chestGrid, chestSlots, chest.Bag.Inventory, true);
-            bagSlots = Fill(bagGrid, bagSlots, who.Bag.Inventory, false);
+            bagSlots = Fill(bagGrid, bagSlots, who.GetBag().Inventory, false);
         }
 
         void OnDestroy() { if (root != null && root.parent != null) root.parent.RemoveFromHierarchy(); }

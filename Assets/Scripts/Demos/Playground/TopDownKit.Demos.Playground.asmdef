@@ -1,0 +1,24 @@
+{
+    "name": "TopDownKit.Demos.Playground",
+    "rootNamespace": "TopDownKit",
+    "references": [
+        "TopDownKit.Core",
+        "TopDownKit.Movement",
+        "TopDownKit.Facing",
+        "TopDownKit.Camera",
+        "TopDownKit.Screens",
+        "TopDownKit.Combat",
+        "TopDownKit.Interaction",
+        "TopDownKit.Inventory",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

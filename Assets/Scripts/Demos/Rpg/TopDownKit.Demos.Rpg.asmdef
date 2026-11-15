@@ -1,0 +1,20 @@
+{
+    "name": "TopDownKit.Demos.Rpg",
+    "rootNamespace": "TopDownKit",
+    "references": [
+        "TopDownKit.Core",
+        "TopDownKit.Screens",
+        "TopDownKit.Inventory",
+        "TopDownKit.Interaction",
+        "TopDownKit.Movement"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,20 @@
+{
+    "name": "TopDownKit.Feel",
+    "rootNamespace": "TopDownKit",
+    "references": [
+        "TopDownKit.Core",
+        "TopDownKit.Movement",
+        "Unity.RenderPipelines.Universal.2D.Runtime",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.RenderPipelines.Core.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

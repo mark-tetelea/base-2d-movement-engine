@@ -1,0 +1,18 @@
+{
+    "name": "TopDownKit.Facing",
+    "rootNamespace": "TopDownKit",
+    "references": [
+        "TopDownKit.Core",
+        "TopDownKit.Movement",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

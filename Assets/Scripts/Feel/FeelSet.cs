@@ -3,15 +3,7 @@ using UnityEngine;
 
 namespace TopDownKit
 {
-    // Everything that can make a sound, an effect or a hit-stop. A game that needs more
-    // adds names at the END (slots are saved by number) and calls FeelPlayer.Play itself.
-    public enum FeelEvent
-    {
-        Step, Shot, Swing, Dash,
-        Hit, MeleeHit, PlayerHurt, Death, Break,
-        Pickup, DoorOpen, DoorShut, Crumble, UiClick,
-        Buy, Sell, Save
-    }
+    // The events themselves (FeelEvent) are in Core/Cues.cs, so any system can raise one.
 
     // One event's slot: a sound, an effect and a freeze. Each part may be left empty.
     [Serializable]

@@ -5,9 +5,10 @@ using UnityEngine;
 namespace TopDownKit
 {
     // Add-on piece, one per scene: plays the sound, effect and hit-stop of each event from
-    // a FeelSet. It listens to the kit's own events (Health, Gun, Dash, Pickup, doors,
-    // crumbling ground, UI buttons), so nothing in the core knows it exists - delete this
-    // folder and the game is simply silent. A game plays its own events with Play().
+    // a FeelSet. It listens to Cues (Core): every system says what happened there (hits,
+    // shots, dashes, pickups, doors, crumbling ground, UI buttons, trades, saves), so
+    // nothing knows this folder exists - delete it and the game is simply silent. A game
+    // raises its own events with Cues.Raise (or Play here).
     //
     // Hit-stop: Time.timeScale = 0 for a few real-time milliseconds, exactly like the
     // pause. No fixed step runs during it, so the gameplay rules, their dt and their
@@ -60,34 +61,12 @@ namespace TopDownKit
         void OnEnable()
         {
             current = this;
-            Health.AnyDamaged += OnDamaged;
-            Health.AnyDied += OnDied;
-            Gun.AnyShot += OnShot;
-            Dash.AnyStarted += OnDash;
-            Pickup.AnyCollected += OnPickup;
-            RoomLock.AnyDoors += OnRoomDoors;
-            LockedDoor.AnyOpened += OnLockedDoor;
-            Lever.AnyPulled += OnLever;
-            GroundMap.TileChanged += OnTile;
-            KitUI.Clicked += OnClick;
-            Shop.AnyTrade += OnTrade;
-            SaveGame.AnySaved += OnSaved;
+            Cues.Raised += OnCue;
         }
 
         void OnDisable()
         {
-            Health.AnyDamaged -= OnDamaged;
-            Health.AnyDied -= OnDied;
-            Gun.AnyShot -= OnShot;
-            Dash.AnyStarted -= OnDash;
-            Pickup.AnyCollected -= OnPickup;
-            RoomLock.AnyDoors -= OnRoomDoors;
-            LockedDoor.AnyOpened -= OnLockedDoor;
-            Lever.AnyPulled -= OnLever;
-            GroundMap.TileChanged -= OnTile;
-            KitUI.Clicked -= OnClick;
-            Shop.AnyTrade -= OnTrade;
-            SaveGame.AnySaved -= OnSaved;
+            Cues.Raised -= OnCue;
             if (Freezing) EndFreeze();
             if (current == this) current = null;
         }
@@ -96,47 +75,17 @@ namespace TopDownKit
 
         // ---- kit events -> slots ----
 
-        static Vector2 Centre(Component c)
+        // Every system raises its moments through Cues (Core), so this folder needs none of
+        // them. Hits on the player's team use PlayerHurt; an object's FeelOverride swaps
+        // its hit and death slots; ground damage freezes only with groundHitsFreeze.
+        void OnCue(Cue c)
         {
-            Collider2D col = c.GetComponent<Collider2D>();
-            return col != null ? (Vector2)col.bounds.center : (Vector2)c.transform.position;
-        }
-
-        void OnDamaged(Health h)
-        {
-            if (h.Dead) return;   // the death plays instead
-            FeelEvent id;
-            FeelOverride o = h.GetComponent<FeelOverride>();
-            if (o != null) id = o.onHit;
-            else if (h.team == playerTeam) id = FeelEvent.PlayerHurt;
-            else id = h.LastSource == HitSource.Melee ? FeelEvent.MeleeHit : FeelEvent.Hit;
-            PlayHere(id, Centre(h), h.LastSource != HitSource.Ground || groundHitsFreeze);
-        }
-
-        void OnDied(Health h)
-        {
-            FeelOverride o = h.GetComponent<FeelOverride>();
-            PlayHere(o != null ? o.onDeath : FeelEvent.Death, Centre(h), h.LastSource != HitSource.Ground || groundHitsFreeze);
-        }
-
-        void OnShot(Gun g)
-        {
-            Weapon w = g.Current;
-            PlayHere(w != null && w.kind == WeaponKind.Melee ? FeelEvent.Swing : FeelEvent.Shot, g.transform.position);
-        }
-
-        void OnDash(Dash d) { PlayHere(FeelEvent.Dash, Centre(d)); }
-        void OnPickup(Pickup p, GameObject who) { PlayHere(FeelEvent.Pickup, p.transform.position); }
-        void OnRoomDoors(RoomLock l, bool shut) { PlayHere(shut ? FeelEvent.DoorShut : FeelEvent.DoorOpen, l.transform.position); }
-        void OnLockedDoor(LockedDoor d) { PlayHere(FeelEvent.DoorOpen, d.transform.position); }
-        void OnLever(Lever l) { PlayHere(FeelEvent.DoorOpen, l.transform.position); }
-        void OnClick() { PlayHere(FeelEvent.UiClick, Vector2.zero); }
-        void OnTrade(Shop s, bool bought) { PlayHere(bought ? FeelEvent.Buy : FeelEvent.Sell, s.transform.position); }
-        void OnSaved(SaveGame g, int slot) { PlayHere(FeelEvent.Save, Vector2.zero); }
-
-        void OnTile(GroundMap map, Vector3Int cell, GroundState state)
-        {
-            if (state == GroundState.Broken) PlayHere(FeelEvent.Crumble, map.Tilemap.GetCellCenterWorld(cell));
+            FeelEvent id = c.id;
+            bool hit = id == FeelEvent.Hit || id == FeelEvent.MeleeHit;
+            FeelOverride o = c.from != null && (hit || id == FeelEvent.Death) ? c.from.GetComponent<FeelOverride>() : null;
+            if (o != null) id = hit ? o.onHit : o.onDeath;
+            else if (hit && c.team >= 0 && c.team == playerTeam) id = FeelEvent.PlayerHurt;
+            PlayHere(id, c.at, !c.fromGround || groundHitsFreeze);
         }
 
         // ---- playing a slot ----
@@ -224,7 +173,7 @@ namespace TopDownKit
 
         public void Freeze(float seconds)
         {
-            if (seconds <= 0f || PauseMenu.IsPaused) return;
+            if (seconds <= 0f || GamePause.IsPaused) return;
             if (!Freezing)
             {
                 if (Time.timeScale <= 0f) return;   // stopped by something else
@@ -238,7 +187,7 @@ namespace TopDownKit
         {
             freezeLeft = 0f;
             // Never ends a pause, and leaves alone a scale someone else set meanwhile.
-            if (Time.timeScale == 0f && !PauseMenu.IsPaused) Time.timeScale = scaleBefore;
+            if (Time.timeScale == 0f && !GamePause.IsPaused) Time.timeScale = scaleBefore;
         }
 
         void Update()

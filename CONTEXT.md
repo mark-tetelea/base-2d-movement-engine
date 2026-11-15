@@ -1,12 +1,13 @@
 # Where the kit is now
 
-> Rewritten, never appended. True as of **2026-11-15**, end of phase 13b (item pickup pass).
+> Rewritten, never appended. True as of **2026-11-15**, end of phase 14 (make everything swappable).
 
 ## How it starts
 
 Press Play on `Assets/Scenes/StartMenu.unity` (first in the build list): a title and four
 buttons - **Playground**, **Arena shooter**, **Little RPG room**, **Dungeon**. In every demo **Esc**
-pauses (the game stops; Resume, Restart, Save, Load, Main menu). Save and Load open a list of
+pauses (the game stops; Resume, Restart, Save, Load, Controls, Main menu). **Controls** lists every key
+(two per action); click one and press a new key or mouse button - the HUD's help line follows. Save and Load open a list of
 3 slots (scene and time, or empty); loading a slot from any demo goes to the demo it was saved in.
 
 ## The Playground
@@ -115,6 +116,17 @@ Playground's map is off (settings rows "Map (M)", "Map reveal").
 Playground's "Touch" row forces them on, to try with the mouse): a move stick bottom left, an aim
 stick bottom right (pushing it fires), Fire, Dash, Use, Gun (next weapon) and a pause button.
 
+## Swapping and removing (phase 14)
+
+Every key is a setting (`Assets/Resources/KitControls`) and the player can change them in the pause menu;
+the change is kept with the other settings. The look of every screen comes from one theme asset
+(`Assets/Resources/KitTheme`: colours, font, box / button / slot / bar art, where each HUD part sits); a
+pixel font drawn for the kit is ready in `Assets/UI/KitThemePixel` (not switched on). A character's art is
+one animations asset (the player: `Assets/Data/Art/PlayerAnims`, idle and a 4-frame walk; any action, any
+number of frames, any speed). Dropped items can have their own floor prefab. Each system is its own folder
+that can be deleted (the README's table says what goes with what); the menu **TopDownKit > Check removable
+systems** proves the rest still compiles. Nothing looks or plays differently from phase 13b in the demos.
+
 ## Screens
 
 One set, used by all four: a HUD (health bar, weapon + ammo, hotbar, a status line, a centre
@@ -163,12 +175,14 @@ last good save.
    sounds and volumes, day/night tint: **built** (phase 12). All scenes.
 12. Systems - save and load (opt-in per system, slots, backups), a coin shop, a minimap, touch
    controls: **built** (phase 13). Save, map and touch in all four demos; the shop only in the RPG room.
+13. Swappable everything - keys (with a rebind screen), UI theme and a pixel font, animations per action,
+   item floor art, sounds only through slots; every optional system deletable, checked: **built** (phase 14).
 
 ## What is not done
 
 - Every playtest: movement feel (Instant vs Glide, wall slide), facing (8 directions, walk
   speed), combat numbers, the RPG room (reach, facing vs closest, magnet), and now the screens
   (sizes, readability, the settings panel), and now grid step (pace, slide time) and the
-  tiles (crumble timing, how forgiving red is), and the phase 9 weapons (swing, charge, bounce, assist), and the phase 10 enemies (boss difficulty, group spacing, trail damage), and the Dungeon (room sizes, wave difficulty, how often crates drop), and the sounds, bits, hit-stop lengths and tint colours, and now the shop prices, the map and the touch controls (never touched with a finger), and the pickup modes (gem reach, how far away "walk away first" is, the bag screen's look). Nobody has played or heard any of it yet.
+  tiles (crumble timing, how forgiving red is), and the phase 9 weapons (swing, charge, bounce, assist), and the phase 10 enemies (boss difficulty, group spacing, trail damage), and the Dungeon (room sizes, wave difficulty, how often crates drop), and the sounds, bits, hit-stop lengths and tint colours, and now the shop prices, the map and the touch controls (never touched with a finger), and the pickup modes (gem reach, how far away "walk away first" is, the bag screen's look), and the rebind screen and the pixel font. Nobody has played or heard any of it yet.
 - Real art for everything in `TO-DRAW.md` except the floor, wall, player and aim marker.
 - WebGL build (module not installed), GIFs (only PNG screenshots in `Media/`), GitHub repo and push (the user's call).

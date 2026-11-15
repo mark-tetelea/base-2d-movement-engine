@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace TopDownKit
 {
@@ -15,10 +14,10 @@ namespace TopDownKit
     // The player's interact key. On the fixed step it picks the best target in reach with
     // the one rule (Interaction.Pick) and uses it on a press, or after a hold. Input
     // arrives as data: SetUseHeld (the E key when readKeyboard is on; a touch button later).
-    public class Interactor : MonoBehaviour
+    public class Interactor : MonoBehaviour, IHudPanel
     {
         public InteractSettings settings = new InteractSettings(1.5f, BestTarget.Facing, UseMode.Press, 0.5f);
-        [Tooltip("On: the E key drives it. Off: something else calls SetUseHeld.")]
+        [Tooltip("On: the Use control (E unless rebound) drives it. Off: something else calls SetUseHeld.")]
         public bool readKeyboard = true;
         [Tooltip("Where reach and facing are measured from, from this object's pivot (tiles).")]
         public Vector2 centre = Vector2.zero;
@@ -27,7 +26,6 @@ namespace TopDownKit
         float holdFor;
         PlayerMover mover;
         PlayerFacing facing;
-        Bag bag;
         readonly List<Vector2> points = new List<Vector2>();
         readonly List<Interactable> candidates = new List<Interactable>();
 
@@ -37,7 +35,6 @@ namespace TopDownKit
         // 0-1 while holding towards a use (Hold mode); 0 otherwise.
         public float HoldProgress => settings.use == UseMode.Hold && Target != null && !usedThisHold
             ? Mathf.Clamp01(holdFor / Mathf.Max(settings.holdTime, 1e-4f)) : 0f;
-        public Bag Bag { get { if (bag == null) bag = GetComponent<Bag>(); return bag; } }
         public Vector2 FacingDirection
         {
             get
@@ -77,9 +74,8 @@ namespace TopDownKit
 
         void Update()
         {
-            if (!readKeyboard || PauseMenu.IsPaused) return;
-            Keyboard k = Keyboard.current;
-            SetUseHeld((k != null && k.eKey.isPressed) || otherHeld);
+            if (!readKeyboard || GamePause.IsPaused) return;
+            SetUseHeld(Controls.Held(Controls.Use) || otherHeld);
         }
 
         void FixedUpdate()

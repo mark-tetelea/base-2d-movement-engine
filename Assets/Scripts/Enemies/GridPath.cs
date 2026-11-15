@@ -50,15 +50,9 @@ namespace TopDownKit
             return false;
         }
 
-        // Ground on this tile hurts or kills (any running GroundMap).
-        public static bool Hurts(Vector2Int cell)
-        {
-            IReadOnlyList<GroundMap> maps = GroundMap.All;
-            Vector2 c = Centre(cell);
-            for (int i = 0; i < maps.Count; i++)
-                if (maps[i] != null && Ground.Hurts(maps[i].RulesAt(maps[i].CellAt(c)))) return true;
-            return false;
-        }
+        // Ground on this tile hurts or kills (asked through GroundCheck, which the Tiles
+        // folder's GroundMap answers - so paths need no Tiles folder).
+        public static bool Hurts(Vector2Int cell) => GroundCheck.HurtsAt(Centre(cell));
 
         // ---- The search -----------------------------------------------------------------
 

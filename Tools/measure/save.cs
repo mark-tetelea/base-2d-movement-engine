@@ -283,6 +283,8 @@ Do("change settings", () =>
 {
     UnityEngine.Object.FindFirstObjectByType<TopDownKit.FeelPlayer>().master = 0.25f;
     UnityEngine.Object.FindFirstObjectByType<TopDownKit.Minimap>().mode = TopDownKit.MapMode.FullOnKey;
+    // Phase 14: the player's key changes are kept in the same file.
+    TopDownKit.Controls.Rebind("Dash", new TopDownKit.KeyBinding(UnityEngine.InputSystem.Key.LeftShift));
 });
 Wait(0.7f);
 Do("scene change", () => UnityEngine.SceneManagement.SceneManager.LoadScene("Dungeon"));
@@ -295,8 +297,10 @@ Do("settings kept", () =>
     Check("settings survive a scene change", Mathf.Approximately(fp.master, 0.25f) && mm.mode == TopDownKit.MapMode.FullOnKey && tc.mode == TopDownKit.TouchMode.Auto,
         "master " + fp.master + ", map " + mm.mode + ", touch " + tc.mode);
     string txt = System.IO.File.ReadAllText(System.IO.Path.Combine(dir, "settings.json"));
-    Check("  the file holds all eight", System.Text.RegularExpressions.Regex.Matches(txt, "\"key\"").Count == 8, txt.Replace(System.Environment.NewLine, " "));
+    Check("  the file holds all eight and the keys", System.Text.RegularExpressions.Regex.Matches(txt, "\"key\"").Count == 9, txt.Replace(System.Environment.NewLine, " "));
+    Check("  a rebound key is in the file", txt.Contains("Dash=LeftShift,None,None"), "");
     fp.master = 1f; mm.mode = TopDownKit.MapMode.Corner;
+    TopDownKit.Controls.ResetAll();
 });
 Wait(0.7f);
 

@@ -703,3 +703,51 @@ Brief: `Docs/prompt-phase13b-pickups.md`. Extends phase 5's pickups (no second p
 - Dungeon, one run: 33 of 34 enemies carry Drops with generator seeds; 16 killed -> 7 coins and 3 hearts on the floor.
 - `save.cs`: run 1 found the upgraded file still said version 1 (fixed in `SaveFiles`); run 2: 1 fail - "Dungeon round trip is exact (player moved 0.26 tiles)" on layout seed 1931867546, everything else passed incl. the upgrade; run 3 (another layout): **ALL PASS, 46 checks**. The run-2 fail looks like the known phase 11 spawn overlap (the player pushed after loading on some layouts) - unverified, not re-run on that seed.
 - Not verified: anything by real keys or mouse clicks (bag screen clicks, Q, I - trap 39); the bag screen's look (no panel capture, trap 81); feel of the gem reach and of "walk away first".
+
+## 2026-11-15 - Phase 14: everything swappable, every optional system removable
+
+Brief: `Docs/prompt-phase14-swappable.md`. The last building pass before the phase 15 test pass.
+
+**Decided:**
+- **One assembly definition per system folder (20).** Core, never removed: `Core` (new), `Movement`, `Facing`, `Camera`, `Screens`. Every other folder can be deleted; some take their users with them (the removal check prints the list): Combat -> Enemies, Tiles, World + Arena/Dungeon/Playground demos; Interaction -> Inventory, Save, Shop, World + 3 demos; Inventory -> Save, Shop, World + 3 demos; Tiles -> World + Dungeon demo; World -> Dungeon demo. Enemies, Feel, Save, Shop, Map, Touch and each demo go alone. **Why:** the user wants "easy to get rid of useless stuff"; an asmdef makes a folder's needs explicit and enforced, so a new cross-dependency fails to compile at once. **Not done:** Save without Inventory/Interaction, Tiles without Combat (ground hurts health) - judged natural, not worth more promises.
+- **Shared promises live in `Assets/Scripts/Core` (three-caller rule met):** `Controls` + `ControlSet` (every key; callers: all four demos), `GamePause`, `Cues` + `FeelEvent` (moved from Feel; raised by Health, Gun, Dash, Pickup, Lever, LockedDoor, RoomLock, GroundMap, Shop, SaveGame, KitUI; Feel listens), `Contracts.cs`: `IHealth` (Health; read by pickups, Save, HUD), `IRefill` (Gun; pickups), `IMapDot` + `MapDots` (Health, Pickup; the map), `ILevelPart` (EnemyBrain, Gun, Drops; RoomGenerator), `LevelSeed` (RoomGenerator; Save), `GroundCheck` (GroundMap; GridPath). HUD promises in `Hud.cs`: `IHudMeter`, `IHudText`, `IHudSlots`, `IHudPanel`. Inventory's own: `IItemStock` (Shop; Save), `BagLookup.GetBag(Interactor)` (Interactor no longer knows bags).
+- **Every key is a setting: `Resources/KitControls` (ControlSet asset) + the player's rebinds on top (`Controls.Rebind`), kept by Save's settings file under the key "Controls".** Code reads controls by name (`Controls.Pressed(Controls.Dash)`); a missing row warns once and has no keys. Rebind screen = `ControlsScreen` behind a "Controls" button the PauseMenu adds itself (`controlsButton`). Touch buttons press the same controls (`Controls.SetHeld/Tap`), so Touch needs no Combat/Interaction/Movement add-ons. A press that starts on a screen still never shoots (`KeysPressed`/`KeysHeld` ignore touch). HUD help lines name controls (`{Use}`, `{Move}`) and follow rebinds.
+- **Art and animation: a `SpriteAnimSet` asset per character** (any action by name, any frame count and rate, loop or once, one entry for all facings or one per facing, empty facings borrow the nearest, `mirrorLeft` moved onto the asset). `DirectionalSprites` keeps its name and plays it: Hold (Death) > Play (Attack, Hurt) > Dash > Walk > Idle; without `PlayerFacing` it faces the way it moves (enemies). Combat calls Play/Hold. Player art migrated to `Assets/Data/Art/PlayerAnims` (Idle = frame 0, Walk = step, idle, step, idle at 8 fps - the old look). The locked decision "5 drawings + mirroring" stands; only where the switch lives changed.
+- **UI look = one `UITheme` asset (`Resources/KitTheme`):** colours (incl. map and touch), font asset or font, `pixelFontSize` (sizes round to its multiples), text scale, shadow, box/button/slot/bar sprites (empty = flat box), sizes, and where each HUD part sits (`UIPlace`: anchor + offset). Elements carry USS classes for `KitTheme.tss`. Inline styles still win over USS - said in the README.
+- **A pixel font drawn in code:** `Tools/font/make-pixel-font.py` writes `Assets/UI/Fonts/KitPixel.ttf` (5x7, lowercase with descenders, proportional, no libraries); `Tools/measure/setup-pixel-font.cs` makes a static RASTER_HINTED 8 px font asset with a point-filtered atlas and `Assets/UI/KitThemePixel.asset`. Default theme keeps the default font (the user has not picked).
+- **Art swaps found in code and moved to fields:** `Item.floorPrefab` (dropped/spilled items' look; empty = icon), `Burst.bit` sprite, minimap/touch/pause-overlay colours -> theme. Bullet/blade art was already on `Weapon`.
+- **Sounds:** every event now reaches Feel through `Cues`; the only clips are in `FeelSet` slots (audited: no AudioClip outside Feel).
+- **Demo glue moved to `Assets/Scripts/Demos/{Arena,Rpg,Dungeon,Playground}`** (ArenaGoal, RpgGoal, DungeonGoal, Picker, KnockKey), one asmdef each. The Picker reaches Feel/Map/Touch by field name (reflection), so deleting those add-ons only hides rows. Moved for dependencies: `LockedDoor` Interaction -> Inventory, `TrailMaker` Enemies -> Tiles.
+- **The removable-systems check (vital, keep): `Assets/Editor/RemovalCheck.cs`** (menu TopDownKit > Check removable systems; `sh Tools/measure/removal-check.sh`). For each optional system it compiles all kit sources minus that folder and its users as one scratch assembly with `AssemblyBuilder` (Temp/RemovalCheck; Assets untouched), referencing Unity and packages but never the kit's own compiled dlls. Self-test: Combat removed with its users kept must FAIL.
+
+**Built:** `Core/Controls.cs`, `Core/ControlSet.cs`, `Core/Cues.cs`, `Core/Contracts.cs`, `Facing/SpriteAnimSet.cs`, `Screens/UITheme.cs`, `Screens/ControlsScreen.cs`, `Inventory/ItemStock.cs`, `Inventory/ItemSlots.cs`, 20 asmdefs + `Assets/Editor/TopDownKit.Editor.asmdef`, `Assets/Editor/RemovalCheck.cs`; rewrites of `Hud.cs`, `KitUI.cs` (theme), `DirectionalSprites.cs`, `FeelPlayer.cs` (listens to Cues only), `TouchControls.cs`, `PauseMenu.cs`; every key reader switched to Controls. Assets `Resources/KitControls`, `Resources/KitTheme`, `Data/Art/PlayerAnims`, `UI/Fonts/KitPixel.*`, `UI/KitThemePixel`. Tools: `Tools/measure/compile.sh` (recompile + errors), `removal-check.sh`, `missing-scripts.cs`, `setup-phase14.cs` (ran once; its player part no longer compiles - the old fields are gone), `setup-pixel-font.cs`, `Tools/font/make-pixel-font.py`. README: controls, "Replace or remove a system" table, folders.
+
+**Measured / verified:**
+- Compiles, 0 errors, 0 warnings. All five build scenes open and 25 prefabs load with 0 missing scripts (`missing-scripts.cs`, one run).
+- Removal check **ALL PASS, 17 checks**, run 3 times (self-test fails with 18 errors as it must).
+- `save.cs` **ALL PASS, 47 checks** (one run after the change; the run before failed only "the file holds all eight" because the settings file now has a 9th key "Controls" - the check now expects 9 and that a rebound key is in the file).
+- Play smoke (one run each, entry points not keys): Playground - 26 control rows, pause + Controls screen open, rebind Dash -> LeftShift shows in the screen and in the HUD help, Export/Import round-trips, Reset all; 0 console errors or warnings. Panel rendered to a RenderTexture and looked at: the rebind screen in the default font and in the pixel theme (LittleRpg) - pixel font crisp at x3.
+- Not verified: rebinding by real key presses and mouse clicks (trap 39); movement/combat checks with input now through Controls (logic is the same reads, not re-run); touch with a finger; a game with a folder actually deleted in the editor (the check compiles without it; scenes would show Missing script).
+
+**Moved from CLAUDE.md (size, 2026-11-15)** - kept here word for word:
+
+- `Assets/Scenes/Playground.unity` (was TestArena) - Pixel Perfect Camera 640x360 / 16 PPU,
+  Pixel Snapping, Windowbox; floor and wall tilemaps (walls: one merged collider, trap 74);
+  the player with every system. `Assets/Scripts/Playground/Picker.cs` (Tab) switches every
+  setting live and places the aim marker; K knocks the player from the mouse (`KnockKey.cs`);
+  speed pad, mud and ice patch under `Zones`; a chest, the Guide, coins in A; wanderers and a
+  grid-step chaser (Stepper) in D; a group (Leader + 3 Chasers) and a trail enemy in upper C;
+  the tile garden (every ground tile, a lever door, a key door) in the lower left of C; B's
+  north door is door ground.
+- `Tools/measure/` - measuring harness (`compile.sh` recompiles and prints errors; `removal-check.sh` = the
+  vital removable-systems check; `missing-scripts.cs`): `movement.cs` (run with `eval_file` in play mode;
+  drives the real key path through a virtual keyboard, logs every fixed step) and
+  `analyse-movement.js`; it also checks dash distance and knockback decay at 30 vs 144 fps. Re-run it after any change to movement. `combat.cs` (30 vs 144 fps), `bullet-alloc.cs`, `playthrough.cs` on ArenaShooter (rooms B, C, D, boss room E; its bot paths round walls); `inventory.cs` (edit mode), `rpg-playthrough.cs` on LittleRpg; `screens.cs` on Playground (UI scale, click guard, picker, pause; run at 1920x1080 and WXGA); `tiles.cs` on Playground (every tile rule, grid step at 30 vs 144 fps); `dungeon-layouts.cs` (edit mode: 200 seeds finishable, pieces' doors connect) and `dungeon-play.cs` (play mode on Dungeon: flood over real colliders reaches every room). The movement/facing/camera checks run on Playground.
+
+- `set_player_settings` silently ignores fields it does not know - check `applied` in its
+  result, not `success`. Ask `BuildPipeline.IsBuildTargetSupported` about modules; the
+  `install-modules --list` status is misleading. (Both from Jewelery Shop.)
+- `D:\package.json` is broken JSON: any Node tool under `D:\` needs its own `package.json`
+  (trap 55).
+- `Assets/Art/PixelSprite16.preset` - import default for PNGs under `Assets/Art/**`.
+  Not a place for per-sprite settings (pivots are set per file).

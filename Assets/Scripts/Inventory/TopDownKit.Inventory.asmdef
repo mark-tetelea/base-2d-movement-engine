@@ -1,0 +1,20 @@
+{
+    "name": "TopDownKit.Inventory",
+    "rootNamespace": "TopDownKit",
+    "references": [
+        "TopDownKit.Core",
+        "TopDownKit.Movement",
+        "TopDownKit.Facing",
+        "TopDownKit.Screens",
+        "TopDownKit.Interaction"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

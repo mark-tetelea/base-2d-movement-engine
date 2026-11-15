@@ -63,13 +63,26 @@ What the player meets, in order:
   choice: play-mode tuning is kept and movers share feels. An exception for movement
   feel, not a config system. (LOG, 2026-10-18)
 - **Directional art is 5 drawings + mirroring** (right, up-right, up, down-right, down;
-  left = right flipped). `DirectionalSprites.mirrorLeft` off lets a game supply true 8.
-  The user's choice. (LOG, 2026-11-14)
+  left = right flipped). `SpriteAnimSet.mirrorLeft` off lets a game supply true 8.
+  The user's choice. (LOG, 2026-11-14; moved onto the asset 2026-11-15)
+- **One assembly definition per system folder. Core (`Core`, `Movement`, `Facing`, `Camera`,
+  `Screens`) needs nothing else; a system reaches another only through its asmdef references
+  or a promise in `Core`.** `Assets/Editor/RemovalCheck.cs` must stay ALL PASS. Why: any
+  optional folder can be deleted (the user). (LOG, 2026-11-15)
+- **Keys are read only through `Controls` (by name, `Resources/KitControls`); sounds only
+  through `Cues`; UI looks only through the `UITheme`.** (LOG, 2026-11-15)
 
 ## What exists
 
 Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
-`SampleScene.unity` is the template's empty scene). Kit code is in namespace `TopDownKit`.
+`SampleScene.unity` is the template's empty scene). Kit code is in namespace `TopDownKit`,
+one asmdef per folder (`TopDownKit.<Folder>`); the README's "Replace or remove a system" table
+says what each folder needs and what goes with it.
+
+- `Assets/Scripts/Core/` (phase 14) - `Controls` (every key by name; `Pressed/Held/Move`, touch
+  `SetHeld/Tap`, `Rebind`, `Export/Import`), `ControlSet` (asset `Resources/KitControls`),
+  `GamePause.IsPaused`, `Cues` (+ `FeelEvent`: systems say what happened, Feel plays it),
+  `Contracts.cs` (`IHealth`, `IRefill`, `IMapDot`/`MapDots`, `ILevelPart`, `LevelSeed`, `GroundCheck`).
 
 - `Assets/Scripts/Movement/` - `Movement.Step(velocity, moveDirection, settings, dt)` is the
   one movement rule; `MoveSettings` (speed in tiles/s, time to full speed, time to stop;
@@ -93,19 +106,13 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
   Temporary ground: `GroundMap.PaintFor(cell, tile, seconds, owner)` lays a tile over plain ground
   (rules in force, art on a runtime overlay, fading; the owner is never hurt by it).
   Tiles in `Assets/Data/Tiles/`: Normal, Red, Blue, Crumbling, Door, Trail. A new kind = a new asset.
-- `Assets/Scenes/Playground.unity` (was TestArena) - Pixel Perfect Camera 640x360 / 16 PPU,
-  Pixel Snapping, Windowbox; floor and wall tilemaps (walls: one merged collider, trap 74);
-  the player with every system. `Assets/Scripts/Playground/Picker.cs` (Tab) switches every
-  setting live and places the aim marker; K knocks the player from the mouse (`KnockKey.cs`);
-  speed pad, mud and ice patch under `Zones`; a chest, the Guide, coins in A; wanderers and a
-  grid-step chaser (Stepper) in D; a group (Leader + 3 Chasers) and a trail enemy in upper C;
-  the tile garden (every ground tile, a lever door, a key door) in the lower left of C; B's
-  north door is door ground.
+- `Assets/Scenes/Playground.unity` - every system at once; what is where: `CONTEXT.md` (LOG 2026-11-15 has the old list).
 - `Assets/Scripts/Facing/` - `Facing` (the one facing rule: index 0-7 counter-clockwise
   from right, `Step`/`Snap`, zero direction keeps the facing; `FacingSettings`: 4 or 8,
   face walk or aim), `PlayerAim` (mouse or walk -> `Direction`, data), `PlayerFacing`
-  (rule on the fixed step), `DirectionalSprites` (sprite swap idle / 2-step walk, flips the
-  left side; no Animator). Player sprites are 48x24 sheets of 3 frames sliced by `Tools/pxkit/slice-sheet.cs`.
+  (rule on the fixed step), `DirectionalSprites` (plays a `SpriteAnimSet` asset: any action by name,
+  any frames and fps, per facing; Hold Death > Play Attack/Hurt > Dash > Walk > Idle; no Animator).
+  Player: `Assets/Data/Art/PlayerAnims`, from 48x24 sheets sliced by `Tools/pxkit/slice-sheet.cs`.
 - `Assets/Scripts/Camera/` - `CameraFollow` (the one camera rule), `CameraRig` (on the camera;
   layout Open / RoomsSlide / RoomsFade is a setting; whole pixels; slide, fade, `Shake`),
   `Room` (marked rectangle), add-ons `RoomLock` (doors until `Clear()`) and `Warp`. Arena:
@@ -116,8 +123,8 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
   `Gun` (input as data: aim, trigger, reload, select; charge = hold/release; aim assist
   `AimAssist.Nudge`, strength 0 = off), `Bullet` (fixed step, circle sweep, `ObjectPool`;
   flies over `ShootOver` colliders; `Weapon.bounces` reflects off walls), melee = `Weapon.kind`
-  Melee: `Melee` (the one swing rule) + add-on `MeleeSwing` (Gun adds it), `PlayerShooter` (mouse/keys -> Gun), add-ons `RoomWaves` (clears a
-  `RoomLock`), `RestartOnDeath`; `ArenaGoal` (the demo's win/wave text into the `Hud`). Weapons in `Assets/Data/Weapons/`,
+  Melee: `Melee` (the one swing rule) + add-on `MeleeSwing` (Gun adds it), `PlayerShooter` (controls -> Gun), add-ons `RoomWaves` (clears a
+  `RoomLock`), `RestartOnDeath`. Demo rules (`ArenaGoal`, `RpgGoal`, `DungeonGoal`, `Picker`, `KnockKey`) are in `Assets/Scripts/Demos/`. Weapons in `Assets/Data/Weapons/`,
   enemies in `Assets/Prefabs/Enemies/` (Chaser, Shooter, Wanderer, Boss, Leader, Trailer, Stepper).
 - `Assets/Scripts/Enemies/` (phase 10) - `EnemyBrain` (Chase / KeepDistanceAndShoot / Wander on a
   `PlayerMover` with `readKeyboard` off; runs before the mover; swings melee in reach, holds a charge
@@ -126,7 +133,7 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
   (`Steer(goal)`: straight when clear, else a path re-planned on a timer; works for grid-step walkers;
   `ShotClear` - shooters go round walls), `EnemyGroup` (on a leader: followers hold a shape, break off
   near the target), `BossPhases` (phases at health levels swap behaviour, weapon, feel; boss bar
-  `Hud.Boss`), `TrailMaker` (leaves temporary ground behind it).
+  `Hud.Boss`, else `Hud.Current`). `TrailMaker` (leaves temporary ground) lives in `Tiles/`.
 - `Assets/Scripts/World/` (phase 11) - `Layout` (the one layout rule: plain data, a tree of pieces on a
   grid of 40x22-tile cells, end piece last on the deepest room; `Reachable`/`Problems` checks), `RoomPiece`
   (prefab: `Room` + own Floor/Walls tilemaps painted closed + door spots side/cell), `RoomGenerator`
@@ -136,9 +143,8 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
   Crate = prefab (sprite, static collider, `Health` team 2, `Drops`). Pieces in `Assets/Prefabs/Rooms/`,
   `Crate` in `Prefabs/World/`, `Coin`/`Heart` in `Prefabs/Pickups/`. A new piece = a new prefab, no code.
 - `Assets/Scripts/Feel/` (phase 12, add-on: delete it and the game is silent, nothing breaks) -
-  `FeelPlayer` (one per scene, on "Feel") listens to the core's static events (`Health.AnyDamaged/AnyDied`
-  + `LastSource`, `Gun.AnyShot`, `Dash.AnyStarted`, `Pickup.AnyCollected`, `RoomLock.AnyDoors`,
-  `LockedDoor.AnyOpened`, `Lever.AnyPulled`, `GroundMap.TileChanged`, `KitUI.Clicked`) and plays the
+  `FeelPlayer` (one per scene, on "Feel") listens only to `Cues.Raised` (raised by Health, Gun, Dash, Pickup,
+  Lever, LockedDoor, RoomLock, GroundMap, KitUI, Shop, SaveGame; hits carry team + ground) and plays the
   `FeelSet` asset's slot per `FeelEvent` (clips, volume, effect prefab, hit-stop seconds; 0/empty = off);
   `Play(id, pos)` for a game's own events. Hit-stop = timeScale 0 for real seconds, never ends a pause.
   `FeelOverride` (other slots for one object; Crate breaks), `Footsteps`, `Burst` (placeholder effect),
@@ -155,34 +161,33 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
 - `Assets/Scripts/Shop/` (phase 13, add-on) - `Shop` (an `Interactable`; the trade rule `Buy`/`Sell` tries
   the whole trade on a copy of the bag; sell price = stock price x `sellRate`), `ShopStock` (asset: item,
   price, amount, -1 endless; in `Assets/Data/Shops/`), `ShopScreen` (buy/sell on the shared panel); `delivery` IntoBag / OnFloor.
-- `Assets/Scripts/Map/` (phase 13, add-on) - `Minimap` (Off / Corner / FullOnKey, M or a click opens the full
-  map; rooms appear when visited = `Room.Visited`; enemies and items optional). Looks only.
+- `Assets/Scripts/Map/` (add-on) - `Minimap` (Off / Corner / FullOnKey; rooms by `Room.Visited`; dots from `MapDots`).
 - `Assets/Scripts/Touch/` (phase 13, add-on) - `TouchControls` (Auto / On / Off; move stick, aim stick that
   fires, Fire, Dash, Use, Gun, pause; feeds `PlayerMover.SetMoveDirection`, `PlayerAim.Hold`,
-  `PlayerShooter.SetOtherTrigger`, `Dash.Request`, `Interactor.SetOtherHeld`; one pointer id per finger).
+  and the Fire/Dash/Use/NextWeapon/Pause controls via `Controls.SetHeld/Tap`; one pointer id per finger).
 - `Assets/Scripts/Interaction/` - `Interaction.Pick` (the one best-target rule, plain points),
-  `Interactable` base + targets `Talker`, `LockedDoor`, `Lever` (and `Chest`, `Pickup`),
-  `Interactor` (E as data; open panels pause walking), `InteractPrompt`, `TextBox` +
+  `Interactable` base + targets `Talker`, `Lever` (and Inventory's `Chest`, `Pickup`, `LockedDoor`),
+  `Interactor` (Use control as data; open panels pause walking; bags via Inventory's `GetBag()`), `InteractPrompt`, `TextBox` +
   `DialogueLines`. `Assets/Scripts/Inventory/` - `Inventory` (the one rule, plain C#, used by
   bag and chests), `Bag`, `Item` (pickup mode Walk/Interact/Magnet, magnet reach/speed, droppable), `Pickup` (mode
   from item or override, heal, ammo; `Spawn` = the one way items reach the floor), `Collector` (walk + magnet),
-  `Hotbar` (`DropSlot`), `BagScreen` (I; click drops), `ChestScreen`, `Chest` (`spillOnOpen`), `RpgGoal`.
+  `Hotbar` (`DropSlot`), `BagScreen` (I; click drops), `ChestScreen`, `Chest` (`spillOnOpen`), `LockedDoor`, `IItemStock`; `Item.floorPrefab`.
 - `Assets/Scripts/Screens/` - UI Toolkit built in code: `KitUI` (the one panel, 640x360 scaled
-  by the camera's `pixelRatio`; EventSystem; `PointerOverUI`; shared box/button/slot looks),
-  `Hud` (health, ammo, hotbar, status, banner, boss bar, help - all optional), `PauseMenu` (Esc,
-  `IsPaused`; Resume / Restart / add-on buttons via `AddButton` / Main menu), `StartMenu`. `TextBox` and `ChestScreen` draw on
+  by the camera's `pixelRatio`; EventSystem; `PointerOverUI`; box/button/slot/bar looks from the
+  `UITheme` asset `Resources/KitTheme`; pixel font `Assets/UI/Fonts/KitPixel` + `Assets/UI/KitThemePixel`),
+  `Hud` (fields take any `IHudMeter`/`IHudText`/`IHudSlots`/`IHudPanel`; parts placed by the theme; help
+  `{Control}` names), `PauseMenu` (Pause control; Resume / Restart / `AddButton` buttons / Controls / Main menu),
+  `ControlsScreen` (rebind), `StartMenu`. `TextBox` and `ChestScreen` draw on
   the same panel. Panel asset: `Assets/Resources/KitPanel.asset` + `Assets/UI/KitTheme.tss`.
   Keyboard readers ignore keys while paused; a press that starts on a screen never shoots.
 - Build list: `StartMenu` (0, buttons to the demos), `ArenaShooter` (1), `LittleRpg` (2,
   the Little RPG room demo), `Playground` (3), `Dungeon` (4, generated rooms). Pause -> Main menu loads index 0.
 - `Assets/Scenes/ArenaShooter.unity` - the Arena shooter demo (death reloads by build index). `Warp` moves only the camera's target.
-- `Tools/measure/` - measuring harness: `movement.cs` (run with `eval_file` in play mode;
-  drives the real key path through a virtual keyboard, logs every fixed step) and
-  `analyse-movement.js`; it also checks dash distance and knockback decay at 30 vs 144 fps. Re-run it after any change to movement. `combat.cs` (30 vs 144 fps), `bullet-alloc.cs`, `playthrough.cs` on ArenaShooter (rooms B, C, D, boss room E; its bot paths round walls); `inventory.cs` (edit mode), `rpg-playthrough.cs` on LittleRpg; `screens.cs` on Playground (UI scale, click guard, picker, pause; run at 1920x1080 and WXGA); `tiles.cs` on Playground (every tile rule, grid step at 30 vs 144 fps); `dungeon-layouts.cs` (edit mode: 200 seeds finishable, pieces' doors connect) and `dungeon-play.cs` (play mode on Dungeon: flood over real colliders reaches every room). The movement/facing/camera checks run on Playground.
+- `Tools/measure/` - measuring harness: `compile.sh` (recompile, print errors), `removal-check.sh` (vital),
+  `save.cs` (vital), `missing-scripts.cs`, and per-system checks (`movement.cs` - re-run after any movement
+  change - `combat.cs`, `tiles.cs`, `screens.cs`, bots...). What each checks: LOG 2026-11-15 "moved from CLAUDE.md".
 - `Assets/Art/Palette/endesga-32.gpl` - the one palette; pxkit and Aseprite both load it.
   Never written by a script that also reads it (trap 70).
-- `Assets/Art/PixelSprite16.preset` - import default for PNGs under `Assets/Art/**`.
-  Not a place for per-sprite settings (pivots are set per file).
 - `Tools/pxkit/` - code-drawn sprites (`README.md` there). Must not grow game-specific
   helpers: a drawing used once belongs in its sprite file.
 
@@ -198,7 +203,7 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
 ## Traps
 
 > One line each: symptom -> rule. The full story is in `Docs/TRAPS.md` under the same
-> number. Add the day a trap is found; next free number is **87**.
+> number. Add the day a trap is found; next free number is **90**.
 
 **The editor lies about your own edits**
 1. Code right, game wrong -> a changed `[SerializeField]` default does not change a scene that already saved it; edit the scene in edit mode and save.
@@ -309,6 +314,9 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
 83. Burst of exceptions after a recompile -> play mode was still stopping; wait for `isPlaying` false before `recompile`.
 84. Scripted mouse press never lands -> the real mouse's events overwrite it; `AddDevice<Mouse>`, `MakeCurrent`, queue on that, remove after.
 85. Long `eval_file` "Main thread operation timed out after 5000ms" -> the script still ran to the end; check its results (`git status`, an `eval`) before re-running it.
+87. Poll loop on `eval` never ends -> the reply echoes your code; match on `"result":"<marker>`, not a word in the code.
+88. Statics keep last Play's values -> domain reload is off on entering play mode; reset new statics in `SubsystemRegistration` or `OnDisable`.
+89. "Compile without X" passes anyway -> exclude the kit's own compiled dlls; keep a self-test that must fail.
 
 ## Environment
 
@@ -338,14 +346,9 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
   on a file's FIRST import; files already in `Assets/Art` are not changed by it.
 - **A C# compile error boots Unity into Safe Mode and the command line cannot connect at
   all.** Fix the compile error; never hand-edit scene files instead.
-- `set_player_settings` silently ignores fields it does not know - check `applied` in its
-  result, not `success`. Ask `BuildPipeline.IsBuildTargetSupported` about modules; the
-  `install-modules --list` status is misleading. (Both from Jewelery Shop.)
 - **Aseprite** 1.3.7 at `D:\Aseprite.v1.3.7\Aseprite.exe` (or `aseprite` from bash). Run it
   from bash, headless with `-b --script x.lua`; `print()` never reaches the shell, write
   results to a file. Never script an edit to a file open in Aseprite.
-- `D:\package.json` is broken JSON: any Node tool under `D:\` needs its own `package.json`
-  (trap 55).
 - **pxkit** (`Tools/pxkit`, code-drawn sprites; `.claude/skills/draw-sprite`) reads the
   palette `Assets/Art/Palette/endesga-32.gpl`. Checked end to end 2026-10-18. Art rules:
   `ART.md`; drawing list: `TO-DRAW.md`.

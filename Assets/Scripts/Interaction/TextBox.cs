@@ -76,7 +76,8 @@ namespace TopDownKit
             nameLabel.text = speaker ?? "";
             nameLabel.style.display = string.IsNullOrEmpty(speaker) ? DisplayStyle.None : DisplayStyle.Flex;
             textLabel.text = lines[index];
-            moreLabel.text = index < lines.Length - 1 ? "[E] next" : "[E] close";
+            string use = "[" + Controls.Describe(Controls.Use) + "] ";
+            moreLabel.text = use + (index < lines.Length - 1 ? "next" : "close");
         }
 
         void OnDestroy() { if (root != null) root.RemoveFromHierarchy(); }

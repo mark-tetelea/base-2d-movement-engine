@@ -11,7 +11,7 @@ namespace TopDownKit
     // Where a hit came from (Health.LastSource): add-ons such as sounds and hit-stop read it.
     public enum HitSource { Other, Shot, Melee, Touch, Ground }
 
-    public class Health : MonoBehaviour
+    public class Health : MonoBehaviour, IHealth, IMapDot, IHudMeter
     {
         [Min(1)] public int maxHealth = 5;
         [Tooltip("Hits from the same team are ignored (no friendly fire). Player 0, enemies 1.")]
@@ -50,8 +50,15 @@ namespace TopDownKit
         SpriteRenderer[] sprites;
         Color[] colors;
 
-        void OnEnable() { Init(); if (!all.Contains(this)) all.Add(this); }
-        void OnDisable() { all.Remove(this); }
+        void OnEnable() { Init(); if (!all.Contains(this)) all.Add(this); MapDots.Add(this); }
+        void OnDisable() { all.Remove(this); MapDots.Remove(this); }
+
+        // The shared promises (Core/Contracts.cs, Hud): HUD bars, pickups, saves, the map.
+        public int Max => maxHealth;
+        public int Team => team;
+        public Vector2 DotPosition => transform.position;
+        public int DotKind => team;
+        public bool DotShown => !Dead;
 
         void Init()
         {
@@ -63,7 +70,12 @@ namespace TopDownKit
         }
 
         // Back to full health (a restart without reloading the scene).
-        public void Restore() { Init(); Current = maxHealth; invulnerableLeft = 0f; }
+        public void Restore()
+        {
+            Init(); Current = maxHealth; invulnerableLeft = 0f;
+            DirectionalSprites anim = GetComponent<DirectionalSprites>();
+            if (anim != null) anim.Release();
+        }
 
         // Sets health outright, clamped to 1..maxHealth (loading a save). No hit, no events.
         public void Set(int amount)
@@ -104,10 +116,19 @@ namespace TopDownKit
             }
             Damaged?.Invoke(this);
             AnyDamaged?.Invoke(this);
+            // Animations (if it has any): Hurt once, or Death to stay.
+            DirectionalSprites anim = GetComponent<DirectionalSprites>();
+            if (anim != null) { if (Current > 0) anim.Play(Anims.Hurt); else anim.Hold(Anims.Death); }
+            // Sounds, effects, hit-stop (the Feel add-on listens; a death plays instead of the hit).
+            Collider2D col = GetComponent<Collider2D>();
+            Vector2 centre = col != null ? (Vector2)col.bounds.center : (Vector2)transform.position;
+            if (Current > 0)
+                Cues.Raise(new Cue { id = source == HitSource.Melee ? FeelEvent.MeleeHit : FeelEvent.Hit, at = centre, from = gameObject, team = team, fromGround = source == HitSource.Ground });
             if (Current <= 0)
             {
                 Died?.Invoke(this);
                 AnyDied?.Invoke(this);
+                Cues.Raise(new Cue { id = FeelEvent.Death, at = centre, from = gameObject, team = team, fromGround = source == HitSource.Ground });
                 if (destroyOnDeath) Destroy(gameObject);
             }
             return true;

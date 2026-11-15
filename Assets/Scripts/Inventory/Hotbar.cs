@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace TopDownKit
 {
@@ -7,9 +6,9 @@ namespace TopDownKit
     // keys pick the selected slot; Q drops one of what it holds on the floor in front of
     // the player (unless the item is not droppable). Input arrives as data: Select and Drop (keys only when readKeyboard).
     [RequireComponent(typeof(Bag))]
-    public class Hotbar : MonoBehaviour
+    public class Hotbar : MonoBehaviour, IHudSlots
     {
-        [Tooltip("On: number keys and Q drive it. Off: something else calls Select / Drop.")]
+        [Tooltip("On: the Slot 1-9 and Drop controls (number keys, Q) drive it. Off: something else calls Select / Drop.")]
         public bool readKeyboard = true;
         [Tooltip("How far in front (tiles) a dropped item lands.")]
         [Min(0f)] public float dropDistance = 1f;
@@ -52,15 +51,20 @@ namespace TopDownKit
 
         void Update()
         {
-            if (!readKeyboard || PauseMenu.IsPaused) return;
+            if (!readKeyboard || GamePause.IsPaused) return;
             if (interactor == null) interactor = GetComponent<Interactor>();
             if (interactor != null && interactor.PanelOpen) return;
-            Keyboard k = Keyboard.current;
-            if (k == null) return;
             int n = Mathf.Min(Inventory.settings.hotbarSlots, 9);
             for (int i = 0; i < n; i++)
-                if (k[Key.Digit1 + i].wasPressedThisFrame) Select(i);
-            if (k.qKey.wasPressedThisFrame) Drop(1);
+                if (Controls.Pressed(Controls.Slot(i))) Select(i);
+            if (Controls.Pressed(Controls.Drop)) Drop(1);
         }
+
+        // ---- what the HUD shows (IHudSlots) ----
+        public int SlotCount => Mathf.Min(Inventory.settings.hotbarSlots, Inventory.Size);
+        public Sprite SlotIcon(int i) => Inventory.slots[i].Empty ? null : Inventory.slots[i].item.icon;
+        public int SlotAmount(int i) => Inventory.slots[i].Empty ? 0 : Inventory.slots[i].count;
+        public int SelectedSlot => Selected;
+        public void ClickSlot(int i) { Select(i); }
     }
 }

@@ -1,0 +1,64 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 500b05aba4d16a448a7fff12979616d0, type: 3}
+  m_Name: KitTheme
+  m_EditorClassIdentifier: TopDownKit.Screens::TopDownKit.UITheme
+  ink: {r: 0.09411765, g: 0.078431375, b: 0.14509805, a: 1}
+  panel: {r: 0.14901961, g: 0.16862746, b: 0.26666668, a: 1}
+  edge: {r: 0.3529412, g: 0.4117647, b: 0.53333336, a: 1}
+  text: {r: 1, g: 1, b: 1, a: 1}
+  dim: {r: 0.54509807, g: 0.60784316, b: 0.7058824, a: 1}
+  gold: {r: 0.99607843, g: 0.68235296, b: 0.20392157, a: 1}
+  red: {r: 0.89411765, g: 0.23137255, b: 0.26666668, a: 1}
+  green: {r: 0.3882353, g: 0.78039217, b: 0.3019608, a: 1}
+  overlay: {r: 0, g: 0, b: 0, a: 0.5}
+  mapRoomSeen: {r: 0.22745098, g: 0.26666668, b: 0.4, a: 1}
+  mapRoomHere: {r: 0.3529412, g: 0.4117647, b: 0.53333336, a: 1}
+  mapRoomEdge: {r: 0.54509807, g: 0.60784316, b: 0.7058824, a: 1}
+  touchBack: {r: 0.1, g: 0.1, b: 0.15, a: 0.55}
+  touchKnob: {r: 0.55, g: 0.6, b: 0.7, a: 0.8}
+  touchDown: {r: 0.35, g: 0.4, b: 0.55, a: 0.75}
+  fontAsset: {fileID: 0}
+  font: {fileID: 0}
+  pixelFontSize: 0
+  textScale: 1
+  textShadow: 1
+  box: {fileID: 0}
+  button: {fileID: 0}
+  slot: {fileID: 0}
+  slotSelected: {fileID: 0}
+  barBack: {fileID: 0}
+  barFill: {fileID: 0}
+  slotSize: 20
+  iconSize: 16
+  edgeWidth: 1
+  hudHealth:
+    anchor: 0
+    offset: {x: 4, y: 4}
+  hudHelp:
+    anchor: 2
+    offset: {x: 4, y: 4}
+  hudAmmo:
+    anchor: 8
+    offset: {x: 4, y: 4}
+  hudHotbar:
+    anchor: 7
+    offset: {x: 0, y: 2}
+  hudBoss:
+    anchor: 1
+    offset: {x: 0, y: 18}
+  hudBanner:
+    anchor: 1
+    offset: {x: 0, y: 90}
+  healthBarWidth: 64
+  bossBarWidth: 200
+  barHeight: 6

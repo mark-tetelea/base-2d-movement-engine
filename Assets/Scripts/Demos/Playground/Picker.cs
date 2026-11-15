@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 namespace TopDownKit.Playground
 {
-    // Playground only: a mouse-driven panel (Tab shows / hides it) that switches every
+    // Playground only: a mouse-driven panel (the Picker control, Tab, shows / hides it) that switches every
     // choice the kit has, live. Each row is a name and a button showing the value in use;
     // a click moves to the next value. It only writes the kit's own settings - nothing
     // here is a rule. Also places the aim marker.
@@ -29,12 +29,16 @@ namespace TopDownKit.Playground
         public float[] magnets = { 0f, 2.5f, 5f };
         [Tooltip("Aim assist strengths the aim assist row cycles through; 0 = off.")]
         public float[] assists = { 0f, 0.35f, 0.7f };
-        public FeelPlayer feel;
-        public DayNight dayNight;
+        [Tooltip("The Feel add-on's FeelPlayer (rows found by field name, so this demo needs no Feel folder).")]
+        public MonoBehaviour feel;
+        [Tooltip("The Feel add-on's DayNight.")]
+        public MonoBehaviour dayNight;
         [Tooltip("Master volumes the volume row cycles through.")]
         public float[] volumes = { 1f, 0.5f, 0.25f };
-        public Minimap minimap;
-        public TouchControls touch;
+        [Tooltip("The Map add-on's Minimap.")]
+        public MonoBehaviour minimap;
+        [Tooltip("The Touch add-on's TouchControls.")]
+        public MonoBehaviour touch;
         public bool startOpen = true;
 
         [Tooltip("A small sprite placed along the aim, so aim is visible.")]
@@ -74,7 +78,7 @@ namespace TopDownKit.Playground
                 () => mover.feel = feels[Next(Array.IndexOf(feels, mover.feel), feels.Length)]);
             Add("Grid step", () => mover != null && gridFeels != null && gridFeels.Length > 0,
                 () => mover.feel != null && mover.feel.settings.gridStep ? mover.feel.name : "off", NextGrid);
-            Add("Dash (Space)", () => dash != null, () => dash.enabled ? "on" : "off", () => dash.enabled = !dash.enabled);
+            Add("Dash (" + Controls.Describe(Controls.Dash) + ")", () => dash != null, () => dash.enabled ? "on" : "off", () => dash.enabled = !dash.enabled);
             Add("Facings", () => facing != null, () => ((int)facing.settings.directions).ToString(),
                 () => facing.settings.directions = facing.settings.directions == FacingCount.Eight ? FacingCount.Four : FacingCount.Eight);
             Add("Face towards", () => facing != null, () => facing.settings.faceTowards.ToString(),
@@ -98,20 +102,37 @@ namespace TopDownKit.Playground
             Add("Magnet", () => collector != null && magnets.Length > 0,
                 () => collector.settings.magnetReach <= 0f ? "off" : Num(collector.settings.magnetReach) + " tiles",
                 () => collector.settings.magnetReach = magnets[Next(IndexOf(magnets, collector.settings.magnetReach), magnets.Length)]);
-            Add("Hit-stop", () => feel != null, () => feel.hitStop ? "on" : "off", () => feel.hitStop = !feel.hitStop);
-            Add("Particles", () => feel != null, () => feel.effects ? "on" : "off", () => feel.effects = !feel.effects);
-            Add("Sounds", () => feel != null, () => feel.sounds ? "on" : "off", () => feel.sounds = !feel.sounds);
-            Add("Volume", () => feel != null && volumes.Length > 0, () => Mathf.RoundToInt(feel.master * 100f) + "%",
-                () => feel.master = volumes[Next(IndexOf(volumes, feel.master), volumes.Length)]);
-            Add("Day/night", () => dayNight != null, () => dayNight.mode.ToString(),
-                () => dayNight.mode = (DayNightMode)(((int)dayNight.mode + 1) % 3));
-            Add("Map (M)", () => minimap != null, () => minimap.mode.ToString(),
-                () => minimap.mode = (MapMode)(((int)minimap.mode + 1) % 3));
-            Add("Map reveal", () => minimap != null, () => minimap.revealOnVisit ? "visited" : "all",
-                () => minimap.revealOnVisit = !minimap.revealOnVisit);
-            Add("Touch", () => touch != null, () => touch.mode.ToString(),
-                () => touch.mode = (TouchMode)(((int)touch.mode + 1) % 3));
+            // Add-ons (Feel, Map, Touch) by field name: deleting their folder only hides the row.
+            FieldRow("Hit-stop", feel, "hitStop");
+            FieldRow("Particles", feel, "effects");
+            FieldRow("Sounds", feel, "sounds");
+            FieldRow("Volume", feel, "master", volumes);
+            FieldRow("Day/night", dayNight, "mode");
+            FieldRow("Map (" + Controls.Describe(Controls.Map) + ")", minimap, "mode");
+            FieldRow("Map reveal", minimap, "revealOnVisit");
+            FieldRow("Touch", touch, "mode");
             Add("Room", () => rig != null && rig.target != null, RoomText, ClearRoom);
+        }
+
+        // A row for a public field of an add-on component: a bool flips, an enum steps to its
+        // next value, a float steps through `values` (shown as a percent).
+        void FieldRow(string name, MonoBehaviour target, string field, float[] values = null)
+        {
+            FieldInfo f = target != null ? target.GetType().GetField(field) : null;
+            if (f == null) return;
+            if (f.FieldType == typeof(bool))
+                Add(name, () => target != null, () => (bool)f.GetValue(target) ? "on" : "off",
+                    () => f.SetValue(target, !(bool)f.GetValue(target)));
+            else if (f.FieldType.IsEnum)
+                Add(name, () => target != null, () => f.GetValue(target).ToString(), () =>
+                {
+                    Array all = Enum.GetValues(f.FieldType);
+                    int i = Array.IndexOf(all, f.GetValue(target));
+                    f.SetValue(target, all.GetValue((i + 1) % all.Length));
+                });
+            else if (f.FieldType == typeof(float) && values != null && values.Length > 0)
+                Add(name, () => target != null, () => Mathf.RoundToInt((float)f.GetValue(target) * 100f) + "%",
+                    () => f.SetValue(target, values[Next(IndexOf(values, (float)f.GetValue(target)), values.Length)]));
         }
 
         // off -> each grid feel -> off (back to the last free feel).
@@ -156,7 +177,7 @@ namespace TopDownKit.Playground
             box.style.position = Position.Absolute;
             box.style.left = 4; box.style.top = 22;
             box.style.width = 150;
-            var title = KitUI.Label("Settings  [Tab] hide", 8, KitUI.Dim);
+            var title = KitUI.Label("Settings  [" + Controls.Describe("Picker") + "] hide", 8, KitUI.Dim);
             title.style.marginBottom = 2;
             box.Add(title);
             for (int i = 0; i < rows.Count; i++)
@@ -181,8 +202,7 @@ namespace TopDownKit.Playground
 
         void Update()
         {
-            Keyboard k = Keyboard.current;
-            if (k != null && !PauseMenu.IsPaused && k.tabKey.wasPressedThisFrame) Toggle();
+            if (Controls.Pressed("Picker")) Toggle();
         }
 
         void LateUpdate()

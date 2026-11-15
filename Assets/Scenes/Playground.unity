@@ -1783,7 +1783,6 @@ MonoBehaviour:
   showEnemies: 1
   showItems: 1
   enemyTeam: 1
-  fullMapKey: 27
   cornerTop: 24
   cornerSize: {x: 96, y: 56}
   cornerScale: 1
@@ -2544,6 +2543,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TopDownKit.PauseMenu
   menuScene: 0
+  controlsButton: 1
 --- !u!114 &764418375
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2560,10 +2560,13 @@ MonoBehaviour:
   gun: {fileID: 827345427}
   hotbar: {fileID: 827345426}
   interactor: {fileID: 827345425}
-  help: 'WASD move  mouse aim  click shoot  R reload  1-6 weapon
+  help: '{Move} move  mouse aim  {Fire} shoot  {Reload} reload  1-6 weapon
 
-    Space dash 
-    E use  K knockback  Tab settings  I bag  Q drop  Esc pause'
+    {Dash}
+    dash
+
+    {Use} use  {Knock} knockback  {Picker} settings  {Bag} bag  {Drop}
+    drop  {Pause} pause'
 --- !u!114 &764418376
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2908,6 +2911,7 @@ MonoBehaviour:
     duration: 0.2
     cooldown: 0.4
     invulnerable: 1
+  readControls: 1
 --- !u!114 &827345422
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2949,6 +2953,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 422acb67201033440a9e25bc3b8604b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TopDownKit.DirectionalSprites
+  art: {fileID: 11400000, guid: c59155d07aa067e49b10165bbb079931, type: 2}
+  walkThreshold: 0.1
+  facingsWhenNoAim: 8
   directions:
   - frames:
     - {fileID: 1879116137117346813, guid: 6a8b16b4ba31c2847a1374162b1fab63, type: 3}
@@ -2975,7 +2982,6 @@ MonoBehaviour:
     - {fileID: 4799633895057451423, guid: a7b37165e06f96e4fac5606599778af4, type: 3}
   mirrorLeft: 1
   walkFps: 8
-  walkThreshold: 0.1
 --- !u!114 &827345425
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44202,10 +44208,7 @@ MonoBehaviour:
   mode: 0
   mover: {fileID: 827345416}
   aim: {fileID: 827345422}
-  shooter: {fileID: 827345431}
-  dash: {fileID: 827345421}
   interactor: {fileID: 827345425}
-  gun: {fileID: 827345427}
   aimStickFires: 1
   deadZone: 0.2
   fullAt: 0.8

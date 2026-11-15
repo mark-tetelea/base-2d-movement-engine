@@ -47,7 +47,11 @@ namespace TopDownKit
             bool changed = setUp && shut != Locked;
             setUp = true;
             Locked = shut;
-            if (changed) AnyDoors?.Invoke(this, shut);
+            if (changed)
+            {
+                AnyDoors?.Invoke(this, shut);
+                Cues.Raise(shut ? FeelEvent.DoorShut : FeelEvent.DoorOpen, transform.position, gameObject);
+            }
             if (doors == null) return;
             foreach (GameObject d in doors) if (d != null) d.SetActive(shut);
         }

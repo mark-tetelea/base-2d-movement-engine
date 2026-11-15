@@ -26,7 +26,7 @@ namespace TopDownKit
         void Reset() { verb = "Open"; }
 
         public override bool CanUse(Interactor who) =>
-            (spillOnOpen && !Opened) || (who.Bag != null && ChestScreen.Current != null);
+            (spillOnOpen && !Opened) || (who.GetBag() != null && ChestScreen.Current != null);
 
         public override void Use(Interactor who)
         {

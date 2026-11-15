@@ -48,6 +48,7 @@ namespace TopDownKit
             VisualElement r = doc.rootVisualElement;
             r.pickingMode = PickingMode.Ignore;   // trap 17
             r.style.flexGrow = 1f;
+            ApplyFont(r);
             EnsureEventSystem();
         }
 
@@ -97,25 +98,62 @@ namespace TopDownKit
             }
         }
 
-        // --- Shared looks (Endesga 32 colours) -------------------------------------------
+        // --- Shared looks: the theme (Resources/KitTheme, a UITheme asset) ----------------
 
-        public static readonly Color Ink = new Color32(0x18, 0x14, 0x25, 255);
-        public static readonly Color Panel = new Color32(0x26, 0x2b, 0x44, 255);   // opaque (trap 36)
-        public static readonly Color Edge = new Color32(0x5a, 0x69, 0x88, 255);
-        public static readonly Color Text = new Color32(0xff, 0xff, 0xff, 255);
-        public static readonly Color Dim = new Color32(0x8b, 0x9b, 0xb4, 255);
-        public static readonly Color Gold = new Color32(0xfe, 0xae, 0x34, 255);
-        public static readonly Color Red = new Color32(0xe4, 0x3b, 0x44, 255);
-        public static readonly Color Green = new Color32(0x63, 0xc7, 0x4d, 255);
+        const string ThemeAsset = "KitTheme";
+        static UITheme theme;
+
+        // The look in use. A game may set another theme before its screens are built.
+        public static UITheme Theme
+        {
+            get
+            {
+                if (theme == null)
+                {
+                    theme = Resources.Load<UITheme>(ThemeAsset);
+                    if (theme == null) theme = ScriptableObject.CreateInstance<UITheme>();
+                }
+                return theme;
+            }
+            set { theme = value; if (doc != null && doc.rootVisualElement != null) ApplyFont(doc.rootVisualElement); }
+        }
+
+        public static Color Ink => Theme.ink;
+        public static Color Panel => Theme.panel;
+        public static Color Edge => Theme.edge;
+        public static Color Text => Theme.text;
+        public static Color Dim => Theme.dim;
+        public static Color Gold => Theme.gold;
+        public static Color Red => Theme.red;
+        public static Color Green => Theme.green;
+
+        // The theme's font on the root; every label inherits it.
+        static void ApplyFont(VisualElement r)
+        {
+            UITheme t = Theme;
+            if (t.fontAsset != null) r.style.unityFontDefinition = FontDefinition.FromSDFFont(t.fontAsset);
+            else if (t.font != null) r.style.unityFontDefinition = FontDefinition.FromFont(t.font);
+            else r.style.unityFontDefinition = StyleKeyword.Null;
+        }
+
+        // A text size through the theme: scaled, and for a pixel font a whole multiple of its size.
+        public static int FontSize(int asked)
+        {
+            UITheme t = Theme;
+            float s = asked * t.textScale;
+            if (t.pixelFontSize > 0) return Mathf.Max(1, Mathf.RoundToInt(s / t.pixelFontSize)) * t.pixelFontSize;
+            return Mathf.Max(1, Mathf.RoundToInt(s));
+        }
 
         public static Label Label(string text, int size = 9, Color? color = null)
         {
             var l = new Label(text);
+            l.AddToClassList("kit-label");
             l.pickingMode = PickingMode.Ignore;
-            l.style.fontSize = size;
+            l.style.fontSize = FontSize(size);
             l.style.color = color ?? Text;
             // A 1-pixel dark shadow so text reads over any floor.
-            l.style.textShadow = new TextShadow { offset = new Vector2(1f, 1f), blurRadius = 0f, color = Ink };
+            if (Theme.textShadow) l.style.textShadow = new TextShadow { offset = new Vector2(1f, 1f), blurRadius = 0f, color = Ink };
             l.style.marginLeft = l.style.marginRight = l.style.marginTop = l.style.marginBottom = 0;
             l.style.paddingLeft = l.style.paddingRight = l.style.paddingTop = l.style.paddingBottom = 0;
             return l;
@@ -130,12 +168,30 @@ namespace TopDownKit
             return v;
         }
 
-        // A filled box with a 1-pixel edge. Pickable (it blocks clicks behind it).
+        // Theme art on an element: the sprite (9-sliced by its borders) if there is one,
+        // else a flat fill with an edge.
+        public static void Paint(VisualElement v, Sprite art, Color fill, Color edge)
+        {
+            if (art != null)
+            {
+                v.style.backgroundImage = new StyleBackground(art);
+                v.style.backgroundColor = Color.clear;
+                Border(v, Color.clear, 0f);
+            }
+            else
+            {
+                v.style.backgroundImage = new StyleBackground(StyleKeyword.None);
+                v.style.backgroundColor = fill;
+                Border(v, edge, Theme.edgeWidth);
+            }
+        }
+
+        // A filled box with a 1-pixel edge (or the theme's box art). Pickable (it blocks clicks behind it).
         public static VisualElement Box(float pad = 4f)
         {
             var v = new VisualElement();
-            v.style.backgroundColor = Panel;
-            Border(v, Edge, 1f);
+            v.AddToClassList("kit-box");
+            Paint(v, Theme.box, Panel, Edge);
             v.style.paddingLeft = v.style.paddingRight = v.style.paddingTop = v.style.paddingBottom = pad;
             return v;
         }
@@ -146,16 +202,37 @@ namespace TopDownKit
             v.style.borderLeftColor = v.style.borderRightColor = v.style.borderTopColor = v.style.borderBottomColor = c;
         }
 
+        // A bar (health, boss): the back and its fill. Set the fill's width in percent.
+        public static VisualElement Bar(int width, out VisualElement fill)
+        {
+            var back = new VisualElement { pickingMode = PickingMode.Ignore };
+            back.AddToClassList("kit-bar");
+            back.style.width = width; back.style.height = Theme.barHeight;
+            Paint(back, Theme.barBack, Ink, Edge);
+            fill = new VisualElement { pickingMode = PickingMode.Ignore };
+            fill.AddToClassList("kit-bar-fill");
+            fill.style.height = Length.Percent(100);
+            if (Theme.barFill != null) fill.style.backgroundImage = new StyleBackground(Theme.barFill);
+            else fill.style.backgroundColor = Red;
+            back.Add(fill);
+            return back;
+        }
+
         // Every kit button press (a click sound).
         public static event System.Action Clicked;
 
         public static Button Button(string text, System.Action click, int size = 9)
         {
-            var b = new Button(() => { Clicked?.Invoke(); click?.Invoke(); }) { text = text };
-            b.style.fontSize = size;
+            var b = new Button(() =>
+            {
+                Clicked?.Invoke();
+                Cues.Raise(FeelEvent.UiClick, Vector2.zero);
+                click?.Invoke();
+            }) { text = text };
+            b.AddToClassList("kit-button");
+            b.style.fontSize = FontSize(size);
             b.style.color = Text;
-            b.style.backgroundColor = Ink;
-            Border(b, Edge, 1f);
+            Paint(b, Theme.button, Ink, Edge);
             b.style.borderTopLeftRadius = b.style.borderTopRightRadius = b.style.borderBottomLeftRadius = b.style.borderBottomRightRadius = 0;
             b.style.marginLeft = b.style.marginRight = 0;
             b.style.marginTop = b.style.marginBottom = 1;
@@ -171,16 +248,36 @@ namespace TopDownKit
             v.style.left = v.style.top = v.style.right = v.style.bottom = 0;
         }
 
+        // A full-screen layer that holds `part` at a theme place (a HUD part).
+        public static VisualElement Placed(VisualElement part, UIPlace place)
+        {
+            var layer = Group();
+            Fill(layer);
+            int col = (int)place.anchor % 3, row = (int)place.anchor / 3;
+            layer.style.alignItems = col == 0 ? Align.FlexStart : col == 1 ? Align.Center : Align.FlexEnd;
+            layer.style.justifyContent = row == 0 ? Justify.FlexStart : row == 1 ? Justify.Center : Justify.FlexEnd;
+            layer.style.paddingLeft = col == 0 ? place.offset.x : 0f;
+            layer.style.paddingRight = col == 2 ? place.offset.x : 0f;
+            layer.style.paddingTop = row == 0 ? place.offset.y : 0f;
+            layer.style.paddingBottom = row == 2 ? place.offset.y : 0f;
+            if (part is Label l)
+                l.style.unityTextAlign = row == 0 ? (col == 0 ? TextAnchor.UpperLeft : col == 1 ? TextAnchor.UpperCenter : TextAnchor.UpperRight)
+                                       : row == 1 ? (col == 0 ? TextAnchor.MiddleLeft : col == 1 ? TextAnchor.MiddleCenter : TextAnchor.MiddleRight)
+                                       : (col == 0 ? TextAnchor.LowerLeft : col == 1 ? TextAnchor.LowerCenter : TextAnchor.LowerRight);
+            layer.Add(part);
+            return layer;
+        }
+
         // --- Inventory slot: a box, the item icon at a whole-number size, the count --------
 
-        public const int SlotSize = 20;
+        public static int SlotSize => Theme.slotSize;
 
         public static VisualElement Slot(System.Action click)
         {
             var s = new VisualElement();
+            s.AddToClassList("kit-slot");
             s.style.width = s.style.height = SlotSize;
-            s.style.backgroundColor = Ink;
-            Border(s, Edge, 1f);
+            Paint(s, Theme.slot, Ink, Edge);
             s.style.marginRight = 2;
             s.style.marginBottom = 2;
             s.style.alignItems = Align.Center;
@@ -188,7 +285,7 @@ namespace TopDownKit
             if (click == null) s.pickingMode = PickingMode.Ignore;
             else s.RegisterCallback<ClickEvent>(e => click());
             var icon = new VisualElement { name = "icon", pickingMode = PickingMode.Ignore };
-            icon.style.width = icon.style.height = 16;
+            icon.style.width = icon.style.height = Theme.iconSize;
             s.Add(icon);
             var num = Label("", 7, Dim); num.name = "num";
             num.style.position = Position.Absolute; num.style.left = 1; num.style.top = 0;
@@ -199,14 +296,17 @@ namespace TopDownKit
             return s;
         }
 
-        public static void SetSlot(VisualElement s, ItemStack stack, bool selected, string number = "")
+        // Shows an item (icon, amount; null = empty) in a slot, gold-edged when selected.
+        public static void SetSlot(VisualElement s, Sprite icon, int amount, bool selected, string number = "")
         {
-            Border(s, selected ? Gold : Edge, 1f);
-            var icon = s.Q("icon");
-            Sprite sp = stack.Empty ? null : stack.item.icon;
-            icon.style.backgroundImage = sp != null ? new StyleBackground(sp) : new StyleBackground(StyleKeyword.None);
+            UITheme t = Theme;
+            if (selected && t.slotSelected != null) Paint(s, t.slotSelected, Ink, Gold);
+            else if (!selected && t.slot != null) Paint(s, t.slot, Ink, Edge);
+            else Paint(s, null, Ink, selected ? Gold : Edge);
+            var iconEl = s.Q("icon");
+            iconEl.style.backgroundImage = icon != null ? new StyleBackground(icon) : new StyleBackground(StyleKeyword.None);
             s.Q<Label>("num").text = number;
-            s.Q<Label>("count").text = !stack.Empty && stack.count > 1 ? stack.count.ToString() : "";
+            s.Q<Label>("count").text = icon != null && amount > 1 ? amount.ToString() : "";
         }
     }
 

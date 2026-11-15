@@ -1,0 +1,21 @@
+{
+    "name": "TopDownKit.Save",
+    "rootNamespace": "TopDownKit",
+    "references": [
+        "TopDownKit.Core",
+        "TopDownKit.Movement",
+        "TopDownKit.Camera",
+        "TopDownKit.Screens",
+        "TopDownKit.Interaction",
+        "TopDownKit.Inventory"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -48,8 +48,8 @@ namespace TopDownKit
         }
 
         // Data entry points (the buttons call these; checks call them directly).
-        public TradeResult Buy(int line) => Say(IsOpen ? shop.BuyLine(who.Bag.Inventory, line) : TradeResult.Nothing, true);
-        public TradeResult Sell(int slot) => Say(IsOpen ? shop.SellSlot(who.Bag.Inventory, slot) : TradeResult.Nothing, false);
+        public TradeResult Buy(int line) => Say(IsOpen ? shop.BuyLine(who.GetBag().Inventory, line) : TradeResult.Nothing, true);
+        public TradeResult Sell(int slot) => Say(IsOpen ? shop.SellSlot(who.GetBag().Inventory, slot) : TradeResult.Nothing, false);
 
         TradeResult Say(TradeResult r, bool buying)
         {
@@ -102,7 +102,7 @@ namespace TopDownKit
             note = KitUI.Label("", 8, KitUI.Text);
             note.style.marginTop = 3;
             root.Add(note);
-            var hint = KitUI.Label("click a line to buy, a slot to sell one   [E] close", 8, KitUI.Dim);
+            var hint = KitUI.Label("click a line to buy, a slot to sell one   [" + Controls.Describe(Controls.Use) + "] close", 8, KitUI.Dim);
             hint.style.marginTop = 2;
             root.Add(hint);
 
@@ -143,7 +143,7 @@ namespace TopDownKit
                 ShopStock.Line l = shop.Line(i);
                 int left = shop.Left(i);
                 VisualElement line = lineRows[i];
-                KitUI.SetSlot(line[0], new ItemStack(l.item, left < 0 ? 1 : Mathf.Max(left, 1)), false);
+                ItemSlots.Show(line[0], new ItemStack(l.item, left < 0 ? 1 : Mathf.Max(left, 1)), false);
                 line[0].Q<Label>("count").text = left < 0 ? "" : left.ToString();
                 line.Q<Label>("name").text = l.item != null ? l.item.Name : "-";
                 line.Q<Label>("price").text = left == 0 ? "sold out" : l.price.ToString();
@@ -168,7 +168,7 @@ namespace TopDownKit
             {
                 ItemStack s = inv.slots[i];
                 int pay = s.Empty ? 0 : shop.SellPrice(s.item);
-                KitUI.SetSlot(bagSlots[i], s, false, pay > 0 && s.item != shop.currency ? pay.ToString() : "");
+                ItemSlots.Show(bagSlots[i], s, false, pay > 0 && s.item != shop.currency ? pay.ToString() : "");
             }
         }
 
@@ -177,10 +177,10 @@ namespace TopDownKit
         void LateUpdate()
         {
             if (root == null || root.panel == null) Build();   // trap 18
-            bool show = IsOpen && who != null && who.Bag != null;
+            bool show = IsOpen && who != null && who.GetBag() != null;
             root.parent.style.display = show ? DisplayStyle.Flex : DisplayStyle.None;
             if (!show) return;
-            Inventory bag = who.Bag.Inventory;
+            Inventory bag = who.GetBag().Inventory;
             title.text = shop.Title;
             money.text = shop.currency != null ? shop.currency.Name + "s " + bag.Count(shop.currency) : "";
             note.text = Message;

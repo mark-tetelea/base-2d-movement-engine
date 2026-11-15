@@ -213,7 +213,7 @@ tasks.Add(("lever door", 60, s =>
 tasks.Add(("key door", 60, s =>
 {
     var c = Cell(4.5f, 17.5f); var p = new Vector2(4.5f, 17.5f);
-    var bag = interactor.Bag.Inventory;
+    var bag = TopDownKit.BagLookup.GetBag(interactor).Inventory;   // phase 14: Interactor.Bag became the Inventory folder's GetBag
     if (s == 0) { bag.Remove(keyItem, 99); keyLock.Use(interactor); return false; }
     if (s == 1)
     {

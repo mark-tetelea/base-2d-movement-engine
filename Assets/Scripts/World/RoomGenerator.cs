@@ -60,6 +60,7 @@ namespace TopDownKit
         public RoomPiece EndRoom { get; private set; }
 
         void Awake() { if (buildOnAwake) Build(); }
+        void OnDestroy() { if (Built && LevelSeed.Used == UsedSeed) LevelSeed.Used = 0; }
 
         // The pieces as plain shapes for the layout rule: start, end, then the others.
         public RoomPiece[] AllPieces()
@@ -92,7 +93,7 @@ namespace TopDownKit
 
         // A seed for the next Build only, in any generator (replaying a layout, loading a
         // save). 0 = none; used up by the build that reads it.
-        public static int NextSeed;
+        public static int NextSeed { get => LevelSeed.Next; set => LevelSeed.Next = value; }
 
         public bool Build()
         {
@@ -109,6 +110,7 @@ namespace TopDownKit
 
             UsedSeed = PickSeed(NextSeed != 0 ? NextSeed : seed);
             NextSeed = 0;
+            LevelSeed.Used = UsedSeed;   // the Save add-on keeps it
             var layout = new Layout.Result();
             if (!Layout.Generate(Shapes(all), 0, 1, Allowed(all), roomCount, UsedSeed, layout))
             {
@@ -155,14 +157,10 @@ namespace TopDownKit
 
             // Point the piece's contents at this level (waves are switched off, so search those too).
             foreach (RoomLock l in room.GetComponentsInChildren<RoomLock>(true)) if (l.player == null) l.player = player;
-            foreach (EnemyBrain b in room.GetComponentsInChildren<EnemyBrain>(true))
-            {
-                if (b.target == null) b.target = player;
-                b.seed = random.Next(1, int.MaxValue);
-            }
-            foreach (Gun g in room.GetComponentsInChildren<Gun>(true)) g.seed = random.Next(1, int.MaxValue);
-            foreach (Drops d in room.GetComponentsInChildren<Drops>(true)) d.seed = random.Next(1, int.MaxValue);
-            if (hud != null) foreach (BossPhases b in room.GetComponentsInChildren<BossPhases>(true)) if (b.hud == null) b.hud = hud;
+            // Enemies, guns, drop tables... (ILevelPart): the player to chase, a seed each.
+            // The boss bar finds the level's HUD itself (Hud.Current).
+            foreach (ILevelPart part in room.GetComponentsInChildren<ILevelPart>(true))
+                part.PlacedInLevel(player, random.Next(1, int.MaxValue));
             return room;
         }
 

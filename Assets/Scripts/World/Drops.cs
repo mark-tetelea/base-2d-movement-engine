@@ -12,7 +12,7 @@ namespace TopDownKit
     // A destructible crate is no special class: a sprite, a solid collider with no body
     // (blocks walking, bullets and enemy paths), a Health on its own team, and this.
     [RequireComponent(typeof(Health))]
-    public class Drops : MonoBehaviour
+    public class Drops : MonoBehaviour, ILevelPart
     {
         [Serializable]
         public struct Line
@@ -82,5 +82,8 @@ namespace TopDownKit
             }
             return -1;
         }
+
+        // In a generated room: its own random seed.
+        public void PlacedInLevel(Transform player, int levelSeed) { seed = levelSeed; }
     }
 }

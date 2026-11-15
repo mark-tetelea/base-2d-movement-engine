@@ -8,9 +8,9 @@ namespace TopDownKit
 
     // Add-on: on-screen controls for phones, on the kit's panel - a move stick (left), an
     // aim stick (right; dragging it also fires, a setting), and buttons: shoot, dash,
-    // interact, weapon, pause. They feed the same input-as-data entry points the keyboard
-    // does (PlayerMover.SetMoveDirection, PlayerAim.Hold, PlayerShooter.SetOtherTrigger,
-    // Dash.Request, Interactor), so no rule knows about touch. Auto shows them on a phone
+    // interact, weapon, pause. Sticks feed the same input-as-data entry points the keyboard
+    // does (PlayerMover.SetMoveDirection, PlayerAim.Hold); buttons press the same Controls
+    // the keys do (Fire, Dash, Use, NextWeapon, Pause), so no rule knows about touch. Auto shows them on a phone
     // or once a finger touches the screen; On forces them on (testing on PC with the
     // mouse); Off hides them. Each finger is followed by its own pointer id.
     // Runs before the player's scripts, so what it sets is used the same frame.
@@ -22,10 +22,8 @@ namespace TopDownKit
         [Header("Player (any may be empty)")]
         public PlayerMover mover;
         public PlayerAim aim;
-        public PlayerShooter shooter;
-        public Dash dash;
-        public Interactor interactor;
-        public Gun gun;
+        [Tooltip("While this has a screen open (Interaction's Interactor), only Use and pause show.")]
+        public MonoBehaviour interactor;
 
         [Header("Settings")]
         [Tooltip("Dragging the aim stick past the dead zone fires.")]
@@ -66,14 +64,14 @@ namespace TopDownKit
                 ring.style.left = x - r; ring.style.top = y - r;
                 ring.style.width = ring.style.height = r * 2f;
                 Round(ring, r);
-                ring.style.backgroundColor = new Color(0.1f, 0.1f, 0.15f, 0.45f);
+                ring.style.backgroundColor = KitUI.Theme.touchBack;
                 KitUI.Border(ring, KitUI.Edge, 1f);
                 knob = new VisualElement { pickingMode = PickingMode.Ignore };
                 knob.style.position = Position.Absolute;
                 float k = r * 0.45f;
                 knob.style.width = knob.style.height = k * 2f;
                 Round(knob, k);
-                knob.style.backgroundColor = new Color(0.55f, 0.6f, 0.7f, 0.8f);
+                knob.style.backgroundColor = KitUI.Theme.touchKnob;
                 ring.Add(knob);
                 parent.Add(ring);
                 Show(Vector2.zero);
@@ -123,7 +121,7 @@ namespace TopDownKit
                 circle.style.left = x - r; circle.style.top = y - r;
                 circle.style.width = circle.style.height = r * 2f;
                 Round(circle, r);
-                circle.style.backgroundColor = new Color(0.1f, 0.1f, 0.15f, 0.55f);
+                circle.style.backgroundColor = KitUI.Theme.touchBack;
                 KitUI.Border(circle, KitUI.Edge, 1f);
                 circle.style.alignItems = Align.Center;
                 circle.style.justifyContent = Justify.Center;
@@ -142,7 +140,7 @@ namespace TopDownKit
                 Look();
             }
 
-            void Look() { circle.style.backgroundColor = Down ? new Color(0.35f, 0.4f, 0.55f, 0.75f) : new Color(0.1f, 0.1f, 0.15f, 0.55f); }
+            void Look() { circle.style.backgroundColor = Down ? KitUI.Theme.touchDown : KitUI.Theme.touchBack; }
         }
 
         static void Round(VisualElement v, float r)
@@ -175,8 +173,8 @@ namespace TopDownKit
             if (!touchSeen && ts != null && ts.primaryTouch.press.isPressed) touchSeen = true;
 
             if (root == null || root.panel == null) { ReleaseAll(); Build(); }   // trap 18
-            bool shown = Shown && !PauseMenu.IsPaused;
-            bool panel = interactor != null && interactor.PanelOpen;
+            bool shown = Shown && !GamePause.IsPaused;
+            bool panel = interactor is IHudPanel p && p.PanelOpen;
             root.style.display = shown ? DisplayStyle.Flex : DisplayStyle.None;
             playArea.style.display = shown && !panel ? DisplayStyle.Flex : DisplayStyle.None;
             if (!shown || panel)
@@ -214,16 +212,13 @@ namespace TopDownKit
 
             Vector2 a = Shape(look.Value, false);
             if (aim != null) { if (a != Vector2.zero) aim.Hold(a); else aim.Release(); }
-            if (shooter != null) shooter.SetOtherTrigger(shown && (fire.Down || (aimStickFires && a != Vector2.zero)));
-            if (dash != null && dashPad.Pressed) dash.Request();
-            if (interactor != null)
-            {
-                if (interactor.readKeyboard) interactor.SetOtherHeld(use.Down);
-                else interactor.SetUseHeld(use.Down);
-            }
-            if (weapon != null && weapon.Pressed && gun != null && gun.weapons != null && gun.weapons.Length > 1)
-                gun.Select((gun.CurrentIndex + 1) % gun.weapons.Length);
-            if (pause != null && pause.Pressed && PauseMenu.Current != null) PauseMenu.Current.Pause();
+            // Buttons press the same controls the keys do (Controls), so shooting, dashing,
+            // using and switching weapons need nothing from this folder.
+            Controls.SetHeld(Controls.Fire, shown && (fire.Down || (aimStickFires && a != Vector2.zero)));
+            if (dashPad.Pressed) Controls.Tap(Controls.Dash);
+            Controls.SetHeld(Controls.Use, use.Down);
+            if (weapon != null && weapon.Pressed) Controls.Tap(Controls.NextWeapon);
+            if (pause != null && pause.Pressed && !GamePause.IsPaused) Controls.Tap(Controls.Pause);
             dashPad.Pressed = use.Pressed = fire.Pressed = false;
             if (weapon != null) weapon.Pressed = false;
             if (pause != null) pause.Pressed = false;

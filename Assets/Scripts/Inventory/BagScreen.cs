@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 namespace TopDownKit
@@ -48,9 +47,8 @@ namespace TopDownKit
 
         void Update()
         {
-            if (!readKeyboard || PauseMenu.IsPaused) return;
-            Keyboard k = Keyboard.current;
-            if (k != null && k.iKey.wasPressedThisFrame) Toggle();
+            if (!readKeyboard || GamePause.IsPaused) return;
+            if (Controls.Pressed(Controls.Bag)) Toggle();
         }
 
         VisualElement root, grid;
@@ -67,7 +65,7 @@ namespace TopDownKit
             grid.style.flexWrap = Wrap.Wrap;
             grid.style.width = columns * (KitUI.SlotSize + 2);
             root.Add(grid);
-            var hint = KitUI.Label("click a slot to drop it   [I] close", 8, KitUI.Dim);
+            var hint = KitUI.Label("click a slot to drop it   [" + Controls.Describe(Controls.Bag) + "] close", 8, KitUI.Dim);
             hint.style.marginTop = 4;
             root.Add(hint);
             var wrap = KitUI.Group();
@@ -98,7 +96,7 @@ namespace TopDownKit
                 }
             }
             for (int i = 0; i < inv.Size; i++)
-                KitUI.SetSlot(slots[i], inv.slots[i], false, i < inv.settings.hotbarSlots ? (i + 1).ToString() : "");
+                ItemSlots.Show(slots[i], inv.slots[i], false, i < inv.settings.hotbarSlots ? (i + 1).ToString() : "");
         }
 
         void OnDisable() { Close(); }

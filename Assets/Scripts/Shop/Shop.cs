@@ -14,7 +14,7 @@ namespace TopDownKit
     // trade goes through the one inventory rule: Buy and Sell try the whole trade on a
     // copy of the bag first and only keep it if all of it fits, so a trade never half
     // happens. Sell price = the stock price x sellRate, rounded down.
-    public class Shop : Interactable
+    public class Shop : Interactable, IItemStock
     {
         public ShopStock stock;
         [Tooltip("The item paid with (Coin).")]
@@ -37,6 +37,8 @@ namespace TopDownKit
 
         public string Title => string.IsNullOrEmpty(title) ? name : title;
         public int LineCount => stock != null && stock.lines != null ? stock.lines.Length : 0;
+        public Item LineItem(int i) => stock.lines[i].item;
+        public Item Currency => currency;
         public ShopStock.Line Line(int i) => stock.lines[i];
 
         void Reset() { verb = "Shop"; }
@@ -76,7 +78,7 @@ namespace TopDownKit
             return i < 0 ? 0 : Mathf.FloorToInt(stock.lines[i].price * sellRate + 1e-4f);
         }
 
-        public override bool CanUse(Interactor who) => who.Bag != null && ShopScreen.Current != null && stock != null;
+        public override bool CanUse(Interactor who) => who.GetBag() != null && ShopScreen.Current != null && stock != null;
 
         public override void Use(Interactor who) { ShopScreen.Current.Show(who, this); }
 
@@ -92,6 +94,7 @@ namespace TopDownKit
                 Pickup.Spawn(l.item, 1, (Vector2)transform.position + deliverAt, deliverSortingOrder, 0f);
             if (left[i] > 0) left[i]--;
             AnyTrade?.Invoke(this, true);
+            Cues.Raise(FeelEvent.Buy, transform.position, gameObject);
             return r;
         }
 
@@ -107,6 +110,7 @@ namespace TopDownKit
             if (r != TradeResult.Done) return r;
             if (left[i] >= 0) left[i]++;
             AnyTrade?.Invoke(this, false);
+            Cues.Raise(FeelEvent.Sell, transform.position, gameObject);
             return r;
         }
 

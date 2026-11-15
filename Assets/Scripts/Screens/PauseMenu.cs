@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 namespace TopDownKit
 {
-    // Esc pauses: Time.timeScale = 0 (the fixed step stops, so all gameplay stops), and a
+    // The Pause control (Esc unless rebound) pauses: Time.timeScale = 0 (the fixed step stops, so all gameplay stops), and a
     // menu offers Resume, Restart and Main menu. Keyboard readers check IsPaused so a key
     // pressed while paused is not kept for later. Only this menu runs while paused.
     // Add-ons put their own buttons in it (Save, Load) with AddButton, so the menu never
@@ -16,9 +15,11 @@ namespace TopDownKit
     {
         [Tooltip("Build index of the start menu scene. -1 hides the Main menu button.")]
         public int menuScene = 0;
+        [Tooltip("A Controls button that opens the rebind screen (every key can be changed).")]
+        public bool controlsButton = true;
 
         static PauseMenu current;
-        public static bool IsPaused => current != null && current.open;
+        public static bool IsPaused => GamePause.IsPaused;
         public static PauseMenu Current => current;
 
         // Extra buttons from add-ons, shown after Resume and Restart.
@@ -46,8 +47,9 @@ namespace TopDownKit
         void OnEnable() { current = this; }
         void OnDisable()
         {
-            if (open) Time.timeScale = 1f;
+            if (open) { Time.timeScale = 1f; GamePause.IsPaused = false; }
             open = false;
+            if (rebind != null) rebind.Close();
             if (current == this) current = null;
             if (root != null) root.RemoveFromHierarchy();
             root = null;
@@ -59,7 +61,7 @@ namespace TopDownKit
             KitUI.Fill(root);
             root.name = "Pause";
             root.pickingMode = PickingMode.Position;   // blocks clicks to the game while open
-            root.style.backgroundColor = new Color(0f, 0f, 0f, 0.5f);
+            root.style.backgroundColor = KitUI.Theme.overlay;
             root.style.alignItems = Align.Center;
             root.style.justifyContent = Justify.Center;
             var box = KitUI.Box(8f);
@@ -71,6 +73,7 @@ namespace TopDownKit
             box.Add(KitUI.Button("Resume", Resume));
             box.Add(KitUI.Button("Restart", Restart));
             foreach (var e in extras) { Action click = e.click; box.Add(KitUI.Button(e.label, () => click())); }
+            if (controlsButton) box.Add(KitUI.Button("Controls", OpenControls));
             builtVersion = extrasVersion;
             if (menuScene >= 0 && menuScene != SceneManager.GetActiveScene().buildIndex)
                 box.Add(KitUI.Button("Main menu", MainMenu));
@@ -82,14 +85,26 @@ namespace TopDownKit
         public void Pause()
         {
             open = true;
+            GamePause.IsPaused = true;
             Time.timeScale = 0f;
         }
 
         public void Resume()
         {
+            if (rebind != null) rebind.Close();
             open = false;
+            GamePause.IsPaused = false;
             Time.timeScale = 1f;
         }
+
+        // The rebind screen, over the menu; its Back (or the Pause key) comes back here.
+        ControlsScreen rebind;
+        public void OpenControls()
+        {
+            if (rebind == null) rebind = new ControlsScreen();
+            rebind.Open();
+        }
+        public bool ControlsOpen => rebind != null && rebind.IsOpen;
 
         public void Restart()
         {
@@ -105,12 +120,13 @@ namespace TopDownKit
 
         void Update()
         {
-            Keyboard k = Keyboard.current;
-            if (k != null && k.escapeKey.wasPressedThisFrame) { if (open) Resume(); else Pause(); }
+            if (rebind != null && rebind.IsOpen) rebind.Update();
+            else if (Controls.Pressed(Controls.Pause)) { if (open) Resume(); else Pause(); }
             if (root != null && builtVersion != extrasVersion) { root.RemoveFromHierarchy(); root = null; }
             if (root == null || root.panel == null) Build();   // trap 18
-            root.style.display = open ? DisplayStyle.Flex : DisplayStyle.None;
+            root.style.display = open && !ControlsOpen ? DisplayStyle.Flex : DisplayStyle.None;
             root.BringToFront();
+            if (ControlsOpen) rebind.BringToFront();
         }
     }
 }

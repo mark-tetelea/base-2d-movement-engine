@@ -28,6 +28,8 @@ namespace TopDownKit
         [Min(0f)] public float magnetSpeed;
         [Tooltip("Off: it can never be dropped from the bag or hotbar (quest items).")]
         public bool droppable = true;
+        [Tooltip("What it looks like lying on the floor when dropped or spilled: a prefab (animated, glowing, any art). Empty = its icon on a plain sprite.")]
+        public GameObject floorPrefab;
 
         public string Name => string.IsNullOrEmpty(displayName) ? name : displayName;
     }

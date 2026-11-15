@@ -22,7 +22,7 @@ namespace TopDownKit
 
         public override void Use(Interactor who)
         {
-            Bag bag = who != null ? who.Bag : null;
+            Bag bag = who != null ? who.GetBag() : null;
             if (key != null && (bag == null || !bag.Inventory.Has(key)))
             {
                 if (TextBox.Current != null) TextBox.Current.Show(who, null, lockedText);
@@ -38,7 +38,11 @@ namespace TopDownKit
         // Silent: no event, no sound (loading a save).
         public void Open(bool silent = false)
         {
-            if (!IsOpen && !silent) AnyOpened?.Invoke(this);
+            if (!IsOpen && !silent)
+            {
+                AnyOpened?.Invoke(this);
+                Cues.Raise(FeelEvent.DoorOpen, transform.position, gameObject);
+            }
             IsOpen = true;
             if (blockers == null) return;
             foreach (GameObject b in blockers) if (b != null) b.SetActive(false);

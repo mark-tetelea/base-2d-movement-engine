@@ -3,7 +3,7 @@ using UnityEngine.InputSystem;
 
 namespace TopDownKit.Playground
 {
-    // K knocks the player away from the mouse pointer, so knockback can
+    // K (the Knock control) knocks the player away from the mouse pointer, so knockback can
     // be tried with every feel. Stands in for a hit until enemies exist (phase 4).
     public class KnockKey : MonoBehaviour
     {
@@ -18,8 +18,7 @@ namespace TopDownKit.Playground
 
         void Update()
         {
-            Keyboard k = Keyboard.current;
-            if (k != null && !PauseMenu.IsPaused && k.kKey.wasPressedThisFrame) pressed = true;
+            if (Controls.Pressed("Knock")) pressed = true;
         }
 
         void FixedUpdate()

@@ -21,6 +21,8 @@ namespace TopDownKit
         [Tooltip("Spread in degrees around up (360 = all round).")]
         [Range(0f, 360f)] public float arc = 360f;
         public int sortingOrder = 60;
+        [Tooltip("The art of one bit (a spark, a leaf, a drop), at its own size. Empty = a square of Pixels game pixels.")]
+        public Sprite bit;
 
         SpriteRenderer[] bits;
         Vector2[] velocity;
@@ -58,9 +60,9 @@ namespace TopDownKit
             {
                 var go = new GameObject("Bit");
                 go.transform.SetParent(transform, false);
-                go.transform.localScale = Vector3.one * pixels;
+                go.transform.localScale = Vector3.one * (bit != null ? 1f : pixels);
                 bits[i] = go.AddComponent<SpriteRenderer>();
-                bits[i].sprite = pixel;
+                bits[i].sprite = bit != null ? bit : pixel;
                 bits[i].sortingOrder = sortingOrder;
             }
         }

@@ -646,3 +646,24 @@ server returned 400 ... Main thread operation timed out after 5000ms". Cause: th
 every asset, prefab and saved both scenes). Rule: after this error, check what the script
 was meant to leave (`git status`, an `eval` that reads it back) before re-running it; a
 re-run of a non-idempotent script would do the work twice. Found 2026-11-14 (phase 10).
+
+## 87. A poll loop on `unity command eval` never ends (or ends at once)
+Symptom: a shell loop waiting for "RUNNING" to disappear from the reply never stopped.
+Cause: the human output repeats your code in its Parameters column, so a word in the code
+("RUNNING") is always in the reply. Rule: return a marker the code itself does not contain
+as a whole (`"still-going"`), and match on `"result":"<marker>`, never a bare word. Found
+2026-11-15 (phase 14).
+
+## 88. Statics survive between Plays in this project
+Symptom: none yet - found while adding static state (`Controls`, `GamePause`). Cause:
+`EditorSettings.m_EnterPlayModeOptions: 1` = domain reload off when entering play mode, so
+static fields keep last session's values (a rebind, a paused flag). Rule: every new static
+that holds play state gets a `[RuntimeInitializeOnLoadMethod(SubsystemRegistration)]` reset
+(see `Controls.ResetStatics`), or is cleared in `OnDisable`. Found 2026-11-15 (phase 14).
+
+## 89. A "compile without X" check passes because X still compiles from elsewhere
+Symptom (avoided): an `AssemblyBuilder` scratch build of the kit minus a folder can quietly
+reference `Library/ScriptAssemblies/TopDownKit.*.dll`, so the removed types still resolve and
+every removal "passes". Rule: put the kit's own dlls and `Assembly-CSharp*` in
+`excludeReferences`, add only package dlls the asmdefs name, and keep a self-test that must
+FAIL (Combat removed, its users kept). Found 2026-11-15 (phase 14).

@@ -1,63 +1,109 @@
-using System;
 using UnityEngine;
 
 namespace TopDownKit
 {
-    // Idle and walk by sprite swap, from the facing. Plain on purpose: no Animator.
-    // Each direction's frames: [0] idle, [1] and [2] the two steps. The walk plays
-    // step, idle, step, idle. Visual only, so it runs in Update.
+    // Plays a SpriteAnimSet by sprite swap: no Animator, visual only, so it runs in Update.
+    // Which animation: one started with Play (Attack, Hurt - plays once) or Hold (Death -
+    // stays), else Dash while a Dash runs, else Walk while moving, else Idle. Any it does
+    // not find in the set falls back to the next (no Dash anim: Walk; no Walk: Idle).
+    // Which facing: the PlayerFacing if there is one, else the way it last moved (enemies).
+    // Combat plays Attack on a shot or swing, Hurt on a hit, Death on dying.
     [RequireComponent(typeof(SpriteRenderer))]
     public class DirectionalSprites : MonoBehaviour
     {
-        [Serializable]
-        public class Frames { public Sprite[] frames = new Sprite[3]; }
-
-        [Tooltip("Indexed by facing: 0 right, 1 up-right, 2 up, 3 up-left, 4 left, 5 down-left, 6 down, 7 down-right.")]
-        public Frames[] directions = new Frames[8];
-        [Tooltip("On: left facings (3, 4, 5) show the right-side drawing flipped, so 5 drawings cover 8. Off: they use their own drawings.")]
-        public bool mirrorLeft = true;
-        [Tooltip("Frames per second of the walk cycle.")]
-        public float walkFps = 8f;
-        [Tooltip("Walking speed (tiles/s) under which the idle frame shows.")]
+        [Tooltip("The animations (Create > TopDownKit > Sprite Animations). Swap the asset to swap the character's art.")]
+        public SpriteAnimSet art;
+        [Tooltip("Walking speed (tiles/s) under which Idle plays.")]
         public float walkThreshold = 0.1f;
+        [Tooltip("With no PlayerFacing: 4 or 8 facings from the way it moves.")]
+        public FacingCount facingsWhenNoAim = FacingCount.Eight;
 
         SpriteRenderer render;
         PlayerFacing facing;
         PlayerMover mover;
-        float walkClock;
+        Dash dash;
+        int lastFacing = 6;   // down
+        string playing;       // what is showing now
+        float clock;
+        string oneShot;       // Play: once, then back
+        string held;          // Hold: until Release
+
+        // The animation showing now, and how far into it (seconds).
+        public string Current => playing;
+        public float Time01 { get; private set; }
+
+        // Plays an animation once (Attack, Hurt, a game's own), then goes back to the usual one.
+        public void Play(string anim)
+        {
+            if (held != null || art == null || art.Find(anim) == null) return;
+            oneShot = anim;
+            Switch(anim);
+        }
+
+        // Shows an animation until Release (Death stays on its last frame).
+        public void Hold(string anim)
+        {
+            if (art == null || art.Find(anim) == null) return;
+            held = anim;
+            oneShot = null;
+            Switch(anim);
+        }
+
+        public void Release() { held = null; }
+
+        void Switch(string anim) { if (playing != anim) { playing = anim; clock = 0f; } }
 
         void Update()
         {
-            if (render == null) render = GetComponent<SpriteRenderer>();
-            if (facing == null) facing = GetComponent<PlayerFacing>();
-            if (mover == null) mover = GetComponent<PlayerMover>();
-            if (facing == null) return;
-
-            int f = facing.Current;
-            bool flip = false;
-            if (mirrorLeft && Facing.PointsLeft(f)) { f = Facing.Mirror(f); flip = true; }
-
-            bool walking = mover != null && mover.MoveVelocity.magnitude > walkThreshold;
-            walkClock = walking ? walkClock + Time.deltaTime : 0f;
-            int frame = 0;
-            if (walking)
+            if (render == null)
             {
-                int i = (int)(walkClock * walkFps) % 4;   // step, idle, step, idle
-                frame = i == 0 ? 1 : i == 2 ? 2 : 0;
+                render = GetComponent<SpriteRenderer>();
+                facing = GetComponent<PlayerFacing>();
+                mover = GetComponent<PlayerMover>();
+                dash = GetComponent<Dash>();
             }
+            if (art == null) return;
 
-            Sprite s = Pick(f, frame);
+            // Which facing (0-7).
+            int f = lastFacing;
+            if (facing != null) f = facing.Current;
+            else if (mover != null && mover.MoveVelocity.magnitude > walkThreshold)
+                f = Facing.Snap(mover.MoveVelocity, facingsWhenNoAim, lastFacing);
+            lastFacing = f;
+
+            // Which animation.
+            string want = held ?? oneShot ?? Usual();
+            Switch(want);
+            SpriteAnim a = art.Find(playing);
+            if (a == null) return;
+
+            bool flip = false;
+            if (art.mirrorLeft && a.facings != null && a.facings.Length > 1 && Facing.PointsLeft(f)) { f = Facing.Mirror(f); flip = true; }
+            SpriteFrames fr = a.Get(f);
+            if (fr == null) return;
+
+            clock += UnityEngine.Time.deltaTime;
+            int n = fr.frames.Length;
+            int i = Mathf.FloorToInt(clock * a.fps);
+            if (a.loop) i %= n;
+            else if (i >= n)
+            {
+                i = n - 1;
+                if (oneShot == playing) { oneShot = null; }   // done: back to the usual next frame
+            }
+            Time01 = n > 0 ? Mathf.Clamp01((float)i / n) : 0f;
+            Sprite s = fr.frames[i];
             if (s != null) render.sprite = s;
             render.flipX = flip;
         }
 
-        Sprite Pick(int f, int frame)
+        // Dash while dashing, Walk while moving, else Idle - whichever the set has.
+        string Usual()
         {
-            if (directions == null || f >= directions.Length || directions[f] == null) return null;
-            Sprite[] fr = directions[f].frames;
-            if (fr == null || fr.Length == 0) return null;
-            Sprite s = frame < fr.Length ? fr[frame] : null;
-            return s != null ? s : fr[0];
+            if (dash != null && dash.IsDashing && art.Find(Anims.Dash) != null) return Anims.Dash;
+            bool walking = mover != null && mover.MoveVelocity.magnitude > walkThreshold;
+            if (walking && art.Find(Anims.Walk) != null) return Anims.Walk;
+            return Anims.Idle;
         }
     }
 }

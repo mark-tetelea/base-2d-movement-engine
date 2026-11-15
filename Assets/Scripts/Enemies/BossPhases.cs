@@ -63,6 +63,7 @@ namespace TopDownKit
 
             if (pauseLeft > 0 && --pauseLeft == 0) brain.enabled = true;
 
+            if (hud == null) hud = Hud.Current;   // a generated room: the level's HUD
             if (hud != null)
             {
                 hud.Boss = health.Dead ? null : health;
@@ -96,7 +97,7 @@ namespace TopDownKit
 
         void OnDisable()
         {
-            if (hud != null && hud.Boss == health) hud.Boss = null;
+            if (hud != null && ReferenceEquals(hud.Boss, health)) hud.Boss = null;
         }
     }
 }

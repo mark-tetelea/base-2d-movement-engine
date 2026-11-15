@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 namespace TopDownKit
@@ -24,7 +23,6 @@ namespace TopDownKit
         public bool showItems = true;
         [Tooltip("Health team drawn as enemies.")]
         public int enemyTeam = 1;
-        public Key fullMapKey = Key.M;
 
         [Header("Look (UI pixels)")]
         [Tooltip("Corner map: UI pixels from the top (below the HUD's help line).")]
@@ -36,9 +34,9 @@ namespace TopDownKit
         [Tooltip("Largest full map size; it shrinks to fit the rooms.")]
         public Vector2 fullSize = new Vector2(560f, 300f);
 
-        static readonly Color RoomSeen = new Color32(0x3a, 0x44, 0x66, 255);
-        static readonly Color RoomHere = new Color32(0x5a, 0x69, 0x88, 255);
-        static readonly Color RoomEdge = new Color32(0x8b, 0x9b, 0xb4, 255);
+        static Color RoomSeen => KitUI.Theme.mapRoomSeen;
+        static Color RoomHere => KitUI.Theme.mapRoomHere;
+        static Color RoomEdge => KitUI.Theme.mapRoomEdge;
 
         bool full;
         VisualElement root, corner, cornerContent, fullBox, fullContent;
@@ -71,9 +69,8 @@ namespace TopDownKit
                 Room r = Room.At(p.position);
                 if (r != null) r.Visited = true;
             }
-            if (PauseMenu.IsPaused || mode == MapMode.Off) { if (mode == MapMode.Off) full = false; return; }
-            Keyboard k = Keyboard.current;
-            if (k != null && k[fullMapKey].wasPressedThisFrame) ToggleFull();
+            if (GamePause.IsPaused || mode == MapMode.Off) { if (mode == MapMode.Off) full = false; return; }
+            if (Controls.Pressed(Controls.Map)) ToggleFull();
         }
 
         void Build()
@@ -116,8 +113,8 @@ namespace TopDownKit
         void LateUpdate()
         {
             if (root == null || root.panel == null) Build();   // trap 18
-            bool cornerOn = CornerShown && !PauseMenu.IsPaused;
-            bool fullOn = FullOpen && !PauseMenu.IsPaused;
+            bool cornerOn = CornerShown && !GamePause.IsPaused;
+            bool fullOn = FullOpen && !GamePause.IsPaused;
             corner.style.display = cornerOn ? DisplayStyle.Flex : DisplayStyle.None;
             fullBox.parent.style.display = fullOn ? DisplayStyle.Flex : DisplayStyle.None;
             if (!cornerOn && !fullOn) return;
@@ -167,12 +164,16 @@ namespace TopDownKit
             }
             foreach (VisualElement e in roomPool.GetRange(roomsUsed, roomPool.Count - roomsUsed)) e.style.display = DisplayStyle.None;
 
-            if (showItems)
-                foreach (Pickup pk in Pickup.All)
-                    if (pk != null && Visible(pk.transform.position)) Dot(content, pk.transform.position, 2f, KitUI.Gold, topLeft, scale);
-            if (showEnemies)
-                foreach (Health h in Health.All)
-                    if (h != null && h.team == enemyTeam && !h.Dead && Visible(h.transform.position)) Dot(content, h.transform.position, 2f, KitUI.Red, topLeft, scale);
+            // Items and enemies come from MapDots (Pickup and Health add themselves), so the
+            // map needs neither the Inventory nor the Combat folder.
+            foreach (IMapDot d in MapDots.All)
+            {
+                if (d == null || (d is Object o && o == null) || !d.DotShown) continue;
+                bool item = d.DotKind == MapDots.Item;
+                if (item ? !showItems : (!showEnemies || d.DotKind != enemyTeam)) continue;
+                Vector2 at2 = d.DotPosition;
+                if (Visible(at2)) Dot(content, at2, 2f, item ? KitUI.Gold : KitUI.Red, topLeft, scale);
+            }
             if (p != null) Dot(content, at, 3f, KitUI.Text, topLeft, scale);
             for (int i = dotsUsed; i < dotPool.Count; i++) dotPool[i].style.display = DisplayStyle.None;
         }

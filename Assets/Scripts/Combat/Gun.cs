@@ -8,7 +8,7 @@ namespace TopDownKit
     // Recoil pushes the shooter's PlayerMover with the one knockback rule. Settings on the
     // weapon pick the extras: charge (hold, release), melee (a MeleeSwing, added on first
     // use), bounces (the Bullet's job). Aim assist bends the aim at the shot, here.
-    public class Gun : MonoBehaviour
+    public class Gun : MonoBehaviour, IRefill, IHudText, ILevelPart
     {
         [Tooltip("Weapons carried; Select switches between them.")]
         public Weapon[] weapons;
@@ -31,6 +31,22 @@ namespace TopDownKit
         PlayerMover mover;
 
         public Weapon Current => weapons != null && weapons.Length > 0 ? weapons[current] : null;
+
+        // What the HUD shows for it: the weapon, its ammo, the charge.
+        public string HudText
+        {
+            get
+            {
+                Weapon w = Current;
+                if (w == null) return "";
+                string a = w.name + "  " + (w.magazine <= 0 ? "inf" : Reloading ? "reloading" : Ammo + "/" + w.magazine);
+                if (Charge01 > 0f) a += "  charge " + Mathf.RoundToInt(Charge01 * 100f) + "%";
+                return a;
+            }
+        }
+
+        // In a generated room: its own random seed.
+        public void PlacedInLevel(Transform player, int levelSeed) { seed = levelSeed; }
         public int CurrentIndex => current;
         public int Ammo { get { Init(); return ammo.Length > 0 ? ammo[current] : 0; } }
         public bool Reloading => reloadLeft > 0f;
@@ -146,6 +162,9 @@ namespace TopDownKit
             }
             if (w.magazine > 0) ammo[current]--;
             AnyShot?.Invoke(this);
+            DirectionalSprites anim = GetComponent<DirectionalSprites>();
+            if (anim != null) anim.Play(Anims.Attack);
+            Cues.Raise(w.kind == WeaponKind.Melee ? FeelEvent.Swing : FeelEvent.Shot, transform.position, gameObject);
             if (mover != null && w.recoil > 0f) mover.AddPush(-dir * w.recoil);
             if (w.shakeOnShot > 0f)
             {

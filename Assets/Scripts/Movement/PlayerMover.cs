@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace TopDownKit
 {
-    // The keyboard player. Reads WASD / arrow keys into a move direction every frame and
+    // The keyboard player. Reads the walk controls (Controls: WASD / arrows unless rebound) into a move direction every frame and
     // moves on the fixed 60 Hz step with the one movement rule (CLAUDE.md, Decision 1).
     // The Rigidbody2D only stops walls being walked through; it must have gravity 0 and
     // interpolation on, which the test arena sets up.
@@ -19,7 +18,7 @@ namespace TopDownKit
         public MoveFeel feel;
         [Tooltip("While on, keys are ignored (walking eases to a stop by the feel). Set by camera fades and slides.")]
         public bool inputPaused;
-        [Tooltip("On: WASD / arrows steer it (the player). Off: something else calls SetMoveDirection (an enemy brain, a touch stick).")]
+        [Tooltip("On: the walk controls steer it (the player). Off: something else calls SetMoveDirection (an enemy brain, a touch stick).")]
         public bool readKeyboard = true;
 
         Rigidbody2D body;
@@ -193,17 +192,7 @@ namespace TopDownKit
             if (p > 0f) push -= n * p;
         }
 
-        // Opposite keys cancel. Diagonals come out as (1, 1); the rule cuts them to length 1.
-        static Vector2 ReadKeys()
-        {
-            Keyboard k = Keyboard.current;
-            if (k == null) return Vector2.zero;
-            float x = 0f, y = 0f;
-            if (k.dKey.isPressed || k.rightArrowKey.isPressed) x += 1f;
-            if (k.aKey.isPressed || k.leftArrowKey.isPressed) x -= 1f;
-            if (k.wKey.isPressed || k.upArrowKey.isPressed) y += 1f;
-            if (k.sKey.isPressed || k.downArrowKey.isPressed) y -= 1f;
-            return new Vector2(x, y);
-        }
+        // The four walk controls (WASD / arrows unless rebound). Opposite keys cancel.
+        static Vector2 ReadKeys() => Controls.Move();
     }
 }

@@ -50,7 +50,19 @@ namespace TopDownKit
 
         public Tilemap Tilemap { get { if (map == null) map = GetComponent<Tilemap>(); return map; } }
 
-        void OnEnable() { if (!all.Contains(this)) all.Add(this); }
+        void OnEnable()
+        {
+            if (!all.Contains(this)) all.Add(this);
+            GroundCheck.Hurts = AnyHurts;   // enemy paths ask through Core, not this folder
+        }
+
+        // Ground at this point hurts or kills (any running GroundMap).
+        static bool AnyHurts(Vector2 world)
+        {
+            for (int i = 0; i < all.Count; i++)
+                if (all[i] != null && Ground.Hurts(all[i].RulesAt(all[i].CellAt(world)))) return true;
+            return false;
+        }
         void OnDisable() { all.Remove(this); ready = false; }
 
         void Start()
@@ -167,7 +179,12 @@ namespace TopDownKit
                 GroundState was = cell.state;
                 cell.state = Ground.Crumble(was, ref cell.stepsLeft, stepped.Contains(c), TileAt(c), dt);
                 if (cell.state == GroundState.Normal) cells.Remove(c); else cells[c] = cell;
-                if (cell.state != was) { Changed(c); TileChanged?.Invoke(this, c, cell.state); }
+                if (cell.state != was)
+                {
+                    Changed(c);
+                    TileChanged?.Invoke(this, c, cell.state);
+                    if (cell.state == GroundState.Broken) Cues.Raise(FeelEvent.Crumble, Tilemap.GetCellCenterWorld(c), gameObject);
+                }
             }
 
             // Deadly ground, after this step's breaks.

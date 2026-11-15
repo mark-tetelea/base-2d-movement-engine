@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace TopDownKit
 {
@@ -44,12 +43,13 @@ namespace TopDownKit
         // Read by damage later (phase 4).
         public bool IsInvulnerable => IsDashing && settings.invulnerable;
 
-        // Input arrives as data: Space for the keyboard player; a touch button calls Request.
+        [Tooltip("On: the Dash control (Space unless rebound; a touch button) asks for dashes. Off: only Request does (an enemy).")]
+        public bool readControls = true;
+
+        // Input arrives as data: the Dash control for the player; anything else calls Request.
         void Update()
         {
-            if (PauseMenu.IsPaused) return;
-            Keyboard k = Keyboard.current;
-            if (k != null && k.spaceKey.wasPressedThisFrame) requested = true;
+            if (readControls && Controls.Pressed(Controls.Dash)) requested = true;
         }
 
         // Asks for a dash at the next step (ignored while dashing or cooling down).
@@ -80,6 +80,8 @@ namespace TopDownKit
             stepsLeft = Steps(settings, dt);
             mover.DriveThisStep(velocity);
             AnyStarted?.Invoke(this);
+            Collider2D col = GetComponent<Collider2D>();
+            Cues.Raise(FeelEvent.Dash, col != null ? (Vector2)col.bounds.center : (Vector2)transform.position, gameObject);
         }
 
         // Whole fixed steps one dash lasts (at least 1).

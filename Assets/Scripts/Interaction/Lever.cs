@@ -20,7 +20,13 @@ namespace TopDownKit
         // Every pull of a lever (sounds).
         public static event System.Action<Lever> AnyPulled;
 
-        public override void Use(Interactor who) { on = !on; Apply(); AnyPulled?.Invoke(this); }
+        public override void Use(Interactor who)
+        {
+            on = !on;
+            Apply();
+            AnyPulled?.Invoke(this);
+            Cues.Raise(FeelEvent.DoorOpen, transform.position, gameObject);
+        }
 
         // Sets the lever without a pull (loading a save): no event, no sound.
         public void Set(bool value) { on = value; Apply(); }

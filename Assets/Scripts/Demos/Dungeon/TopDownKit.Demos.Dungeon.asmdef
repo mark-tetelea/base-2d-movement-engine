@@ -1,0 +1,23 @@
+{
+    "name": "TopDownKit.Demos.Dungeon",
+    "rootNamespace": "TopDownKit",
+    "references": [
+        "TopDownKit.Core",
+        "TopDownKit.Screens",
+        "TopDownKit.Combat",
+        "TopDownKit.Inventory",
+        "TopDownKit.World",
+        "TopDownKit.Interaction",
+        "TopDownKit.Camera",
+        "TopDownKit.Movement"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

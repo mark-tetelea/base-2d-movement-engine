@@ -14,7 +14,7 @@ namespace TopDownKit
     // PlayerMover, so the direction it sets is used in the same step.
     [DefaultExecutionOrder(-20)]
     [RequireComponent(typeof(PlayerMover))]
-    public class EnemyBrain : MonoBehaviour
+    public class EnemyBrain : MonoBehaviour, ILevelPart
     {
         public EnemyBehaviour behaviour = EnemyBehaviour.Chase;
         [Tooltip("Who it goes for.")]
@@ -143,6 +143,13 @@ namespace TopDownKit
             if (!fire) return false;
             if (w.chargeTime > 0f && gun.Charge01 >= 1f) return false;   // release: the shot goes now
             return true;
+        }
+
+        // In a generated room: chase the level's player, own random seed.
+        public void PlacedInLevel(Transform player, int levelSeed)
+        {
+            if (target == null) target = player;
+            seed = levelSeed;
         }
     }
 }
