@@ -5,6 +5,10 @@ namespace TopDownKit
 {
     public enum TradeResult { Done, NoMoney, NoRoom, SoldOut, NotWanted, Nothing }
 
+    // Where a bought item goes: straight into the bag, or onto the floor by the shop as a
+    // floor item taken by its own pickup mode (Pickup.Spawn).
+    public enum ShopDelivery { IntoBag, OnFloor }
+
     // Add-on target: a shop. Using it opens the ShopScreen (buy from the stock, sell from
     // the bag). Money is just an item (the currency, coins) in the same Bag, and every
     // trade goes through the one inventory rule: Buy and Sell try the whole trade on a
@@ -19,6 +23,12 @@ namespace TopDownKit
         [Range(0f, 1f)] public float sellRate = 0.5f;
         [Tooltip("Shown at the top of the shop screen. Empty = the object's name.")]
         public string title = "";
+        [Tooltip("IntoBag: a bought item goes straight into the bag (no room = no sale). OnFloor: it lands by the shop and is picked up by its own pickup mode.")]
+        public ShopDelivery delivery = ShopDelivery.IntoBag;
+        [Tooltip("OnFloor: where bought items land, from the shop's pivot (tiles).")]
+        public Vector2 deliverAt = new Vector2(0f, -1.5f);
+        [Tooltip("OnFloor: sorting order of the floor items.")]
+        public int deliverSortingOrder = 1;
 
         int[] left;
 
@@ -76,8 +86,10 @@ namespace TopDownKit
             if (bag == null || i < 0 || i >= LineCount) return TradeResult.Nothing;
             if (Left(i) == 0) return TradeResult.SoldOut;
             ShopStock.Line l = stock.lines[i];
-            TradeResult r = Buy(bag, currency, l.item, l.price);
+            TradeResult r = delivery == ShopDelivery.OnFloor ? Pay(bag, currency, l.item, l.price) : Buy(bag, currency, l.item, l.price);
             if (r != TradeResult.Done) return r;
+            if (delivery == ShopDelivery.OnFloor)
+                Pickup.Spawn(l.item, 1, (Vector2)transform.position + deliverAt, deliverSortingOrder, 0f);
             if (left[i] > 0) left[i]--;
             AnyTrade?.Invoke(this, true);
             return r;
@@ -109,6 +121,15 @@ namespace TopDownKit
             if (price > 0) trial.Remove(currency, price);
             if (trial.Add(item, 1) > 0) return TradeResult.NoRoom;
             Keep(trial, bag);
+            return TradeResult.Done;
+        }
+
+        // Pays price of currency for an item delivered elsewhere (onto the floor), or changes nothing.
+        public static TradeResult Pay(Inventory bag, Item currency, Item item, int price)
+        {
+            if (bag == null || item == null) return TradeResult.Nothing;
+            if (price > 0 && (currency == null || !bag.Has(currency, price))) return TradeResult.NoMoney;
+            if (price > 0) bag.Remove(currency, price);
             return TradeResult.Done;
         }
 

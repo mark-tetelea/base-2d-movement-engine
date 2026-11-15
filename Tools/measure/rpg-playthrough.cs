@@ -153,8 +153,8 @@ Wait(0.2f);
 Do("to heart", () =>
 {
     Check("shot one", gun.Ammo == gun.Current.magazine - 1 && hp.Current == 4, "ammo " + gun.Ammo + ", health " + hp.Current);
-    ammo = TopDownKit.Pickup.Drop(null, 0, new Vector2(110f, -3f), 0, 0f);
-    ammo.auto = true; ammo.refillAmmo = true;
+    ammo = TopDownKit.Pickup.Spawn(null, 0, new Vector2(110f, -3f), 0, 0f);
+    ammo.mode = TopDownKit.PickupChoice.FromItem; ammo.refillAmmo = true;
     Place(new Vector2(104f, -3f));
 });
 Wait(0.8f);
@@ -163,8 +163,8 @@ Do("healed", () => Check("heart heals 1, ammo pickup refills", hp.Current == 5 &
     "health " + hp.Current + ", ammo " + gun.Ammo));
 Do("full health", () =>
 {
-    var h2 = TopDownKit.Pickup.Drop(null, 0, (Vector2)player.transform.position, 0, 0f);
-    h2.auto = true; h2.heal = 1; hp.Heal(5);
+    var h2 = TopDownKit.Pickup.Spawn(null, 0, (Vector2)player.transform.position, 0, 0f);
+    h2.mode = TopDownKit.PickupChoice.FromItem; h2.heal = 1; hp.Heal(5);
     dropped = h2;
 });
 Wait(0.3f);

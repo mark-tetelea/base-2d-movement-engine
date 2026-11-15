@@ -54,7 +54,7 @@ TopDownKit.SaveData Sample(int coins)
         bag = new[] { new TopDownKit.SlotSave { item = "Coin", count = coins }, new TopDownKit.SlotSave { item = "", count = 0 } },
         coins = coins, chests = new TopDownKit.ChestSave[0], openDoors = new string[0], leversOn = new[] { "Lever:a/b" },
         clearedRooms = new string[0], visitedRooms = new string[0], pickups = new TopDownKit.PickupSave[0],
-        floorItems = new[] { new TopDownKit.FloorItemSave { item = "Gem", count = 1, position = new Vector2(0.1f, 0.2f), auto = true } },
+        floorItems = new[] { new TopDownKit.FloorItemSave { item = "Gem", count = 1, position = new Vector2(0.1f, 0.2f), mode = "FromItem" } },
         shops = new TopDownKit.ShopSave[0]
     };
 }
@@ -95,9 +95,23 @@ try
     Bad("a nested field cut out (slot count)", good.Replace("\"count\": 2", "\"cnt\": 2"), TopDownKit.SaveFiles.State.FromBackup);
     Bad("a nested field cut out (position.y)", System.Text.RegularExpressions.Regex.Replace(good, "\"y\":\\s*-3\\.5", "\"z\": -3.5"), TopDownKit.SaveFiles.State.FromBackup);
     Bad("wrong kind (health as text)", System.Text.RegularExpressions.Regex.Replace(good, "\"playerHealth\":\\s*4", "\"playerHealth\": \"4\""), TopDownKit.SaveFiles.State.FromBackup);
-    Bad("no version", System.Text.RegularExpressions.Regex.Replace(good, "\"version\":\\s*1,", ""), TopDownKit.SaveFiles.State.FromBackup);
-    Bad("version 0", System.Text.RegularExpressions.Regex.Replace(good, "\"version\":\\s*1,", "\"version\": 0,"), TopDownKit.SaveFiles.State.FromBackup);
-    Bad("newer version", System.Text.RegularExpressions.Regex.Replace(good, "\"version\":\\s*1,", "\"version\": 99,"), TopDownKit.SaveFiles.State.Newer);
+    string vPat = "\"version\":\\s*" + V + ",";
+    Bad("no version", System.Text.RegularExpressions.Regex.Replace(good, vPat, ""), TopDownKit.SaveFiles.State.FromBackup);
+    Bad("version 0", System.Text.RegularExpressions.Regex.Replace(good, vPat, "\"version\": 0,"), TopDownKit.SaveFiles.State.FromBackup);
+    Bad("newer version", System.Text.RegularExpressions.Regex.Replace(good, vPat, "\"version\": 99,"), TopDownKit.SaveFiles.State.Newer);
+
+    // Version 1 -> 2 (phase 13b): floor items had `auto`, now `mode` by meaning.
+    {
+        string v1 = System.Text.RegularExpressions.Regex.Replace(good, vPat, "\"version\": 1,");
+        v1 = v1.Replace("\"mode\": \"FromItem\"", "\"auto\": true");
+        v1 = v1.Replace("\"floorItems\": [", "\"floorItems\": [ { \"item\": \"Key\", \"count\": 1, \"position\": { \"x\": 0.0, \"y\": 0.0 }, \"auto\": false },");
+        System.IO.File.WriteAllText(f, v1);
+        var s1 = Rd(out var u, out string un);
+        bool ok = s1 == TopDownKit.SaveFiles.State.Ok && u != null && u.version == V && u.floorItems.Length == 2
+            && u.floorItems[0].mode == "Interact" && u.floorItems[1].mode == "Magnet" && u.floorItems[1].item == "Gem";
+        Check("version 1 file upgrades (auto -> mode by meaning)", ok && !v1.Contains("\"mode\""), s1 + " " + un + (u != null ? " " + JsonUtility.ToJson(u) : ""));
+        System.IO.File.WriteAllText(f, good);
+    }
 
     // A broken main must not become the backup when saving over it, and is kept aside.
     System.IO.File.WriteAllText(f, "{ broken");
@@ -109,7 +123,7 @@ try
     Check("  the broken file is kept aside", kept.Length == 1 && System.IO.File.ReadAllText(kept[0]) == "{ broken", kept.Length + " kept");
     Check("  the new save is in", d3 != null && d3.coins == 3, "");
     // A newer file is kept aside too, never overwritten.
-    string newer = System.Text.RegularExpressions.Regex.Replace(System.IO.File.ReadAllText(f), "\"version\":\\s*1,", "\"version\": 99,");
+    string newer = System.Text.RegularExpressions.Regex.Replace(System.IO.File.ReadAllText(f), "\"version\":\\s*" + V + ",", "\"version\": 99,");
     System.IO.File.WriteAllText(f, newer);
     TopDownKit.SaveFiles.Write(f, Sample(4), Good);
     kept = System.IO.Directory.GetFiles(dir, "a.kept-*.json");
@@ -176,7 +190,7 @@ Do("change every saved system (LittleRpg)", () =>
     Check("shop: a gem (15) with " + coinsBefore + " coins", gemResult == (coinsBefore >= 15 ? TopDownKit.TradeResult.Done : TopDownKit.TradeResult.NoMoney), gemResult.ToString());
     int potionSlot = -1; for (int i = 0; i < bag.Size; i++) if (bag.slots[i].item == ItemAt("Potion")) potionSlot = i;
     Check("shop buys back a potion for half", shop.SellSlot(bag, potionSlot) == TopDownKit.TradeResult.Done, "");
-    TopDownKit.Pickup.Drop(ItemAt("Gem"), 1, new Vector2(2f, -6f + 3f), 0, 0f);   // an item lying loose
+    TopDownKit.Pickup.Spawn(ItemAt("Gem"), 1, new Vector2(2f, -6f + 3f), 0, 0f);   // an item lying loose
 });
 Wait(0.3f);
 Do("save slot 1", () =>
@@ -254,7 +268,7 @@ Do("broken slot", () =>
     int sceneHandle = UnityEngine.SceneManagement.SceneManager.GetActiveScene().handle;
     string err = Game().Load(2);
     Check("broken slot: refused, says so, same scene", err.Contains("broken") && UnityEngine.SceneManagement.SceneManager.GetActiveScene().handle == sceneHandle, err);
-    System.IO.File.WriteAllText(Game().SlotPath(2), System.IO.File.ReadAllText(Game().SlotPath(0)).Replace("\"version\": 1", "\"version\": 2"));
+    System.IO.File.WriteAllText(Game().SlotPath(2), System.IO.File.ReadAllText(Game().SlotPath(0)).Replace("\"version\": " + V, "\"version\": " + (V + 1)));
     err = Game().Load(2);
     Check("newer slot: refused, says so", err.Contains("newer"), err);
     // Slot 1 broken but its backup good (slot 1 was written once, so make a backup by saving twice).

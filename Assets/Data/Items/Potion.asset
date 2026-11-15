@@ -15,3 +15,7 @@ MonoBehaviour:
   displayName: Potion
   icon: {fileID: 21300000, guid: b3fcfb748b692874abee2f84518f0f18, type: 3}
   maxStack: 10
+  pickup: 0
+  magnetReach: 0
+  magnetSpeed: 0
+  droppable: 1

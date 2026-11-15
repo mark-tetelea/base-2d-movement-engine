@@ -132,7 +132,7 @@ for (int i = 0; i < 6; i++)
 {
     var c = Thing("Coin", root.transform, -8f + 1.5f * i, -8f);
     Art(c, coin.icon, Color.white, order - 1);
-    var p = c.AddComponent<TopDownKit.Pickup>(); p.auto = true; p.stack = new TopDownKit.ItemStack(coin, 1); p.centre = Vector2.zero;
+    var p = c.AddComponent<TopDownKit.Pickup>(); p.mode = TopDownKit.PickupChoice.FromItem; p.stack = new TopDownKit.ItemStack(coin, 1); p.centre = Vector2.zero;
 }
 // Two wanderers in area D (reached by the warp), away from the measuring lanes in A.
 foreach (var pos in new[] { new Vector2(108f, 3f), new Vector2(112f, -3f) })

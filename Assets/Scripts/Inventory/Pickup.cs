@@ -3,15 +3,22 @@ using UnityEngine;
 
 namespace TopDownKit
 {
-    // Something lying on the floor. Auto: a Collector picks it up by walking near (coins,
-    // ammo, health), pulled in by its magnet. Manual: an interaction target, taken with the
-    // interact key (weapons, key items). What it gives: items into the Bag, health (the
+    // A Pickup's mode: the item's own setting, or an override for this one object.
+    public enum PickupChoice { FromItem, Walk, Interact, Magnet }
+
+    // Something lying on the floor. How it is taken is the item's pickup mode (Item.pickup),
+    // or this object's override: Walk and Magnet are taken by a Collector, Interact is an
+    // interaction target taken with the interact key. A pickup with no item (a heart, an
+    // ammo box) and no override is Magnet. What it gives: items into the Bag, health (the
     // phase 4 Health), full magazines (Gun.Refill). Any mix of the three.
+    //
+    // Every source puts items on the floor the same way, through Spawn: the hotbar and bag
+    // drop, chests that spill, the shop's floor delivery, Drops on crates and enemies, loading.
     public class Pickup : Interactable
     {
         public ItemStack stack;
-        [Tooltip("On: walked over (Collector). Off: taken with the interact key.")]
-        public bool auto = true;
+        [Tooltip("How it is picked up. FromItem = the item's own setting (no item: Magnet).")]
+        public PickupChoice mode = PickupChoice.FromItem;
         [Tooltip("Health given (needs a Health on the collector).")]
         [Min(0)] public int heal;
         [Tooltip("Left on the floor while the collector is at full health.")]
@@ -22,13 +29,21 @@ namespace TopDownKit
         [Min(0f)] public float waitBeforeCollect;
 
         static readonly List<Pickup> pickups = new List<Pickup>();
-        public static IReadOnlyList<Pickup> All => pickups;
+        public static new IReadOnlyList<Pickup> All => pickups;
         // Every pickup that gives something (sounds, particles). The second value is who took it.
         public static event System.Action<Pickup, GameObject> AnyCollected;
 
         float age;
+        GameObject droppedBy;   // its Collector ignores it until it has walked out of reach once
 
         public bool Ready => age >= waitBeforeCollect - 1e-4f;
+
+        public PickupMode Mode => mode != PickupChoice.FromItem ? (PickupMode)((int)mode - 1)
+                                : stack.item != null ? stack.item.pickup : PickupMode.Magnet;
+
+        // The item's magnet numbers, 0 = the collector's.
+        public float MagnetReach => stack.item != null ? stack.item.magnetReach : 0f;
+        public float MagnetSpeed => stack.item != null ? stack.item.magnetSpeed : 0f;
 
         void Reset() { verb = "Take"; centre = Vector2.zero; promptOffset = new Vector2(0f, 1f); }
 
@@ -37,9 +52,22 @@ namespace TopDownKit
 
         void FixedUpdate() { age += Time.fixedDeltaTime; }
 
-        public override bool CanUse(Interactor who) => !auto && Ready && Wants(who.gameObject);
+        public override bool CanUse(Interactor who) => Mode == PickupMode.Interact && Ready && Wants(who.gameObject);
 
         public override void Use(Interactor who) { Collect(who.gameObject); }
+
+        // Whether a Collector at `who` may take it now. The one who dropped it must first be
+        // out of `reach` once, so a walk or magnet item is not taken straight back.
+        public bool CollectorMay(GameObject who, float distance, float reach)
+        {
+            if (Mode == PickupMode.Interact || !Ready) return false;
+            if (droppedBy != null && who == droppedBy)
+            {
+                if (distance <= reach) return false;
+                droppedBy = null;
+            }
+            return true;
+        }
 
         // Whether collecting now would give the collector anything.
         public bool Wants(GameObject who)
@@ -83,22 +111,41 @@ namespace TopDownKit
             return true;
         }
 
-        // A manual pickup on the floor holding a stack (the Hotbar's drop).
-        public static Pickup Drop(Item item, int count, Vector2 position, int sortingOrder, float waitBeforeCollect)
+        // The one way items appear on the floor: a pickup holding the stack, taken by the
+        // item's pickup mode (or `choice`). `droppedBy` (may be null) cannot collect it by
+        // walking or magnet until it has been out of reach once.
+        public static Pickup Spawn(Item item, int count, Vector2 position, int sortingOrder, float waitBeforeCollect,
+                                   GameObject droppedBy = null, PickupChoice choice = PickupChoice.FromItem)
         {
-            GameObject go = new GameObject("Dropped " + (item != null ? item.Name : "item"));
+            GameObject go = new GameObject((droppedBy != null ? "Dropped " : "Loose ") + (item != null ? item.Name : "item"));
             go.transform.position = position;
             SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
             sr.sprite = item != null ? item.icon : null;
             sr.sortingOrder = sortingOrder;
             Pickup p = go.AddComponent<Pickup>();
             p.stack = new ItemStack(item, count);
-            p.auto = false;
+            p.mode = choice;
             p.verb = "Take";
             p.centre = Vector2.zero;
             p.promptOffset = new Vector2(0f, 1f);
             p.waitBeforeCollect = waitBeforeCollect;
+            p.droppedBy = droppedBy;
             return p;
+        }
+
+        // Puts every stack of an inventory on the floor around `at` (a chest spilling).
+        public static void SpillAll(Inventory inv, Vector2 at, float radius, int sortingOrder)
+        {
+            int n = 0;
+            for (int i = 0; i < inv.Size; i++) if (!inv.slots[i].Empty) n++;
+            int k = 0;
+            for (int i = 0; i < inv.Size; i++)
+            {
+                ItemStack s = inv.TakeFrom(i, inv.slots[i].count);
+                if (s.Empty) continue;
+                float a = (k++ + 0.5f) / n * Mathf.PI * 2f - Mathf.PI * 0.5f;
+                Spawn(s.item, s.count, at + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * radius, sortingOrder, 0f);
+            }
         }
     }
 }

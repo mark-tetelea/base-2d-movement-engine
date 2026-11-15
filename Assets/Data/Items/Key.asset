@@ -15,3 +15,7 @@ MonoBehaviour:
   displayName: Key
   icon: {fileID: 21300000, guid: 46a174ac4548da9438487f9cdb4ebdf1, type: 3}
   maxStack: 1
+  pickup: 1
+  magnetReach: 0
+  magnetSpeed: 0
+  droppable: 1

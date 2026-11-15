@@ -40,7 +40,7 @@ namespace TopDownKit
     [DefaultExecutionOrder(1000)]
     public class SaveGame : MonoBehaviour
     {
-        public const int Version = 1;
+        public const int Version = 2;
 
         [Tooltip("What a save holds. Parts left out stay as the scene starts on loading.")]
         public SaveParts parts = SaveParts.All;
@@ -291,7 +291,7 @@ namespace TopDownKit
                 foreach (Pickup p in Pickup.All)
                 {
                     if (p == null || startCounts.ContainsKey(p) || p.stack.Empty) continue;
-                    loose.Add(new FloorItemSave { item = ItemName(p.stack.item), count = p.stack.count, position = p.transform.position, auto = p.auto });
+                    loose.Add(new FloorItemSave { item = ItemName(p.stack.item), count = p.stack.count, position = p.transform.position, mode = p.mode.ToString() });
                 }
                 d.floorItems = loose.ToArray();
             }
@@ -377,8 +377,8 @@ namespace TopDownKit
                 {
                     Item item = ItemNamed(f.item);
                     if (item == null || f.count <= 0) continue;
-                    Pickup p = Pickup.Drop(item, f.count, f.position, order, 0f);
-                    p.auto = f.auto;
+                    PickupChoice mode = System.Enum.TryParse(f.mode, out PickupChoice m) ? m : PickupChoice.FromItem;
+                    Pickup.Spawn(item, f.count, f.position, order, 0f, null, mode);
                 }
             }
             if (In(d, SaveParts.Shops))
@@ -425,11 +425,21 @@ namespace TopDownKit
         // ---- slots ---------------------------------------------------------------------
 
         // Upgrade steps, run on EVERY file (trap 49), by what the values mean (trap 47).
-        // Version 1 is the first shape: nothing to do yet. When version 2 changes the shape,
-        // add here e.g.: if (!root.ContainsKey("newField")) { root["newField"] = ...; changed = true; }
+        // 1 -> 2 (phase 13b): a floor item's `auto` (true = walked over, which pulled in by the
+        // magnet; false = taken with the interact key) became `mode`, a PickupChoice name.
+        // Version 1 floor items were never anything but their own pickup, so auto true means
+        // Magnet and false means Interact - kept as an override, so the item lies as it did.
         public static bool UpgradeSteps(Dictionary<string, object> root, int fileVersion)
         {
             bool changed = false;
+            if (root.TryGetValue("floorItems", out object fi) && fi is List<object> items)
+                foreach (object o in items)
+                {
+                    if (!(o is Dictionary<string, object> f) || f.ContainsKey("mode") || !f.TryGetValue("auto", out object a)) continue;
+                    f["mode"] = a is bool b && b ? "Magnet" : "Interact";
+                    f.Remove("auto");
+                    changed = true;
+                }
             return changed;
         }
 

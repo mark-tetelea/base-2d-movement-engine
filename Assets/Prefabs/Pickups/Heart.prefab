@@ -110,7 +110,7 @@ MonoBehaviour:
   stack:
     item: {fileID: 0}
     count: 0
-  auto: 1
+  mode: 0
   heal: 1
   onlyWhenHurt: 1
   refillAmmo: 0

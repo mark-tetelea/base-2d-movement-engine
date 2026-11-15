@@ -54,7 +54,9 @@ namespace TopDownKit
 
     [Serializable] public struct PickupSave { public string id; public bool taken; public int count; }
 
-    [Serializable] public struct FloorItemSave { public string item; public int count; public Vector2 position; public bool auto; }
+    // mode: a PickupChoice name (FromItem / Walk / Interact / Magnet). Version 1 had
+    // `bool auto` instead (true -> Magnet, false -> Interact; SaveGame.UpgradeSteps).
+    [Serializable] public struct FloorItemSave { public string item; public int count; public Vector2 position; public string mode; }
 
     [Serializable] public struct ShopLineSave { public string item; public int left; }
 

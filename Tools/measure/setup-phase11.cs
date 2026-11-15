@@ -50,7 +50,7 @@ GameObject PickupPrefab(string name, Sprite sprite, int coins, int heal)
     var go = new GameObject(name);
     var sr = go.AddComponent<SpriteRenderer>(); sr.sprite = sprite; sr.sortingOrder = order - 1;
     var p = go.AddComponent<TopDownKit.Pickup>();
-    p.auto = true; p.centre = Vector2.zero; p.verb = "Take"; p.promptOffset = new Vector2(0f, 1f);
+    p.mode = TopDownKit.PickupChoice.FromItem; p.centre = Vector2.zero; p.verb = "Take"; p.promptOffset = new Vector2(0f, 1f);
     p.stack = coins > 0 ? new TopDownKit.ItemStack(coinItem, coins) : new TopDownKit.ItemStack(null, 0);
     p.heal = heal; p.onlyWhenHurt = true; p.waitBeforeCollect = 0.3f;
     return Save(go, "Assets/Prefabs/Pickups/" + name + ".prefab");

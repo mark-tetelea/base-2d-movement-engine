@@ -15,3 +15,7 @@ MonoBehaviour:
   displayName: Crown
   icon: {fileID: 21300000, guid: b5c601c87d28e3342b63a372ad575cb5, type: 3}
   maxStack: 1
+  pickup: 1
+  magnetReach: 0
+  magnetSpeed: 0
+  droppable: 0

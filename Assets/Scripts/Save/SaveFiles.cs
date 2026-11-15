@@ -83,7 +83,10 @@ namespace TopDownKit
                 int fileVersion = (int)d;
                 if (fileVersion > version) { note = "made by a newer version (" + fileVersion + ")"; return State.Newer; }
                 // Every file goes through the upgrade steps, not only older ones (trap 49).
-                if (upgrade != null && upgrade(root, fileVersion)) text = SaveJson.Write(root);
+                bool changed = upgrade != null && upgrade(root, fileVersion);
+                // After the steps an older file has today's shape: say so in what is read.
+                if (fileVersion < version) { root["version"] = (double)version; changed = true; }
+                if (changed) text = SaveJson.Write(root);
                 var problems = new List<string>();
                 SaveJson.Check(root, typeof(T), "save", problems);
                 if (problems.Count > 0)

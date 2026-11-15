@@ -138,7 +138,7 @@ void Coin(float x, float y)
     var go = Thing("Coin", root.transform, x, y);
     Art(go, coin.icon, Color.white, order - 1);
     var p = go.AddComponent<TopDownKit.Pickup>();
-    p.auto = true; p.stack = new TopDownKit.ItemStack(coin, 1); p.centre = Vector2.zero;
+    p.mode = TopDownKit.PickupChoice.FromItem; p.stack = new TopDownKit.ItemStack(coin, 1); p.centre = Vector2.zero;
 }
 
 // Room A.
@@ -174,7 +174,7 @@ Npc("Hermit", 106f, 2f, hermitLines, "#c0cbdc");
 Chest("Hermit chest", 112f, -2f, (coin, 25));
 var heart = Thing("Heart", root.transform, 108f, -3f);
 Art(heart, heartSprite, Color.white, order - 1);
-var hp = heart.AddComponent<TopDownKit.Pickup>(); hp.auto = true; hp.heal = 1; hp.centre = Vector2.zero;
+var hp = heart.AddComponent<TopDownKit.Pickup>(); hp.mode = TopDownKit.PickupChoice.FromItem; hp.heal = 1; hp.centre = Vector2.zero;
 
 // Screens and the prompt.
 var ui = new GameObject("UI");

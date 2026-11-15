@@ -6,11 +6,11 @@ namespace TopDownKit
     [Serializable]
     public struct CollectSettings
     {
-        [Tooltip("Auto pickups closer than this (tiles) fly towards the collector. 0 = no magnet.")]
+        [Tooltip("Magnet pickups closer than this (tiles) fly towards the collector, unless their item sets its own. 0 = no magnet.")]
         [Min(0f)] public float magnetReach;
-        [Tooltip("How fast they fly, tiles/s.")]
+        [Tooltip("How fast they fly, tiles/s (unless their item sets its own).")]
         [Min(0f)] public float magnetSpeed;
-        [Tooltip("Auto pickups closer than this (tiles) are collected.")]
+        [Tooltip("Walk and magnet pickups closer than this (tiles) are collected.")]
         [Min(0f)] public float collectReach;
 
         public CollectSettings(float magnetReach, float magnetSpeed, float collectReach)
@@ -21,9 +21,10 @@ namespace TopDownKit
         }
     }
 
-    // Picks up auto pickups (coins, ammo, health) on the fixed step: pulls those in magnet
-    // reach towards itself and collects those in collect reach. Only pickups that would
-    // give it something are pulled, so a full bag leaves coins lying where they are.
+    // Picks up walk and magnet pickups (coins, ammo, health) on the fixed step: pulls magnet
+    // pickups in their magnet reach (the item's, else these settings) towards itself and
+    // collects any in collect reach. Only pickups that would give it something are pulled,
+    // so a full bag leaves coins lying where they are.
     public class Collector : MonoBehaviour
     {
         public CollectSettings settings = new CollectSettings(2.5f, 10f, 0.6f);
@@ -36,23 +37,26 @@ namespace TopDownKit
         {
             float dt = Time.fixedDeltaTime;
             Vector2 me = (Vector2)transform.position + centre;
-            float collect2 = settings.collectReach * settings.collectReach;
-            float magnet2 = settings.magnetReach * settings.magnetReach;
             // Backwards: collecting destroys (at the end of the frame, but stay safe).
             for (int i = Pickup.All.Count - 1; i >= 0; i--)
             {
                 Pickup p = Pickup.All[i];
-                if (p == null || !p.auto || !p.Ready) continue;
+                if (p == null) continue;
+                PickupMode mode = p.Mode;
+                if (mode == PickupMode.Interact) continue;
+                float magnet = mode == PickupMode.Magnet ? (p.MagnetReach > 0f ? p.MagnetReach : settings.magnetReach) : 0f;
+                float speed = p.MagnetSpeed > 0f ? p.MagnetSpeed : settings.magnetSpeed;
+                float reach = Mathf.Max(settings.collectReach, magnet);
                 Vector2 at = p.transform.position;
-                float d2 = (at - me).sqrMagnitude;
-                if (d2 > Mathf.Max(collect2, magnet2) || !p.Wants(gameObject)) continue;
-                if (d2 > collect2)
+                float d = (at - me).magnitude;
+                if (!p.CollectorMay(gameObject, d, reach) || d > reach || !p.Wants(gameObject)) continue;
+                if (d > settings.collectReach)
                 {
-                    at = Vector2.MoveTowards(at, me, settings.magnetSpeed * dt);
+                    at = Vector2.MoveTowards(at, me, speed * dt);
                     p.transform.position = at;
-                    d2 = (at - me).sqrMagnitude;
+                    d = (at - me).magnitude;
                 }
-                if (d2 <= collect2 && p.Collect(gameObject)) Collected++;
+                if (d <= settings.collectReach && p.Collect(gameObject)) Collected++;
             }
         }
     }

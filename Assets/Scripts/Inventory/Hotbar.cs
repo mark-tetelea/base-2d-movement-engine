@@ -5,7 +5,7 @@ namespace TopDownKit
 {
     // The first slots of the Bag are the hotbar (InventorySettings.hotbarSlots). Number
     // keys pick the selected slot; Q drops one of what it holds on the floor in front of
-    // the player. Input arrives as data: Select and Drop (keys only when readKeyboard).
+    // the player (unless the item is not droppable). Input arrives as data: Select and Drop (keys only when readKeyboard).
     [RequireComponent(typeof(Bag))]
     public class Hotbar : MonoBehaviour
     {
@@ -32,14 +32,22 @@ namespace TopDownKit
         }
 
         // Drops count of the selected slot in front (or at the feet). Returns the floor item.
-        public Pickup Drop(int count = 1)
+        public Pickup Drop(int count = 1) => DropSlot(Selected, count);
+
+        // Drops count of any bag slot (the bag screen uses this too). Items with droppable
+        // off stay. The floor item uses its item's pickup mode; this player cannot take it
+        // back by walking or magnet until it has stepped out of reach once.
+        public Pickup DropSlot(int slot, int count)
         {
-            ItemStack taken = Inventory.TakeFrom(Selected, count);
+            if (slot < 0 || slot >= Inventory.Size) return null;
+            ItemStack s = Inventory.slots[slot];
+            if (s.Empty || !s.item.droppable) return null;
+            ItemStack taken = Inventory.TakeFrom(slot, count);
             if (taken.Empty) return null;
             if (interactor == null) interactor = GetComponent<Interactor>();
             Vector2 ahead = interactor != null ? interactor.FacingDirection : Vector2.down;
             Vector2 at = (Vector2)transform.position + ahead.normalized * dropDistance;
-            return Pickup.Drop(taken.item, taken.count, at, dropSortingOrder, dropWait);
+            return Pickup.Spawn(taken.item, taken.count, at, dropSortingOrder, dropWait, gameObject);
         }
 
         void Update()

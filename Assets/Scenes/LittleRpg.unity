@@ -170,7 +170,7 @@ MonoBehaviour:
   stack:
     item: {fileID: 0}
     count: 0
-  auto: 1
+  mode: 0
   heal: 1
   onlyWhenHurt: 1
   refillAmmo: 0
@@ -285,7 +285,7 @@ MonoBehaviour:
   stack:
     item: {fileID: 11400000, guid: ce97f8f48707b0a4c96e15f33a17f8d3, type: 2}
     count: 1
-  auto: 1
+  mode: 0
   heal: 0
   onlyWhenHurt: 1
   refillAmmo: 0
@@ -464,6 +464,9 @@ MonoBehaviour:
   art: {fileID: 166142740}
   closedSprite: {fileID: 21300000, guid: d7af6c0e8738d3944adec3f811c10b92, type: 3}
   openSprite: {fileID: 21300000, guid: 2fa7dcc3534436f41a9c1b9066592027, type: 3}
+  spillOnOpen: 1
+  spillRadius: 1.2
+  spillSortingOrder: 1
 --- !u!114 &166142738
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -796,6 +799,9 @@ MonoBehaviour:
   art: {fileID: 204965325}
   closedSprite: {fileID: 21300000, guid: d7af6c0e8738d3944adec3f811c10b92, type: 3}
   openSprite: {fileID: 21300000, guid: 2fa7dcc3534436f41a9c1b9066592027, type: 3}
+  spillOnOpen: 0
+  spillRadius: 1.2
+  spillSortingOrder: 1
 --- !u!114 &204965323
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -990,7 +996,7 @@ MonoBehaviour:
   stack:
     item: {fileID: 11400000, guid: ce97f8f48707b0a4c96e15f33a17f8d3, type: 2}
     count: 1
-  auto: 1
+  mode: 0
   heal: 0
   onlyWhenHurt: 1
   refillAmmo: 0
@@ -1107,6 +1113,9 @@ MonoBehaviour:
   art: {fileID: 241504982}
   closedSprite: {fileID: 21300000, guid: d7af6c0e8738d3944adec3f811c10b92, type: 3}
   openSprite: {fileID: 21300000, guid: 2fa7dcc3534436f41a9c1b9066592027, type: 3}
+  spillOnOpen: 0
+  spillRadius: 1.2
+  spillSortingOrder: 1
 --- !u!114 &241504980
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1301,7 +1310,7 @@ MonoBehaviour:
   stack:
     item: {fileID: 11400000, guid: ce97f8f48707b0a4c96e15f33a17f8d3, type: 2}
     count: 1
-  auto: 1
+  mode: 0
   heal: 0
   onlyWhenHurt: 1
   refillAmmo: 0
@@ -1616,7 +1625,7 @@ MonoBehaviour:
   stack:
     item: {fileID: 11400000, guid: ce97f8f48707b0a4c96e15f33a17f8d3, type: 2}
     count: 1
-  auto: 1
+  mode: 0
   heal: 0
   onlyWhenHurt: 1
   refillAmmo: 0
@@ -1731,7 +1740,7 @@ MonoBehaviour:
   stack:
     item: {fileID: 11400000, guid: ce97f8f48707b0a4c96e15f33a17f8d3, type: 2}
     count: 1
-  auto: 1
+  mode: 0
   heal: 0
   onlyWhenHurt: 1
   refillAmmo: 0
@@ -1925,7 +1934,7 @@ MonoBehaviour:
   stack:
     item: {fileID: 11400000, guid: ce97f8f48707b0a4c96e15f33a17f8d3, type: 2}
     count: 1
-  auto: 1
+  mode: 0
   heal: 0
   onlyWhenHurt: 1
   refillAmmo: 0
@@ -2127,10 +2136,10 @@ MonoBehaviour:
   gun: {fileID: 0}
   hotbar: {fileID: 827345426}
   interactor: {fileID: 827345425}
-  help: 'WASD move  E use  1-5 hotbar  Q drop
+  help: 'WASD move  E use  1-5 hotbar  Q drop  I bag
 
-    chest: click / T take all  Esc
-    pause  M map'
+    chest: click / T take all 
+    Esc pause  M map'
 --- !u!114 &428046919
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2387,7 +2396,7 @@ MonoBehaviour:
   stack:
     item: {fileID: 11400000, guid: ce97f8f48707b0a4c96e15f33a17f8d3, type: 2}
     count: 1
-  auto: 1
+  mode: 0
   heal: 0
   onlyWhenHurt: 1
   refillAmmo: 0
@@ -2677,7 +2686,7 @@ MonoBehaviour:
   stack:
     item: {fileID: 11400000, guid: ce97f8f48707b0a4c96e15f33a17f8d3, type: 2}
     count: 1
-  auto: 1
+  mode: 0
   heal: 0
   onlyWhenHurt: 1
   refillAmmo: 0
@@ -3460,7 +3469,7 @@ MonoBehaviour:
   stack:
     item: {fileID: 11400000, guid: ce97f8f48707b0a4c96e15f33a17f8d3, type: 2}
     count: 1
-  auto: 1
+  mode: 0
   heal: 0
   onlyWhenHurt: 1
   refillAmmo: 0
@@ -3575,7 +3584,7 @@ MonoBehaviour:
   stack:
     item: {fileID: 11400000, guid: ce97f8f48707b0a4c96e15f33a17f8d3, type: 2}
     count: 1
-  auto: 1
+  mode: 0
   heal: 0
   onlyWhenHurt: 1
   refillAmmo: 0
@@ -3660,6 +3669,7 @@ GameObject:
   - component: {fileID: 827345425}
   - component: {fileID: 827345427}
   - component: {fileID: 827345429}
+  - component: {fileID: 827345430}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -3990,6 +4000,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TopDownKit.Footsteps
   stride: 1
+--- !u!114 &827345430
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 827345415}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29c874a93a7c7f64580946341201fb4b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TopDownKit.BagScreen
+  readKeyboard: 1
+  columns: 5
 --- !u!1 &966733084
 GameObject:
   m_ObjectHideFlags: 0
@@ -4041,7 +4065,7 @@ MonoBehaviour:
   stack:
     item: {fileID: 11400000, guid: ce97f8f48707b0a4c96e15f33a17f8d3, type: 2}
     count: 1
-  auto: 1
+  mode: 0
   heal: 0
   onlyWhenHurt: 1
   refillAmmo: 0
@@ -4344,7 +4368,7 @@ MonoBehaviour:
   stack:
     item: {fileID: 11400000, guid: ce97f8f48707b0a4c96e15f33a17f8d3, type: 2}
     count: 1
-  auto: 1
+  mode: 0
   heal: 0
   onlyWhenHurt: 1
   refillAmmo: 0
@@ -4748,7 +4772,7 @@ MonoBehaviour:
   stack:
     item: {fileID: 11400000, guid: ce97f8f48707b0a4c96e15f33a17f8d3, type: 2}
     count: 1
-  auto: 1
+  mode: 0
   heal: 0
   onlyWhenHurt: 1
   refillAmmo: 0
@@ -5146,7 +5170,7 @@ MonoBehaviour:
   stack:
     item: {fileID: 11400000, guid: ce97f8f48707b0a4c96e15f33a17f8d3, type: 2}
     count: 1
-  auto: 1
+  mode: 0
   heal: 0
   onlyWhenHurt: 1
   refillAmmo: 0
@@ -44293,6 +44317,9 @@ MonoBehaviour:
   art: {fileID: 1817531339}
   closedSprite: {fileID: 21300000, guid: d7af6c0e8738d3944adec3f811c10b92, type: 3}
   openSprite: {fileID: 21300000, guid: 2fa7dcc3534436f41a9c1b9066592027, type: 3}
+  spillOnOpen: 0
+  spillRadius: 1.2
+  spillSortingOrder: 1
 --- !u!114 &1817531337
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44487,7 +44514,7 @@ MonoBehaviour:
   stack:
     item: {fileID: 11400000, guid: ce97f8f48707b0a4c96e15f33a17f8d3, type: 2}
     count: 1
-  auto: 1
+  mode: 0
   heal: 0
   onlyWhenHurt: 1
   refillAmmo: 0
@@ -44602,7 +44629,7 @@ MonoBehaviour:
   stack:
     item: {fileID: 11400000, guid: ce97f8f48707b0a4c96e15f33a17f8d3, type: 2}
     count: 1
-  auto: 1
+  mode: 0
   heal: 0
   onlyWhenHurt: 1
   refillAmmo: 0
@@ -44862,7 +44889,7 @@ MonoBehaviour:
   stack:
     item: {fileID: 11400000, guid: ce97f8f48707b0a4c96e15f33a17f8d3, type: 2}
     count: 1
-  auto: 1
+  mode: 0
   heal: 0
   onlyWhenHurt: 1
   refillAmmo: 0
@@ -51096,6 +51123,9 @@ MonoBehaviour:
   currency: {fileID: 11400000, guid: ce97f8f48707b0a4c96e15f33a17f8d3, type: 2}
   sellRate: 0.5
   title: Shop
+  delivery: 0
+  deliverAt: {x: 0, y: -1.5}
+  deliverSortingOrder: 1
 --- !u!58 &2125546212
 CircleCollider2D:
   m_ObjectHideFlags: 0

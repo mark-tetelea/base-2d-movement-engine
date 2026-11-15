@@ -15,3 +15,7 @@ MonoBehaviour:
   displayName: Coin
   icon: {fileID: 21300000, guid: c945f30682f6308419c6277c4b4f181f, type: 3}
   maxStack: 99
+  pickup: 2
+  magnetReach: 0
+  magnetSpeed: 0
+  droppable: 1

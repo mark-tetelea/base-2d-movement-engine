@@ -1,6 +1,6 @@
 # Where the kit is now
 
-> Rewritten, never appended. True as of **2026-11-14**, end of phase 13 (save and load, coin shop, minimap, touch controls).
+> Rewritten, never appended. True as of **2026-11-15**, end of phase 13b (item pickup pass).
 
 ## How it starts
 
@@ -15,7 +15,10 @@ pauses (the game stops; Resume, Restart, Save, Load, Main menu). Save and Load o
 arena of four rooms: A (start), B to the right (its doors lock once you are inside), big
 room C above, and area D reached by a brown warp pad in C. Along the top of A: a yellow
 speed pad (x1.6), brown mud (x0.5) and a cyan ice patch. In A: a chest (a key and 10 coins),
-the green Guide to talk to, a row of coins. In D: two green wanderers to shoot and a
+the green Guide to talk to, a row of coins, and to its right one item per pickup mode: a potion
+(walk onto it), a gem (pulled in from 4.5 tiles - its own magnet reach), a crown (press E; it
+cannot be dropped) and a coin set to "press E" in the scene instead of its usual magnet. In D: two
+green wanderers to shoot (they may drop a coin, three coins or a heart) and a
 red grid-step chaser that hops one tile at a time and goes round walls. In the upper part of C: a
 group - a crowned leader wandering with three red chasers in a V behind it (they break off and
 chase you when you come within 4 tiles) - and a brown trail enemy that leaves a fading trail of
@@ -43,7 +46,8 @@ button; a click moves to the next value, live:
 
 WASD move, mouse aims, left click shoots (not when the click lands on a screen), R reloads,
 1-6 pick a weapon (Sword swings an arc; Charger: hold to charge, release to fire, up to x4
-damage; Bouncer: bullets bounce off walls 3 times), E uses, K knocks the player away from the mouse. The HUD shows health,
+damage; Bouncer: bullets bounce off walls 3 times), E uses, K knocks the player away from the mouse,
+Q drops one of the hotbar item, I opens the bag (click a slot to drop that stack). The HUD shows health,
 weapon and ammo, the hotbar (click a slot) and the controls.
 
 ## The Arena shooter demo (phase 4)
@@ -62,9 +66,12 @@ restarts after 1.5 s).
 ## The Little RPG room demo (phase 5)
 
 `Assets/Scenes/LittleRpg.unity`. Instant feel, 4 facings, rooms fade. E uses the best target
-in front (an "E" shows over it), 1-5 pick a hotbar slot, Q drops one. Talk to the Guide,
-pick up coins (magnet 2.5 tiles), find the key in a chest in C, open the pink door, take the
-crown in B to win. Chests open a transfer screen (click a slot, T takes all, E closes). A plum
+in front (an "E" shows over it), 1-5 pick a hotbar slot, Q drops one, I opens the bag (click a
+slot to drop it). Talk to the Guide, pick up coins (magnet 2.5 tiles), find the key in a chest in
+C, open the pink door, take the crown in B to win (the crown cannot be dropped). Chests open a
+transfer screen (click a slot, T takes all, E closes); the hermit's chest in D throws its coins
+out on the floor instead the first time. A dropped item is not taken straight back: walk away
+from it and come back. A plum
 **shopkeeper** in A sells potions (4 coins, 5 of them) and gems (15 coins, 2); click a line to buy
 one, click a bag slot to sell one back for half (only what the shop sells). Potions and gems do
 nothing yet.
@@ -78,7 +85,7 @@ crates, wanderers), a long Hall (two screens wide), Pool (blue water to shoot ov
 tall Tower (two screens high), and always last, as far from the start as the layout allows, the
 Boss room with the horned blob. Walking into a room shuts its doors (door ground) and sends two
 waves; clearing it opens them. **Crates** (wooden boxes) block walking and bullets; three hits break
-one, and it may drop a coin, three coins or a heart. HUD status: "Rooms 2/6  Coins 3  Seed 12345"
+one, and it may drop a coin, three coins or a heart; enemies (not the boss) drop the same way. HUD status: "Rooms 2/6  Coins 3  Seed 12345"
 (the seed names the layout); "Dungeon cleared - you win" when the boss room is cleared; death or
 Restart gives a new layout. A fixed seed on the generator gives the same layout every time.
 
@@ -112,7 +119,7 @@ stick bottom right (pushing it fires), Fire, Dash, Use, Gun (next weapon) and a 
 
 One set, used by all four: a HUD (health bar, weapon + ammo, hotbar, a status line, a centre
 banner, a help line - each demo shows only what it has), the text box, the chest screen, the
-shop screen, the pause menu and its save/load slot list, the map, the touch controls, the start
+bag screen, the shop screen, the pause menu and its save/load slot list, the map, the touch controls, the start
 menu, and the Playground's settings panel. Placeholder look: dark
 Endesga 32 boxes, the default font, drawn in the game's 640x360 pixels and scaled by whole
 numbers like the game (x3 at 1920x1080, x2 at 1366x768).
@@ -135,7 +142,11 @@ last good save.
 1. Movement - 8 directions, instant-to-glide, Ice/Heavy, dash, knockback, speed zones: **built**.
 2. Facing and animation - 4 or 8, aim separate from walking: **built**. Camera and rooms: **built**.
 3. Interaction - one key, best nearby target: **built**.
-4. Pickups and inventory - auto and manual, hotbar, chests as inventories: **built**.
+4. Pickups and inventory - hotbar, chests as inventories: **built**. Phase 13b: each item picks
+   how it is taken (walk onto it / press E / magnet, magnet reach and speed per item; a scene object
+   can override), every source puts items on the floor the same way (chests that spill, the shop's
+   floor delivery, crate and enemy drops, dropping), and the bag screen drops any slot (a per-item
+   "droppable" switch).
 5. Shooting - weapons, reused bullets, health, damage, recoil, tiny enemies: **built**.
 6. Screens and the Playground picker: **built** (phase 6).
 7. Ground tiles (normal, red, blue, crumbling, door) and grid-step movement: **built** (phase 8,
@@ -158,6 +169,6 @@ last good save.
 - Every playtest: movement feel (Instant vs Glide, wall slide), facing (8 directions, walk
   speed), combat numbers, the RPG room (reach, facing vs closest, magnet), and now the screens
   (sizes, readability, the settings panel), and now grid step (pace, slide time) and the
-  tiles (crumble timing, how forgiving red is), and the phase 9 weapons (swing, charge, bounce, assist), and the phase 10 enemies (boss difficulty, group spacing, trail damage), and the Dungeon (room sizes, wave difficulty, how often crates drop), and the sounds, bits, hit-stop lengths and tint colours, and now the shop prices, the map and the touch controls (never touched with a finger). Nobody has played or heard any of it yet.
+  tiles (crumble timing, how forgiving red is), and the phase 9 weapons (swing, charge, bounce, assist), and the phase 10 enemies (boss difficulty, group spacing, trail damage), and the Dungeon (room sizes, wave difficulty, how often crates drop), and the sounds, bits, hit-stop lengths and tint colours, and now the shop prices, the map and the touch controls (never touched with a finger), and the pickup modes (gem reach, how far away "walk away first" is, the bag screen's look). Nobody has played or heard any of it yet.
 - Real art for everything in `TO-DRAW.md` except the floor, wall, player and aim marker.
 - WebGL build (module not installed), GIFs (only PNG screenshots in `Media/`), GitHub repo and push (the user's call).

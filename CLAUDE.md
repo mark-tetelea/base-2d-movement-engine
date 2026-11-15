@@ -17,8 +17,8 @@ What the player meets, in order:
 - **Face and animate** in 4 or 8 directions (a setting). **Aim is separate from walking**:
   walk one way, aim and shoot another.
 - **Interact**: one key uses the best nearby target - chest, NPC or item, one shared system.
-- **Pick up**: automatic (coins, ammo) or manual (weapons, key items). An inventory with a
-  hotbar; **chests are inventories too**, same system.
+- **Pick up**: walk onto it, press interact, or magnet - a per-item setting. An inventory with a
+  hotbar; **chests are inventories too**, same system. Anything can be dropped back.
 - **Shoot**: weapon settings, bullets reused rather than created per shot, health,
   damage, recoil.
 
@@ -132,7 +132,7 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
   (prefab: `Room` + own Floor/Walls tilemaps painted closed + door spots side/cell), `RoomGenerator`
   (settings: start/end/allowed pieces, room count, seed 0 = random; stamps tiles into the level's
   tilemaps, cuts doors as door ground + `TileDoor` on each room's `RoomLock`, points enemies/locks/boss
-  bar at the level; `Awake` order -100), `Drops` (add-on: weighted drop table on death), `DungeonGoal`.
+  bar at the level; `Awake` order -100), `Drops` (add-on: weighted table on death, prefab or item lines; crates, enemies), `DungeonGoal`.
   Crate = prefab (sprite, static collider, `Health` team 2, `Drops`). Pieces in `Assets/Prefabs/Rooms/`,
   `Crate` in `Prefabs/World/`, `Coin`/`Heart` in `Prefabs/Pickups/`. A new piece = a new prefab, no code.
 - `Assets/Scripts/Feel/` (phase 12, add-on: delete it and the game is silent, nothing breaks) -
@@ -154,7 +154,7 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
   raise `SaveGame.Version` + an upgrade step. `Tools/measure/save.cs` is its check.
 - `Assets/Scripts/Shop/` (phase 13, add-on) - `Shop` (an `Interactable`; the trade rule `Buy`/`Sell` tries
   the whole trade on a copy of the bag; sell price = stock price x `sellRate`), `ShopStock` (asset: item,
-  price, amount, -1 endless; in `Assets/Data/Shops/`), `ShopScreen` (buy/sell on the shared panel).
+  price, amount, -1 endless; in `Assets/Data/Shops/`), `ShopScreen` (buy/sell on the shared panel); `delivery` IntoBag / OnFloor.
 - `Assets/Scripts/Map/` (phase 13, add-on) - `Minimap` (Off / Corner / FullOnKey, M or a click opens the full
   map; rooms appear when visited = `Room.Visited`; enemies and items optional). Looks only.
 - `Assets/Scripts/Touch/` (phase 13, add-on) - `TouchControls` (Auto / On / Off; move stick, aim stick that
@@ -164,8 +164,9 @@ Movement, on the Unity URP 2D template (URP settings in `Assets/Settings/`;
   `Interactable` base + targets `Talker`, `LockedDoor`, `Lever` (and `Chest`, `Pickup`),
   `Interactor` (E as data; open panels pause walking), `InteractPrompt`, `TextBox` +
   `DialogueLines`. `Assets/Scripts/Inventory/` - `Inventory` (the one rule, plain C#, used by
-  bag and chests), `Bag`, `Item`, `Pickup` (auto/manual, heal, ammo), `Collector` (magnet),
-  `Hotbar`, `ChestScreen`, `RpgGoal` (coins and win text into the `Hud`).
+  bag and chests), `Bag`, `Item` (pickup mode Walk/Interact/Magnet, magnet reach/speed, droppable), `Pickup` (mode
+  from item or override, heal, ammo; `Spawn` = the one way items reach the floor), `Collector` (walk + magnet),
+  `Hotbar` (`DropSlot`), `BagScreen` (I; click drops), `ChestScreen`, `Chest` (`spillOnOpen`), `RpgGoal`.
 - `Assets/Scripts/Screens/` - UI Toolkit built in code: `KitUI` (the one panel, 640x360 scaled
   by the camera's `pixelRatio`; EventSystem; `PointerOverUI`; shared box/button/slot looks),
   `Hud` (health, ammo, hotbar, status, banner, boss bar, help - all optional), `PauseMenu` (Esc,

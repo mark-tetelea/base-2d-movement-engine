@@ -1,62 +1,60 @@
 # Next
 
-> Overwritten at every `/handoff`. Written 2026-11-14, end of phase 13 (save/load, shop, minimap, touch).
+> Overwritten at every `/handoff`. Written 2026-11-15, end of phase 13b (item pickup pass).
 
 ## Do first
 
-1. **Phase 13b of `Docs/ROADMAP.md` (item pickup pass)** - when the counselor starts it. The shop is ready
-   for it: `Shop.BuyLine` puts the item straight in the bag today; 13b decides whether a bought item can
-   instead land on the floor / come with a pickup mode. Loose floor items are saved already
-   (`SaveData.floorItems`: item, count, position, auto) - if 13b adds a per-item pickup mode, that is a
-   save-shape change: raise `SaveGame.Version` and add an upgrade step (traps 46-47).
-2. The playtests from `CONTEXT.md`, "What is not done" - now including the shop prices, the map and the
-   touch controls on a real phone (nobody has touched them with a finger).
+1. **Phase 14 of `Docs/ROADMAP.md` (make everything swappable)** - when the counselor starts it. Notes for it below
+   ("Phase 14 notes").
+2. The playtests from `CONTEXT.md`, "What is not done" - now including the pickup modes (Playground row in room A:
+   potion walk, gem magnet, crown press E, coin overridden to press E), dropping (Q, I bag screen) and the hermit's
+   spilling chest in LittleRpg.
 
 ## Half-done (for the phase 15 test pass)
 
-- **Phase 13 was checked by** `Tools/measure/save.cs` (the vital one, ALL PASS 4 runs) and one smoke run per
-  scene (LOG 2026-11-14). Run `save.cs` again after any change to a saved system. Phase 15 should add:
-  multi-touch with two fingers (move + aim at once) - UI Toolkit pointer ids through the EventSystem are
-  unverified; touch Auto turning on from a real touch; the touch layout over the hotbar and HUD on a 16:9
-  phone and at 1366x768; a look at the minimap (corner and full) and the shop screen on a capture (trap 81);
-  buying/selling by mouse clicks (only entry points were driven, trap 39); Save/Load buttons by click.
-- **Unsure / known gaps:** crates are not saved (a reload brings broken crates back, coins can be farmed);
-  enemies not in a room's waves come back on load (the Playground's wanderers); heal-only pickups dropped at
-  run time (crate hearts) are not saved; a renamed or moved scene object loses its saved state (warning in the
-  console); save ids include `#k` for same-named siblings, worked out at scene start; settings are written
-  from the values seen in the last half second of real time; the Gun's ammo and selected weapon, the hotbar
-  selection and facing are not saved; no "Continue" on the start menu (load is from the pause menu only);
-  the shopkeeper uses the NPC sprite tinted; potions and gems do nothing.
-- **Found, not fixed (phase 11):** in some Dungeon layouts the player spawns overlapping something and is
-  pushed ~1 tile up in the first 3 steps (seen on several seeds, spawn y 11 -> 12.0).
-- **Editor quirk:** in play mode the editor's mouse can read as held (trap 84) - a fresh Dungeon's player
-  then fires once on spawn. Any play check that compares positions should add its own Mouse like `save.cs`.
-- From phase 12: timeScale after mixes of freezes/pauses/loads, hit-stop at 30 vs 144 fps, sound and effect
-  pools; Lever plays DoorOpen when it closes; enemy shots use the Shot sound; Footsteps only on keyboard
-  players; DayNight multiplies a coloured global light. Phase 14 notes: Feel now also listens to `Shop` and
-  `SaveGame`; Save depends on Inventory, Combat, Interaction, Camera, World and Shop; Map and Touch depend
-  only on core + Screens; the Playground picker has rows for Map and Touch.
-- From before: phase 11/10/9 smoke-only items, re-run `combat.cs` and `bullet-alloc.cs`, camera check flake,
-  broken crumbling in "blocks" mode, tiles closing on someone, `screens.cs` at WXGA, WebGL module + build,
-  GitHub push, GIFs, `Assets/_Recovery/` to delete, default font, warning `Pickup.All` hides
-  `Interactable.All`, aim assist bends toward crates.
+- **Phase 13b was checked by** one scripted Playground / LittleRpg / Dungeon run each (entry points, not keys) and
+  `Tools/measure/save.cs` (ALL PASS on the last run, 46 checks; LOG 2026-11-15). Phase 15 should add: a pickup check
+  (each mode, item reach vs collector reach, "walk away first", droppable off, shop OnFloor, chest spill, enemy
+  drops) driven by real keys; the bag screen by mouse clicks and on a capture (traps 39, 81).
+- **`save.cs` failed once on a Dungeon layout** (seed 1931867546): "player moved 0.26 tiles" after loading. Probably the
+  known phase 11 spawn overlap; not re-run on that seed. Try it with a fixed seed on the generator.
+- **Unsure (13b):** a spilled chest throws each stack as one pile (25 coins = one pickup of 25), not 25 coins; the
+  bag screen drops the whole stack, Q drops one; Shop OnFloor lands at `deliverAt` (0, -1.5) from the shop - inside
+  a wall if a shop stands with a wall below it; dropped items land 1 tile in front even into a wall (as before);
+  "walk away first" uses the collector's reach for that item (4.5 tiles for the gem), so a dropped gem needs a long walk;
+  `Drops` seed 0 is by position in 1/16 tiles, so two enemies dying on the same spot drop the same; the LittleRpg shop
+  stays IntoBag (OnFloor only checked by setting it at run time).
+- **Phase 14 notes:** `World/Drops` now depends on `Inventory` (`Pickup.Spawn`, `Item`); `Shop` and `Chest` call
+  `Pickup.Spawn`; `BagScreen` depends on `Hotbar`, `Interactor`, `KitUI`. The I key is hard-coded like Q and T.
+- From phase 13: multi-touch with two fingers, touch Auto from a real touch, touch layout at 1366x768, minimap and
+  shop screen on a capture, buying/selling by clicks, Save/Load by click. Known gaps: crates are not saved (coins can
+  be farmed); enemies not in waves come back on load; heal-only pickups dropped at run time are not saved; a renamed
+  or moved scene object loses its saved state; the Gun's ammo, selected weapon, hotbar selection and facing are not
+  saved; no "Continue" on the start menu; potions and gems do nothing.
+- **Found, not fixed (phase 11):** in some Dungeon layouts the player spawns overlapping something and is pushed ~1
+  tile up in the first 3 steps.
+- **Editor quirk:** in play mode the editor's mouse can read as held (trap 84); play checks that compare positions
+  should add their own Mouse like `save.cs`.
+- From before: phase 12/11/10/9 smoke-only items, re-run `combat.cs` and `bullet-alloc.cs`, camera check flake, broken
+  crumbling in "blocks" mode, tiles closing on someone, `screens.cs` at WXGA, WebGL module + build, GitHub push,
+  GIFs, `Assets/_Recovery/` to delete, default font, aim assist bends toward crates.
 
 ## Waiting on the user
 
-- Playtests (everything so far, now also the shop, the map and touch on a phone). WebGL module install,
-  repo push.
+- Playtests (everything so far, now also the pickup modes and dropping). WebGL module install, repo push.
 
 ## Don't
 
-- Don't change `SaveData` (or any saved struct) without raising `SaveGame.Version` and adding an upgrade step
+- Don't change `SaveData` (or any saved struct) without raising `SaveGame.Version` (now 2) and adding an upgrade step
   that works by what values mean; never let `JsonUtility` see a file `SaveFiles` has not checked.
-- Don't run play checks against the real save folder: set `SaveFiles.FolderOverride` (trap 50). Leaving play
-  mode writes the settings file.
-- Don't read components in `OnDisable` to save them (trap 86).
-- Don't make the pause menu know about saving: add-ons use `PauseMenu.AddButton`.
-- Don't add Android/iOS build targets (still on "Do NOT build yet").
-- Don't reorder `FeelEvent` - add at the end. Don't make core code call `FeelPlayer`.
+- Don't put items on the floor any way but `Pickup.Spawn` (or a Pickup prefab); don't bring back a per-pickup `auto`.
+- Don't put `Drops` on the shared enemy prefabs: the Arena's player has no bag or collector (drops go on scene /
+  room-piece instances).
+- Don't run play checks against the real save folder: set `SaveFiles.FolderOverride` (trap 50). Leaving play mode
+  writes the settings file.
+- Don't read components in `OnDisable` to save them (trap 86). Don't make the pause menu know about saving.
+- Don't add Android/iOS build targets. Don't reorder `FeelEvent`. Don't make core code call `FeelPlayer`.
 - Don't write or run checks per phase beyond the vital ones (user, 2026-11-14).
-- From before: no hand-painted generated rooms, no second door system, no Crate class, no navmesh, no tile
-  code in enemies, don't drive mouse presses through `Mouse.current` (trap 84), don't recompile while
-  `isPlaying` (trap 83), don't change the licence, don't push or add a remote without the user saying so.
+- From before: no hand-painted generated rooms, no second door system, no Crate class, no navmesh, no tile code in
+  enemies, don't drive mouse presses through `Mouse.current` (trap 84), don't recompile while `isPlaying` (trap 83),
+  don't change the licence, don't push or add a remote without the user saying so.

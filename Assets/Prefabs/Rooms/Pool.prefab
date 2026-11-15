@@ -9418,8 +9418,46 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4318442639698110231, guid: 5c46b5828a5ad5a46bde9a775d4ec6bb, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8700535920770391353}
   m_SourcePrefab: {fileID: 100100000, guid: 5c46b5828a5ad5a46bde9a775d4ec6bb, type: 3}
+--- !u!1 &2677381979204200071 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4318442639698110231, guid: 5c46b5828a5ad5a46bde9a775d4ec6bb, type: 3}
+  m_PrefabInstance: {fileID: 2218524240563700112}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8700535920770391353
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2677381979204200071}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb78a69aaccbb284caa6c75254fb1009, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TopDownKit.Drops
+  table:
+  - prefab: {fileID: 0}
+    item: {fileID: 11400000, guid: ce97f8f48707b0a4c96e15f33a17f8d3, type: 2}
+    weight: 4
+    count: 1
+  - prefab: {fileID: 0}
+    item: {fileID: 11400000, guid: ce97f8f48707b0a4c96e15f33a17f8d3, type: 2}
+    weight: 1.5
+    count: 3
+  - prefab: {fileID: 5335667598045648478, guid: e922fcd008418a346a3e9e04547b60a9, type: 3}
+    item: {fileID: 0}
+    weight: 1.5
+    count: 1
+  nothingWeight: 3
+  rolls: 1
+  scatter: 0.35
+  seed: 0
+  itemSortingOrder: 1
 --- !u!4 &7443510084162740370 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8756511639046086914, guid: 5c46b5828a5ad5a46bde9a775d4ec6bb, type: 3}
@@ -9480,8 +9518,46 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4318442639698110231, guid: 5c46b5828a5ad5a46bde9a775d4ec6bb, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6157146407168663804}
   m_SourcePrefab: {fileID: 100100000, guid: 5c46b5828a5ad5a46bde9a775d4ec6bb, type: 3}
+--- !u!1 &1925369708134358642 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4318442639698110231, guid: 5c46b5828a5ad5a46bde9a775d4ec6bb, type: 3}
+  m_PrefabInstance: {fileID: 2402240762885339493}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6157146407168663804
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1925369708134358642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb78a69aaccbb284caa6c75254fb1009, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TopDownKit.Drops
+  table:
+  - prefab: {fileID: 0}
+    item: {fileID: 11400000, guid: ce97f8f48707b0a4c96e15f33a17f8d3, type: 2}
+    weight: 4
+    count: 1
+  - prefab: {fileID: 0}
+    item: {fileID: 11400000, guid: ce97f8f48707b0a4c96e15f33a17f8d3, type: 2}
+    weight: 1.5
+    count: 3
+  - prefab: {fileID: 5335667598045648478, guid: e922fcd008418a346a3e9e04547b60a9, type: 3}
+    item: {fileID: 0}
+    weight: 1.5
+    count: 1
+  nothingWeight: 3
+  rolls: 1
+  scatter: 0.35
+  seed: 0
+  itemSortingOrder: 1
 --- !u!4 &6400487868452837479 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8756511639046086914, guid: 5c46b5828a5ad5a46bde9a775d4ec6bb, type: 3}
@@ -9542,13 +9618,51 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8776155304733538664, guid: e314b2de97f46684da114521491b1d19, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7757487514978636876}
   m_SourcePrefab: {fileID: 100100000, guid: e314b2de97f46684da114521491b1d19, type: 3}
 --- !u!4 &2511795050319309386 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 397319016577244491, guid: e314b2de97f46684da114521491b1d19, type: 3}
   m_PrefabInstance: {fileID: 2835086059686459137}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &6814813753017142889 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8776155304733538664, guid: e314b2de97f46684da114521491b1d19, type: 3}
+  m_PrefabInstance: {fileID: 2835086059686459137}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7757487514978636876
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6814813753017142889}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb78a69aaccbb284caa6c75254fb1009, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TopDownKit.Drops
+  table:
+  - prefab: {fileID: 0}
+    item: {fileID: 11400000, guid: ce97f8f48707b0a4c96e15f33a17f8d3, type: 2}
+    weight: 4
+    count: 1
+  - prefab: {fileID: 0}
+    item: {fileID: 11400000, guid: ce97f8f48707b0a4c96e15f33a17f8d3, type: 2}
+    weight: 1.5
+    count: 3
+  - prefab: {fileID: 5335667598045648478, guid: e922fcd008418a346a3e9e04547b60a9, type: 3}
+    item: {fileID: 0}
+    weight: 1.5
+    count: 1
+  nothingWeight: 3
+  rolls: 1
+  scatter: 0.35
+  seed: 0
+  itemSortingOrder: 1
 --- !u!1001 &4546385600143362430
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9604,13 +9718,51 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8776155304733538664, guid: e314b2de97f46684da114521491b1d19, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2507686202283565058}
   m_SourcePrefab: {fileID: 100100000, guid: e314b2de97f46684da114521491b1d19, type: 3}
 --- !u!4 &4223125308412728373 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 397319016577244491, guid: e314b2de97f46684da114521491b1d19, type: 3}
   m_PrefabInstance: {fileID: 4546385600143362430}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &5103470485404020758 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8776155304733538664, guid: e314b2de97f46684da114521491b1d19, type: 3}
+  m_PrefabInstance: {fileID: 4546385600143362430}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2507686202283565058
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5103470485404020758}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb78a69aaccbb284caa6c75254fb1009, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TopDownKit.Drops
+  table:
+  - prefab: {fileID: 0}
+    item: {fileID: 11400000, guid: ce97f8f48707b0a4c96e15f33a17f8d3, type: 2}
+    weight: 4
+    count: 1
+  - prefab: {fileID: 0}
+    item: {fileID: 11400000, guid: ce97f8f48707b0a4c96e15f33a17f8d3, type: 2}
+    weight: 1.5
+    count: 3
+  - prefab: {fileID: 5335667598045648478, guid: e922fcd008418a346a3e9e04547b60a9, type: 3}
+    item: {fileID: 0}
+    weight: 1.5
+    count: 1
+  nothingWeight: 3
+  rolls: 1
+  scatter: 0.35
+  seed: 0
+  itemSortingOrder: 1
 --- !u!1001 &6208239753255058894
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9728,8 +9880,46 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8776155304733538664, guid: e314b2de97f46684da114521491b1d19, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3604551124912853258}
   m_SourcePrefab: {fileID: 100100000, guid: e314b2de97f46684da114521491b1d19, type: 3}
+--- !u!1 &2627150775169299003 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8776155304733538664, guid: e314b2de97f46684da114521491b1d19, type: 3}
+  m_PrefabInstance: {fileID: 6755022813714107219}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3604551124912853258
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2627150775169299003}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb78a69aaccbb284caa6c75254fb1009, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TopDownKit.Drops
+  table:
+  - prefab: {fileID: 0}
+    item: {fileID: 11400000, guid: ce97f8f48707b0a4c96e15f33a17f8d3, type: 2}
+    weight: 4
+    count: 1
+  - prefab: {fileID: 0}
+    item: {fileID: 11400000, guid: ce97f8f48707b0a4c96e15f33a17f8d3, type: 2}
+    weight: 1.5
+    count: 3
+  - prefab: {fileID: 5335667598045648478, guid: e922fcd008418a346a3e9e04547b60a9, type: 3}
+    item: {fileID: 0}
+    weight: 1.5
+    count: 1
+  nothingWeight: 3
+  rolls: 1
+  scatter: 0.35
+  seed: 0
+  itemSortingOrder: 1
 --- !u!4 &6358281128806110744 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 397319016577244491, guid: e314b2de97f46684da114521491b1d19, type: 3}
@@ -9790,10 +9980,48 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4399011810951718566, guid: eead054c1001f61408a41b847d0dc1ef, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5807534438005686434}
   m_SourcePrefab: {fileID: 100100000, guid: eead054c1001f61408a41b847d0dc1ef, type: 3}
 --- !u!4 &710892843237156334 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 9202009508659006645, guid: eead054c1001f61408a41b847d0dc1ef, type: 3}
   m_PrefabInstance: {fileID: 8532495703218825563}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &5433010543988428797 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4399011810951718566, guid: eead054c1001f61408a41b847d0dc1ef, type: 3}
+  m_PrefabInstance: {fileID: 8532495703218825563}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5807534438005686434
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5433010543988428797}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb78a69aaccbb284caa6c75254fb1009, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TopDownKit.Drops
+  table:
+  - prefab: {fileID: 0}
+    item: {fileID: 11400000, guid: ce97f8f48707b0a4c96e15f33a17f8d3, type: 2}
+    weight: 4
+    count: 1
+  - prefab: {fileID: 0}
+    item: {fileID: 11400000, guid: ce97f8f48707b0a4c96e15f33a17f8d3, type: 2}
+    weight: 1.5
+    count: 3
+  - prefab: {fileID: 5335667598045648478, guid: e922fcd008418a346a3e9e04547b60a9, type: 3}
+    item: {fileID: 0}
+    weight: 1.5
+    count: 1
+  nothingWeight: 3
+  rolls: 1
+  scatter: 0.35
+  seed: 0
+  itemSortingOrder: 1
