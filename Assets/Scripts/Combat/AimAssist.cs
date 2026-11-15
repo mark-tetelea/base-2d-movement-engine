@@ -28,7 +28,7 @@ namespace TopDownKit
             for (int i = 0; i < all.Count; i++)
             {
                 Health h = all[i];
-                if (h == null || h.team == team || h.Dead) continue;
+                if (h == null || h.team == team || h.Dead || !h.aimAssistTarget) continue;   // crates are not targets (user, 2026-11-15)
                 Vector2 d = (Vector2)h.transform.position - origin;
                 float dist = d.magnitude;
                 if (dist > s.range || dist < 1e-4f || dist >= bestDist) continue;

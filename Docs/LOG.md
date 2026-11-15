@@ -826,3 +826,13 @@ crates are team 2) - a choice for the user, not a bug.
 69. Nearest-colour remap flattens art -> pin big areas by role first.
 70. Migration does a third of the job -> never read from the path you write; a substitution table is not a pipeline.
 
+
+## 2026-11-15 - Aim assist skips crates
+
+**Decided:**
+- **Aim assist only bends toward a Health with `aimAssistTarget` on (default on); the Crate prefab has it off.**
+  **Why:** the user ("skip crates") - a crate nearer in the cone than an enemy used to take the assist.
+  **Consequence:** a per-object setting, not a team rule; any game prop that is only in the way turns it off.
+
+**Measured / verified:** combat2.cs ALL PASS 13 (one run): a crate 4 tiles at +10 deg and an enemy 6 tiles at
+-10 deg, strength 0.7 -> the shot leaves at -6.91 deg (toward the enemy). The same case with the flag on was not run.

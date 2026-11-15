@@ -27,6 +27,8 @@ namespace TopDownKit
         [Min(0f)] public float shakeOnHit;
         [Tooltip("Destroy the object when health reaches 0. Off for the player (something else restarts).")]
         public bool destroyOnDeath = true;
+        [Tooltip("Aim assist may bend shots toward this. Off for things that are only in the way (crates).")]
+        public bool aimAssistTarget = true;
 
         public int Current { get; private set; }
         public bool Dead => started && Current <= 0;

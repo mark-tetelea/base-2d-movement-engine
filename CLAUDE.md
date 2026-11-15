@@ -121,7 +121,7 @@ says what each folder needs and what goes with it.
 - `Assets/Scripts/Combat/` - `Damage` (the one damage rule), `Health` (teams, invulnerable
   time, flash, knockback on the target, dash protects), `Weapon` (asset, settings only),
   `Gun` (input as data: aim, trigger, reload, select; charge = hold/release; aim assist
-  `AimAssist.Nudge`, strength 0 = off), `Bullet` (fixed step, circle sweep, `ObjectPool`;
+  `AimAssist.Nudge`, strength 0 = off; skips a Health with `aimAssistTarget` off - crates), `Bullet` (fixed step, circle sweep, `ObjectPool`;
   flies over `ShootOver` colliders; `Weapon.bounces` reflects off walls), melee = `Weapon.kind`
   Melee: `Melee` (the one swing rule) + add-on `MeleeSwing` (Gun adds it), `PlayerShooter` (controls -> Gun), add-ons `RoomWaves` (clears a
   `RoomLock`), `RestartOnDeath`. Demo rules (`ArenaGoal`, `RpgGoal`, `DungeonGoal`, `Picker`, `KnockKey`) are in `Assets/Scripts/Demos/`. Weapons in `Assets/Data/Weapons/`,

@@ -7,7 +7,7 @@
 //   - Charger: held past chargeTime then let go = damage x chargeDamage; a tap = plain damage.
 //   - Bouncer: fired at a wall, the bullet comes back (still alive, flying the other way).
 //   - Aim assist: strength 0.7, target 10 deg off -> the shot leaves 7 deg off; strength 0 -> 0;
-//     a target outside the cone -> 0.
+//     a target outside the cone -> 0; a nearer crate (aimAssistTarget off) is skipped.
 //   - Hit-stop: the same sword hit with hit-stop on and off gives the same dummy path step by
 //     step (the freeze only waits); a freeze stops the fixed step and gives timeScale back;
 //     a pause during a freeze stays paused.
@@ -113,7 +113,7 @@ tasks.Add(("bounce", s =>
     return true;
 }));
 
-float a7 = 99f, a0 = 99f, aOut = 99f;
+float a7 = 99f, a0 = 99f, aOut = 99f, aCrate = 99f; GameObject crate = null;
 tasks.Add(("aim assist", s =>
 {
     float ang = 10f * Mathf.Deg2Rad;
@@ -137,7 +137,17 @@ tasks.Add(("aim assist", s =>
     if (s == 82) gun.SetTrigger(true);
     if (s == 83) gun.SetTrigger(false);
     if (s == 84) { var b = OneBullet(); aOut = b != null ? Deg(Vel(b)) : 99f; }
-    if (s < 90) return false;
+    if (s == 100)
+    {
+        float c = 10f * Mathf.Deg2Rad, e = -10f * Mathf.Deg2Rad;
+        crate = UnityEngine.Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/World/Crate.prefab"), new Vector3(4f * Mathf.Cos(c), 4f * Mathf.Sin(c), 0f), Quaternion.identity);
+        d1.transform.position = new Vector3(6f * Mathf.Cos(e), 6f * Mathf.Sin(e), 0f); d1.GetComponent<Rigidbody2D>().position = d1.transform.position;
+    }
+    if (s == 102) gun.SetTrigger(true);
+    if (s == 103) gun.SetTrigger(false);
+    if (s == 104) { var b = OneBullet(); aCrate = b != null ? Deg(Vel(b)) : 99f; UnityEngine.Object.Destroy(crate); }
+    if (s < 110) return false;
+    Check("aim assist skips crates (aimAssistTarget off): a nearer crate 10 deg up, an enemy 10 deg down -> bends down 7 deg", Mathf.Abs(aCrate + 7f) < 0.2f, aCrate.ToString("F2") + " deg");
     Check("aim assist 0.7: a target 10 deg off bends the shot 7 deg", Mathf.Abs(a7 - 7f) < 0.2f, a7.ToString("F2") + " deg");
     Check("aim assist 0: the shot goes straight", Mathf.Abs(a0) < 0.01f, a0.ToString("F2") + " deg");
     Check("aim assist: a target outside the cone (25 deg, cone 15) is ignored", Mathf.Abs(aOut) < 0.01f, aOut.ToString("F2") + " deg");

@@ -161,6 +161,7 @@ MonoBehaviour:
   blinkWhileInvulnerable: 0
   shakeOnHit: 0
   destroyOnDeath: 1
+  aimAssistTarget: 0
 --- !u!114 &3431521630276512739
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -175,18 +176,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TopDownKit.Drops
   table:
   - prefab: {fileID: 6803719738244574062, guid: b695a4db38e84894ca6b27271e0d5401, type: 3}
+    item: {fileID: 0}
     weight: 5
     count: 1
   - prefab: {fileID: 6803719738244574062, guid: b695a4db38e84894ca6b27271e0d5401, type: 3}
+    item: {fileID: 0}
     weight: 2
     count: 3
   - prefab: {fileID: 5335667598045648478, guid: e922fcd008418a346a3e9e04547b60a9, type: 3}
+    item: {fileID: 0}
     weight: 1.5
     count: 1
   nothingWeight: 3
   rolls: 1
   scatter: 0.35
   seed: 1
+  itemSortingOrder: 1
 --- !u!114 &2412336416830457016
 MonoBehaviour:
   m_ObjectHideFlags: 0

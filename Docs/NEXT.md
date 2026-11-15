@@ -26,8 +26,6 @@
 
 ## Waiting on the user
 
-- **Aim assist and crates:** the rule bends shots toward any living Health of another team, so a crate (team 2)
-  in the cone and nearer than an enemy wins. Keep, or skip crates (a setting)? Recommendation: skip team 2.
 - Playtests (everything; nobody has played any of it). WebGL module, GIFs, repo push.
 
 ## Don't
